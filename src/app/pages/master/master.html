@@ -1,6 +1,53 @@
-<p>master works!</p>
-<h2>Master Panel</h2>
+<div class="master-page">
 
-<p>
-  <a routerLink="/master/offices">Ir a Offices</a>
-</p>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-text">
+        <div class="app-name">Master ERP</div>
+        <div class="app-sub">Panel de administración</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <section class="hero">
+      <h1>Master Panel</h1>
+      <p>Gestiona oficinas y la configuración base del sistema.</p>
+    </section>
+
+    <section class="grid">
+
+      <a class="card" [routerLink]="['/master/offices']">
+        <div class="card-title">Oficinas</div>
+        <div class="card-desc">
+          Crear, editar y administrar oficinas.
+        </div>
+        <div class="card-cta">Ir a Oficinas →</div>
+      </a>
+
+      <div class="card disabled">
+        <div class="card-title">Empresas</div>
+        <div class="card-desc">
+          Administración de empresas por oficina.
+        </div>
+        <div class="card-cta">Próximamente</div>
+      </div>
+
+      <div class="card disabled">
+        <div class="card-title">Usuarios</div>
+        <div class="card-desc">
+          Usuarios master / admins.
+        </div>
+        <div class="card-cta">Próximamente</div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>© {{ year }} SoluSoft SPA</span>
+  </footer>
+
+</div>

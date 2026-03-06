@@ -1,0 +1,93 @@
+.master-page {
+  min-height: 100vh;
+  background: radial-gradient(1200px 600px at 10% 0%, #e7f0ff 0%, #f4f6f9 45%, #f4f6f9 100%);
+  font-family: Arial, Helvetica, sans-serif;
+  color: #0f172a;
+}
+
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.brand-text .app-name {
+  font-weight: 700;
+  color: #0d47a1;
+  font-size: 18px;
+}
+
+.brand-text .app-sub {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.content {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px 20px;
+}
+
+.hero {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+}
+
+.hero h1 {
+  margin: 0 0 6px 0;
+  color: #0d47a1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+}
+
+.card-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.card-cta {
+  font-weight: bold;
+  color: #0d47a1;
+}
+
+.card.disabled {
+  opacity: 0.6;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+  font-size: 13px;
+}

@@ -1,61 +1,80 @@
 <div class="page">
-  <!-- Header -->
-  <div class="page-header">
-    <div>
-      <h1 class="title">Oficinas</h1>
-      <p class="subtitle">Administración de oficinas (Master)</p>
+  <div class="page-shell">
+    <div class="hero-card">
+      <div class="hero-left">
+        <div class="hero-kicker">MASTER ERP · SOLUSOFT</div>
+        <h1 class="title">Oficinas</h1>
+        <p class="subtitle">Administración de oficinas del panel master</p>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn-primary" type="button">
+          <span class="btn-icon">＋</span>
+          <span>Nueva oficina</span>
+        </button>
+      </div>
     </div>
 
-    <button class="btn-primary" type="button">
-      + Nueva oficina
-    </button>
-  </div>
-
-  <!-- Estados -->
-  <div *ngIf="loading" class="state">
-    Cargando oficinas...
-  </div>
-
-  <div *ngIf="!loading && (errorMsg.length > 0)" class="state error">
-    {{ errorMsg }}
-  </div>
-
-  <!-- Contenido -->
-  <ng-container *ngIf="!loading && (errorMsg.length === 0)">
-    <div *ngIf="offices.length === 0" class="state empty">
-      No hay oficinas registradas.
+    <div *ngIf="loading" class="state-card">
+      <div class="state-text">Cargando oficinas...</div>
     </div>
 
-    <div *ngIf="offices.length > 0" class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>RUT</th>
-            <th>Nombre</th>
-            <th>Razón social</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th class="right">Estado</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr *ngFor="let o of offices">
-            <td class="muted">{{ o.id }}</td>
-            <td>{{ o.rut }}</td>
-            <td class="strong">{{ o.name }}</td>
-            <td class="muted">{{ o.legal_name }}</td>
-            <td>{{ o.email }}</td>
-            <td>{{ o.phone }}</td>
-            <td class="right">
-              <span class="badge" [class.on]="o.status == 1" [class.off]="o.status != 1">
-                {{ o.status == 1 ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div *ngIf="!loading && errorMsg" class="state-card error">
+      <div class="state-text">{{ errorMsg }}</div>
     </div>
-  </ng-container>
+
+    <ng-container *ngIf="!loading && !errorMsg">
+      <div *ngIf="offices.length === 0" class="state-card empty">
+        <div class="state-text">No hay oficinas registradas.</div>
+      </div>
+
+      <div *ngIf="offices.length > 0" class="table-card">
+        <div class="table-toolbar">
+          <div>
+            <h2>Listado de oficinas</h2>
+            <p>{{ offices.length }} registro(s) encontrados</p>
+          </div>
+
+          <div class="toolbar-chip">Panel master</div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Razón social</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let o of offices">
+                <td>
+                  <span class="id-pill">#{{ o.id }}</span>
+                </td>
+                <td>{{ o.rut }}</td>
+                <td class="strong">{{ o.name }}</td>
+                <td>{{ o.legal_name }}</td>
+                <td>{{ o.email }}</td>
+                <td>{{ o.phone }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [class.active]="o.status == 1"
+                    [class.inactive]="o.status != 1">
+                    {{ o.status == 1 ? 'Activa' : 'Inactiva' }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+  </div>
 </div>

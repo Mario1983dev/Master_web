@@ -1,295 +1,199 @@
-/* =========================================================
-   SoluSoft Master ERP - Oficinas (corporativo)
-   Solo CSS (no toca TS/HTML)
-   ========================================================= */
-
-/* Tokens */
 :host {
-  --brand: #0D47A1;
-  --brand2: #0a3a86;
-  --accent: #1e88e5;
-
-  --bg0: #0b1220;          /* fondo */
-  --bg1: #0f1a2f;          /* capa */
-  --card: rgba(255,255,255,.06);
-  --card2: rgba(255,255,255,.08);
-  --line: rgba(255,255,255,.10);
-  --line2: rgba(255,255,255,.14);
-
-  --text: rgba(255,255,255,.92);
-  --muted: rgba(255,255,255,.70);
-
-  --ok: #22c55e;
-  --bad: #ef4444;
-
-  --shadow: 0 18px 60px rgba(0,0,0,.35);
-  --radius: 18px;
-  color: var(--text);
+  display: block;
 }
 
-/* Fondo corporativo + “watermark” suave */
 .page {
-  min-height: calc(100vh - 24px);
-  padding: 28px;
-
-  /* capa base */
-  background:
-    radial-gradient(900px 450px at 10% 8%, rgba(13,71,161,.38), transparent 55%),
-    radial-gradient(700px 420px at 92% 12%, rgba(30,136,229,.25), transparent 60%),
-    radial-gradient(800px 520px at 40% 100%, rgba(34,197,94,.10), transparent 60%),
-    linear-gradient(180deg, var(--bg0), var(--bg1));
-
-  position: relative;
-  overflow: hidden;
+  min-height: 100vh;
+  padding: 24px;
+  background: #eef3f8;
 }
 
-/* textura/grid muy sutil */
-.page::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(255,255,255,.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,.03) 1px, transparent 1px);
-  background-size: 46px 46px;
-  opacity: .25;
-  pointer-events: none;
-}
-
-/* brillo diagonal */
-.page::after {
-  content: "";
-  position: absolute;
-  inset: -200px;
-  background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,.06) 50%, transparent 70%);
-  transform: rotate(-8deg);
-  opacity: .35;
-  pointer-events: none;
-}
-
-/* Contenedor tipo “card” */
-.page > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* Header */
 .page-header {
   display: flex;
-  align-items: flex-end;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  background: #fff;
+  border: 1px solid #e4ebf3;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
 
-  margin: 0 0 16px;
-  padding: 18px 18px;
-
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+.page-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+  color: #6a7f9b;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
 
 .title {
   margin: 0;
-  font-size: 28px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  font-size: 42px;
+  line-height: 1;
+  color: #0d47a1;
+  font-weight: 800;
 }
 
 .subtitle {
-  margin: 8px 0 0;
-  font-size: 13px;
-  color: var(--muted);
+  margin: 10px 0 0;
+  font-size: 15px;
+  color: #607086;
 }
 
-/* Botón corporativo */
 .btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 11px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.12);
-
-  background: linear-gradient(180deg, var(--brand), var(--brand2));
+  border: none;
+  border-radius: 14px;
+  padding: 14px 20px;
+  background: #0d47a1;
   color: #fff;
-  font-weight: 800;
   font-size: 14px;
-
+  font-weight: 700;
   cursor: pointer;
-  transition: transform .06s ease, filter .15s ease, box-shadow .15s ease;
-  box-shadow: 0 12px 30px rgba(13,71,161,.30);
+  box-shadow: 0 8px 20px rgba(13, 71, 161, 0.2);
 }
 
 .btn-primary:hover {
-  filter: brightness(1.08);
+  background: #1565c0;
 }
 
-.btn-primary:active {
-  transform: translateY(1px);
+.state-box {
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  background: #fff;
+  border: 1px solid #e4ebf3;
+  border-radius: 18px;
+  color: #506176;
 }
 
-/* Estados */
-.state {
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,.05);
-  color: var(--muted);
-  box-shadow: 0 10px 30px rgba(0,0,0,.22);
-  backdrop-filter: blur(8px);
+.state-box.error {
+  color: #c62828;
+  background: #fff8f8;
 }
 
-.state.error {
-  background: rgba(239, 68, 68, .14);
-  border-color: rgba(239, 68, 68, .28);
-  color: rgba(255,255,255,.92);
-}
-
-.state.empty {
-  background: rgba(30, 136, 229, .14);
-  border-color: rgba(30, 136, 229, .26);
-  color: rgba(255,255,255,.92);
-}
-
-/* =========================================================
-   Tabla estilo ERP: limpia, espaciosa, filas separadas
-   ========================================================= */
-
-.table-wrap {
-  margin-top: 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,.05);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+.table-card {
+  background: #fff;
+  border: 1px solid #e4ebf3;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
   overflow: hidden;
 }
 
-/* Usamos “border-separate” para look premium */
+.table-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.table-head h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2d3d;
+}
+
+.table-head p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #71839a;
+}
+
+.chip {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #edf4ff;
+  color: #0d47a1;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
 .table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
+  border-collapse: collapse;
 }
 
-/* Header */
-.table thead th {
+.table th {
+  padding: 15px 16px;
   text-align: left;
-  padding: 14px 14px;
   font-size: 12px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: .09em;
-  color: rgba(255,255,255,.78);
-
-  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-  border-bottom: 1px solid var(--line);
+  color: #5d7089;
+  background: #f7faff;
+  border-bottom: 1px solid #e7eef7;
 }
 
-.table thead th:first-child {
-  padding-left: 18px;
-}
-.table thead th:last-child {
-  padding-right: 18px;
-}
-
-/* Body */
-.table tbody td {
-  padding: 14px 14px;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  color: rgba(255,255,255,.90);
-  vertical-align: middle;
+.table td {
+  padding: 16px;
+  font-size: 14px;
+  color: #233142;
+  border-bottom: 1px solid #eef3f8;
 }
 
-.table tbody td:first-child {
-  padding-left: 18px;
-  font-variant-numeric: tabular-nums;
+.table tbody tr:hover td {
+  background: #f9fbff;
 }
 
-.table tbody td:last-child {
-  padding-right: 18px;
+.strong {
+  font-weight: 700;
+  color: #10243e;
 }
 
-.table tbody tr {
-  transition: background .15s ease;
+.id-pill {
+  display: inline-block;
+  min-width: 44px;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: #0d47a1;
+  font-size: 12px;
+  font-weight: 800;
 }
 
-.table tbody tr:hover {
-  background: rgba(13,71,161,.12);
-}
-
-.table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-/* Alineación */
-.right { text-align: right; }
-
-/* Text helpers */
-.muted { color: rgba(255,255,255,.70); }
-.strong { font-weight: 800; }
-
-/* Badge estado */
 .badge {
   display: inline-flex;
+  justify-content: center;
   align-items: center;
-  gap: 8px;
-
+  min-width: 84px;
   padding: 7px 12px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .02em;
-
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
+  font-weight: 800;
 }
 
-/* puntito */
-.badge::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.55);
+.badge.active {
+  background: #e8f7ec;
+  color: #237b3a;
 }
 
-.badge.on {
-  background: rgba(34,197,94,.15);
-  border-color: rgba(34,197,94,.30);
-}
-.badge.on::before { background: var(--ok); }
-
-.badge.off {
-  background: rgba(239,68,68,.14);
-  border-color: rgba(239,68,68,.28);
-}
-.badge.off::before { background: var(--bad); }
-
-/* Mejor lectura de columnas */
-.table td, .table th {
-  white-space: nowrap;
+.badge.inactive {
+  background: #ffecec;
+  color: #c62828;
 }
 
-.table td:nth-child(4),
-.table th:nth-child(4) {
-  white-space: normal; /* Razón social puede partir línea */
-}
-
-/* Responsive */
-@media (max-width: 980px) {
-  .page { padding: 16px; }
-  .page-header {
-    flex-direction: column;
-    align-items: stretch;
+@media (max-width: 900px) {
+  .page {
+    padding: 16px;
   }
-  .btn-primary { width: 100%; justify-content: center; }
-  .table-wrap { overflow-x: auto; }
-  .table { min-width: 980px; }
+
+  .page-header,
+  .table-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title {
+    font-size: 32px;
+  }
 }

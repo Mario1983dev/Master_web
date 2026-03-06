@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { finalize } from 'rxjs/operators';
+import { finalize } from 'rxjs';
 import { OfficesService } from '../../../services/offices.service';
 
 @Component({
@@ -21,27 +21,29 @@ export class Offices implements OnInit {
     this.load();
   }
 
-  load() {
+  load(): void {
+    console.log('LOAD OFFICES -> inicio');
+
     this.loading = true;
     this.errorMsg = '';
 
     this.officesSrv.list()
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (rows: any) => {
-          this.offices = Array.isArray(rows) ? rows : [];
-        },
-        error: (err) => {
-          console.error('LOAD OFFICES ERROR:', err);
-
-          // Si fue 304, lo reportamos explícito para que lo veas
-          if (err?.status === 304) {
-            this.errorMsg = 'El API respondió 304 (Not Modified). Hay caché/ETag activo en /offices.';
-            return;
-          }
-
-          this.errorMsg = err?.error?.message ?? 'No se pudieron cargar las oficinas.';
-        }
-      });
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          console.log('LOAD OFFICES -> finalize, loading=false');
+        })
+      )
+.subscribe({
+  next: (res: any) => {
+    console.log('LOAD OFFICES -> respuesta:', res);
+    this.offices = Array.isArray(res) ? res : [];
+    console.log('LOAD OFFICES -> offices asignadas:', this.offices);
+  },
+  error: (err: any) => {
+    console.error('LOAD OFFICES -> error:', err);
+    this.errorMsg = err?.error?.message || 'No se pudieron cargar las oficinas';
+  }
+});
   }
 }

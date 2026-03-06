@@ -8,4 +8,6 @@ import { RouterModule } from '@angular/router';
   templateUrl: './master.html',
   styleUrls: ['./master.scss']
 })
-export class Master {}
+export class Master {
+  year = new Date().getFullYear();
+}
