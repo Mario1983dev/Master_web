@@ -1,0 +1,122 @@
+<div class="page">
+  <div class="page-shell">
+
+    <!-- Header -->
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">MASTER ERP · SOLUSOFT</span>
+        <h1>Nueva oficina</h1>
+        <p>Crea una nueva oficina para el panel master</p>
+      </div>
+    </section>
+
+    <!-- Formulario -->
+    <section class="form-card">
+
+      <form #f="ngForm" (ngSubmit)="save()">
+
+        <div class="grid">
+
+          <!-- RUT -->
+          <div class="field">
+            <label>RUT</label>
+            <input
+              type="text"
+              name="rut"
+              [(ngModel)]="form.rut"
+              placeholder="76123456-7"
+              required
+            />
+          </div>
+
+          <!-- Nombre -->
+          <div class="field">
+            <label>Nombre</label>
+            <input
+              type="text"
+              name="name"
+              [(ngModel)]="form.name"
+              placeholder="Oficina Santiago"
+              required
+            />
+          </div>
+
+          <!-- Razón social -->
+          <div class="field">
+            <label>Razón social</label>
+            <input
+              type="text"
+              name="legal_name"
+              [(ngModel)]="form.legal_name"
+              placeholder="SoluSoft SPA"
+            />
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="form.email"
+              placeholder="contacto@empresa.cl"
+            />
+          </div>
+
+          <!-- Teléfono -->
+          <div class="field">
+            <label>Teléfono</label>
+            <input
+              type="text"
+              name="phone"
+              [(ngModel)]="form.phone"
+              placeholder="+56 9 1111 2222"
+            />
+          </div>
+
+          <!-- Estado -->
+          <div class="field">
+            <label>Estado</label>
+            <select
+              name="status"
+              [(ngModel)]="form.status"
+            >
+              <option [ngValue]="1">Activa</option>
+              <option [ngValue]="0">Inactiva</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Error -->
+        <div *ngIf="errorMsg" class="state-card error">
+          {{ errorMsg }}
+        </div>
+
+        <!-- Botones -->
+        <div class="actions">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancel()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="loading || f.invalid"
+          >
+            {{ loading ? 'Guardando...' : 'Guardar oficina' }}
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+  </div>
+</div>

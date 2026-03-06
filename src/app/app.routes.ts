@@ -23,6 +23,19 @@ export const routes: Routes = [
   },
 
   {
+    path: 'master/offices/new',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
+  },
+  {
+  path: 'master/offices/edit/:id',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
+},
+
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',

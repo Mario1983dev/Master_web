@@ -196,4 +196,19 @@
   .title {
     font-size: 32px;
   }
+  .btn-danger {
+  border: none;
+  cursor: pointer;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #dc2626;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
 }
