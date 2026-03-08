@@ -4,15 +4,18 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthMaster {
+
   private apiUrl = environment.apiUrl; // http://localhost:3000
 
   constructor(private http: HttpClient) {}
 
   login(email: string, password: string) {
+
     return this.http.post<{ token: string; user: any }>(
-      `${this.apiUrl}/auth/login`,
+      `${this.apiUrl}/api/master/login`,
       { email, password }
     );
+
   }
 
   setToken(token: string) {
@@ -26,4 +29,5 @@ export class AuthMaster {
   logout() {
     localStorage.removeItem('token');
   }
+
 }

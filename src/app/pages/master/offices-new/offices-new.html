@@ -1,23 +1,24 @@
 <div class="page">
   <div class="page-shell">
 
-    <!-- Header -->
     <section class="hero-card">
       <div class="hero-copy">
         <span class="eyebrow">MASTER ERP · SOLUSOFT</span>
-        <h1>Nueva oficina</h1>
-        <p>Crea una nueva oficina para el panel master</p>
+        <h1>{{ isEdit ? 'Editar oficina' : 'Nueva oficina' }}</h1>
+        <p>
+          {{ isEdit
+            ? 'Actualiza los datos de la oficina del panel master'
+            : 'Crea una nueva oficina para el panel master' }}
+        </p>
       </div>
     </section>
 
-    <!-- Formulario -->
     <section class="form-card">
 
       <form #f="ngForm" (ngSubmit)="save()">
 
         <div class="grid">
 
-          <!-- RUT -->
           <div class="field">
             <label>RUT</label>
             <input
@@ -29,7 +30,6 @@
             />
           </div>
 
-          <!-- Nombre -->
           <div class="field">
             <label>Nombre</label>
             <input
@@ -41,7 +41,6 @@
             />
           </div>
 
-          <!-- Razón social -->
           <div class="field">
             <label>Razón social</label>
             <input
@@ -52,7 +51,6 @@
             />
           </div>
 
-          <!-- Email -->
           <div class="field">
             <label>Email</label>
             <input
@@ -63,7 +61,6 @@
             />
           </div>
 
-          <!-- Teléfono -->
           <div class="field">
             <label>Teléfono</label>
             <input
@@ -74,7 +71,6 @@
             />
           </div>
 
-          <!-- Estado -->
           <div class="field">
             <label>Estado</label>
             <select
@@ -88,12 +84,10 @@
 
         </div>
 
-        <!-- Error -->
         <div *ngIf="errorMsg" class="state-card error">
           {{ errorMsg }}
         </div>
 
-        <!-- Botones -->
         <div class="actions">
 
           <button
@@ -109,7 +103,11 @@
             class="btn-primary"
             [disabled]="loading || f.invalid"
           >
-            {{ loading ? 'Guardando...' : 'Guardar oficina' }}
+            {{
+              loading
+                ? (isEdit ? 'Actualizando...' : 'Guardando...')
+                : (isEdit ? 'Actualizar oficina' : 'Guardar oficina')
+            }}
           </button>
 
         </div>
