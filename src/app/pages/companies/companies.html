@@ -1,0 +1,215 @@
+<div class="page">
+  <div class="page-shell">
+
+    <div class="hero-card">
+      <div>
+        <h1>Empresas</h1>
+        <p>Administra las empresas registradas en la oficina contable.</p>
+      </div>
+    </div>
+
+    <div class="content-grid">
+
+      <!-- =========================
+           FORMULARIO
+      ========================== -->
+
+      <section class="form-card">
+
+        <h2>
+          {{ editingCompanyId ? 'Editar empresa' : 'Nueva empresa' }}
+        </h2>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label>Office ID</label>
+            <input type="number" [(ngModel)]="form.office_id" name="office_id">
+          </div>
+
+          <div class="field">
+            <label>RUT</label>
+            <input type="text" [(ngModel)]="form.rut" name="rut">
+          </div>
+
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="form.name" name="name">
+          </div>
+
+          <div class="field">
+            <label>Razón social</label>
+            <input type="text" [(ngModel)]="form.legal_name" name="legal_name">
+          </div>
+
+          <div class="field">
+            <label>Giro</label>
+            <input type="text" [(ngModel)]="form.business_type" name="business_type">
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="form.email" name="email">
+          </div>
+
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="form.phone" name="phone">
+          </div>
+
+          <div class="field">
+            <label>Dirección</label>
+            <input type="text" [(ngModel)]="form.address" name="address">
+          </div>
+
+          <div class="field">
+            <label>Comuna</label>
+            <input type="text" [(ngModel)]="form.commune" name="commune">
+          </div>
+
+          <div class="field">
+            <label>Ciudad</label>
+            <input type="text" [(ngModel)]="form.city" name="city">
+          </div>
+
+          <div class="field">
+            <label>Región</label>
+            <input type="text" [(ngModel)]="form.region_name" name="region_name">
+          </div>
+
+          <div class="field">
+            <label>Estado</label>
+            <select [(ngModel)]="form.status" name="status">
+              <option value="active">Activa</option>
+              <option value="inactive">Inactiva</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Año contable</label>
+            <input type="number" [(ngModel)]="form.year_num" name="year_num">
+          </div>
+
+          <div class="field field-full">
+            <label>Notas</label>
+            <textarea [(ngModel)]="form.notes" name="notes" rows="3"></textarea>
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          <button
+            class="btn btn-primary"
+            (click)="saveCompany()">
+
+            {{ editingCompanyId ? 'Actualizar' : 'Guardar' }}
+
+          </button>
+
+          <button
+            class="btn btn-secondary"
+            (click)="resetForm()">
+
+            Limpiar
+
+          </button>
+
+        </div>
+
+      </section>
+
+      <!-- =========================
+           TABLA EMPRESAS
+      ========================== -->
+
+      <section class="table-card">
+
+        <h2>Listado de empresas</h2>
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Razón social</th>
+                <th>Giro</th>
+                <th>Ciudad</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              <tr *ngFor="let company of companies">
+
+                <td>{{ company.id }}</td>
+
+                <td>{{ company.rut }}</td>
+
+                <td>{{ company.name }}</td>
+
+                <td>{{ company.legal_name }}</td>
+
+                <td>{{ company.business_type }}</td>
+
+                <td>{{ company.city }}</td>
+
+                <td>
+                  {{ company.status === 'active' ? 'Activa' : 'Inactiva' }}
+                </td>
+
+                <td class="actions-cell">
+
+                  <button
+                    class="btn btn-small btn-edit"
+                    (click)="editCompany(company)">
+
+                    Editar
+
+                  </button>
+
+                  <button
+                    class="btn btn-small"
+                    [ngClass]="company.status === 'active'
+                    ? 'btn-delete'
+                    : 'btn-primary'"
+                    (click)="toggleCompanyStatus(company)">
+
+                    {{ company.status === 'active'
+                      ? 'Desactivar'
+                      : 'Activar' }}
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+              <tr *ngIf="companies.length === 0">
+
+                <td colspan="8" class="empty">
+
+                  No hay empresas registradas
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+</div>
