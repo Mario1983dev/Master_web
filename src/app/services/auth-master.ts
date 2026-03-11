@@ -12,8 +12,12 @@ export class AuthMaster {
   login(email: string, password: string) {
 
     return this.http.post<{ token: string; user: any }>(
-      `${this.apiUrl}/api/master/login`,
-      { email, password }
+      `${this.apiUrl}/api/login`,
+      {
+        email: email,
+        username: email,
+        password: password
+      }
     );
 
   }

@@ -37,10 +37,20 @@ export class Login {
       next: (res: any) => {
 
         localStorage.setItem('token', res.token);
+        localStorage.setItem('user', JSON.stringify(res.user));
 
         console.log('RESP:', res);
 
-        this.router.navigate(['/master']);
+        const scope = String(res?.user?.scope || '').trim();
+        const role = String(res?.user?.role || '').trim();
+
+        if (scope === 'master' || role === 'MASTER') {
+          this.router.navigate(['/master']);
+        } else if (scope === 'office_admin' || role === 'OFFICE_ADMIN') {
+          this.router.navigate(['/office']);
+        } else {
+          this.errorMsg = 'Rol de usuario no reconocido';
+        }
 
         this.loading = false;
 

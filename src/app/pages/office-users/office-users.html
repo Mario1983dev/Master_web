@@ -1,0 +1,133 @@
+<div class="office-users-page">
+  <div class="page-header">
+    <div>
+      <h1>Usuarios de Oficina</h1>
+      <p>Administra los usuarios asociados a esta oficina.</p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <section class="card form-card">
+      <div class="card-header">
+        <h2>{{ editingUserId ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+        <span class="badge">{{ editingUserId ? 'Edición' : 'Creación' }}</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre</label>
+          <input
+            type="text"
+            name="name"
+            [(ngModel)]="form.name"
+            placeholder="Ej: Mario Pérez"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Correo</label>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="form.email"
+            placeholder="Ej: mario@empresa.cl"
+          />
+        </div>
+
+        <div class="form-group" *ngIf="!editingUserId">
+          <label>Contraseña</label>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="form.password"
+            placeholder="Ingrese contraseña"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Rol</label>
+          <select name="role" [(ngModel)]="form.role">
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-primary" (click)="save()">
+          {{ editingUserId ? 'Actualizar usuario' : 'Crear usuario' }}
+        </button>
+
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">
+          Limpiar
+        </button>
+      </div>
+    </section>
+
+    <section class="card table-card">
+      <div class="card-header">
+        <h2>Listado de usuarios</h2>
+        <span class="badge">{{ users.length }} registro(s)</span>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th class="actions-column">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="let user of users"
+              [class.inactive-row]="user.status !== 1"
+            >
+              <td>#{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="role-pill" [class.admin]="user.role === 'admin'">
+                  {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
+                </span>
+              </td>
+              <td>
+                <span class="status-pill" [class.inactive]="user.status !== 1">
+                  {{ user.status === 1 ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-edit"
+                  (click)="edit(user)"
+                >
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-sm btn-toggle"
+                  (click)="toggleStatus(user)"
+                >
+                  {{ user.status === 1 ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="users.length === 0">
+              <td colspan="6" class="empty-state">
+                No hay usuarios registrados para esta oficina.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>

@@ -23,17 +23,32 @@ export const routes: Routes = [
   },
 
   {
+    path: 'master/office-users',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/office-users/office-users').then(m => m.OfficeUsers),
+  },
+
+  {
     path: 'master/offices/new',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
   },
+
   {
-  path: 'master/offices/edit/:id',
-  canActivate: [authGuard],
-  loadComponent: () =>
-    import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
-},
+    path: 'master/offices/edit/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
+  },
+
+  {
+    path: 'office',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/office/office').then(m => m.Office),
+  },
 
   {
     path: '',
