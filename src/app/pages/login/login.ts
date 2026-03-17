@@ -12,8 +12,7 @@ import { AuthMaster } from '../../services/auth-master';
   styleUrls: ['./login.scss']
 })
 export class Login {
-
-  email = '';
+  identifier = '';
   password = '';
 
   showPass = false;
@@ -26,16 +25,18 @@ export class Login {
   ) {}
 
   onSubmit() {
-
     if (this.loading) return;
+
+    if (!this.identifier.trim() || !this.password.trim()) {
+      this.errorMsg = 'Ingresa usuario/email y contraseña.';
+      return;
+    }
 
     this.loading = true;
     this.errorMsg = '';
 
-    this.auth.login(this.email, this.password).subscribe({
-
+    this.auth.login(this.identifier, this.password).subscribe({
       next: (res: any) => {
-
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
 
@@ -53,11 +54,9 @@ export class Login {
         }
 
         this.loading = false;
-
       },
 
       error: (err) => {
-
         console.error('ERR:', err);
 
         this.errorMsg =
@@ -65,11 +64,7 @@ export class Login {
           'Error de login. Revisa tus credenciales.';
 
         this.loading = false;
-
       }
-
     });
-
   }
-
 }

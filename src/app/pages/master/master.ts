@@ -1,13 +1,23 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-master',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterLink],
   templateUrl: './master.html',
-  styleUrls: ['./master.scss']
+  styleUrl: './master.scss'
 })
 export class Master {
+
   year = new Date().getFullYear();
+
+  constructor(private router: Router) {}
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.router.navigate(['/login']);
+  }
+
 }

@@ -1,3 +1,4 @@
+
 <div class="master-page">
 
   <header class="topbar">
@@ -6,6 +7,10 @@
         <div class="app-name">Master ERP</div>
         <div class="app-sub">Panel de administración</div>
       </div>
+    </div>
+
+    <div class="actions">
+      <button class="logout-btn" (click)="logout()">Salir</button>
     </div>
   </header>
 
@@ -17,7 +22,6 @@
     </section>
 
     <section class="grid">
-
       <a class="card" [routerLink]="['/master/offices']">
         <div class="card-title">Oficinas</div>
         <div class="card-desc">
@@ -25,23 +29,6 @@
         </div>
         <div class="card-cta">Ir a Oficinas →</div>
       </a>
-
-      <div class="card disabled">
-        <div class="card-title">Empresas</div>
-        <div class="card-desc">
-          Administración de empresas por oficina.
-        </div>
-        <div class="card-cta">Próximamente</div>
-      </div>
-
-      <div class="card disabled">
-        <div class="card-title">Usuarios</div>
-        <div class="card-desc">
-          Usuarios master / admins.
-        </div>
-        <div class="card-cta">Próximamente</div>
-      </div>
-
     </section>
 
   </main>

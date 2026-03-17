@@ -4,22 +4,21 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthMaster {
-
   private apiUrl = environment.apiUrl; // http://localhost:3000
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string) {
+  login(identifier: string, password: string) {
+    const value = identifier.trim();
+
+    const body = value.includes('@')
+      ? { email: value, password }
+      : { username: value, password };
 
     return this.http.post<{ token: string; user: any }>(
       `${this.apiUrl}/api/login`,
-      {
-        email: email,
-        username: email,
-        password: password
-      }
+      body
     );
-
   }
 
   setToken(token: string) {
@@ -32,6 +31,6 @@ export class AuthMaster {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
   }
-
 }
