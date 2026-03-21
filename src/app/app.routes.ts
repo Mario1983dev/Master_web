@@ -53,12 +53,12 @@ export const routes: Routes = [
       import('./pages/office-users/office-users').then(m => m.OfficeUsers),
   },
 
-  {
-    path: 'master/companies',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./pages/companies/companies').then(m => m.Companies),
-  },
+{
+  path: 'master/companies',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./pages/companies/companies').then(m => m.CompaniesComponent),
+},
 
   /* ======================================================
      OFFICE

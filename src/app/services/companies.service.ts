@@ -2,47 +2,31 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface Company {
-  id?: number;
-  office_id: number;
-  rut: string;
-  name: string;
-  legal_name?: string;
-  business_type?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  commune?: string;
-  city?: string;
-  region_name?: string;
-  status?: string;
-  notes?: string;
-  year_num?: number;
-  created_at?: string;
-  updated_at?: string;
-  office_name?: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class CompaniesService {
   private http = inject(HttpClient);
+
   private apiUrl = 'http://localhost:3000/companies';
 
-  getAll(): Observable<Company[]> {
-    return this.http.get<Company[]>(this.apiUrl);
+  getCompanies(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
   }
 
-  getById(id: number): Observable<Company> {
-    return this.http.get<Company>(`${this.apiUrl}/${id}`);
+  createCompany(data: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, data);
   }
 
-  create(company: Company): Observable<any> {
-    return this.http.post(this.apiUrl, company);
+  getCompanyById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  update(id: number, company: Company): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, company);
+  updateCompany(id: number, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data);
+  }
+
+  deleteCompany(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
   }
 }

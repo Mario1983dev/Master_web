@@ -1,7 +1,28 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CompaniesService, Company } from '../../services/companies.service';
+import { CompaniesService } from '../../services/companies.service';
+
+export interface Company {
+  id?: number;
+  office_id?: number;
+  rut?: string;
+  name?: string;
+  legal_name?: string;
+  business_type?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  commune?: string;
+  city?: string;
+  region_name?: string;
+  status?: string;
+  notes?: string;
+  year_num?: number;
+  created_at?: string;
+  updated_at?: string;
+  office_name?: string;
+}
 
 @Component({
   selector: 'app-companies',
@@ -10,7 +31,7 @@ import { CompaniesService, Company } from '../../services/companies.service';
   templateUrl: './companies.html',
   styleUrl: './companies.scss'
 })
-export class Companies implements OnInit {
+export class CompaniesComponent implements OnInit {
   private companiesService = inject(CompaniesService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -39,7 +60,7 @@ export class Companies implements OnInit {
   }
 
   loadCompanies(): void {
-    this.companiesService.getAll().subscribe({
+    this.companiesService.getCompanies().subscribe({
       next: (data) => {
         console.log('EMPRESAS API =>', data);
         this.companies = [...data];
@@ -76,7 +97,7 @@ export class Companies implements OnInit {
     }
 
     if (this.editingCompanyId) {
-      this.companiesService.update(this.editingCompanyId, payload).subscribe({
+      this.companiesService.updateCompany(this.editingCompanyId, payload).subscribe({
         next: () => {
           alert('Empresa actualizada correctamente');
           this.resetForm();
@@ -93,7 +114,7 @@ export class Companies implements OnInit {
         return;
       }
 
-      this.companiesService.create(payload).subscribe({
+      this.companiesService.createCompany(payload).subscribe({
         next: () => {
           alert('Empresa creada correctamente');
           this.resetForm();
@@ -114,16 +135,16 @@ export class Companies implements OnInit {
       office_id: company.office_id ?? 1,
       rut: company.rut ?? '',
       name: company.name ?? '',
-      legal_name: company.legal_name || '',
-      business_type: company.business_type || '',
-      email: company.email || '',
-      phone: company.phone || '',
-      address: company.address || '',
-      commune: company.commune || '',
-      city: company.city || '',
-      region_name: company.region_name || '',
-      status: company.status || 'active',
-      notes: company.notes || '',
+      legal_name: company.legal_name ?? '',
+      business_type: company.business_type ?? '',
+      email: company.email ?? '',
+      phone: company.phone ?? '',
+      address: company.address ?? '',
+      commune: company.commune ?? '',
+      city: company.city ?? '',
+      region_name: company.region_name ?? '',
+      status: company.status ?? 'active',
+      notes: company.notes ?? '',
       year_num: company.year_num || new Date().getFullYear()
     };
   }
@@ -141,26 +162,26 @@ export class Companies implements OnInit {
       office_id: company.office_id ?? 1,
       rut: company.rut ?? '',
       name: company.name ?? '',
-      legal_name: company.legal_name || '',
-      business_type: company.business_type || '',
-      email: company.email || '',
-      phone: company.phone || '',
-      address: company.address || '',
-      commune: company.commune || '',
-      city: company.city || '',
-      region_name: company.region_name || '',
+      legal_name: company.legal_name ?? '',
+      business_type: company.business_type ?? '',
+      email: company.email ?? '',
+      phone: company.phone ?? '',
+      address: company.address ?? '',
+      commune: company.commune ?? '',
+      city: company.city ?? '',
+      region_name: company.region_name ?? '',
       status: newStatus,
-      notes: company.notes || '',
+      notes: company.notes ?? '',
       year_num: company.year_num || new Date().getFullYear()
     };
 
-    this.companiesService.update(company.id, payload).subscribe({
+    this.companiesService.updateCompany(company.id, payload).subscribe({
       next: () => {
         alert(`Empresa ${newStatus === 'active' ? 'activada' : 'desactivada'} correctamente`);
         this.resetForm();
         this.loadCompanies();
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('ERROR TOGGLE COMPANY STATUS:', err);
         alert(err?.error?.message || `Error al ${actionText} empresa`);
       }
@@ -168,23 +189,20 @@ export class Companies implements OnInit {
   }
 
   resetForm(): void {
-    this.editingCompanyId = null;
-
-    this.form = {
-      office_id: 1,
-      rut: '',
-      name: '',
-      legal_name: '',
-      business_type: '',
-      email: '',
-      phone: '',
-      address: '',
-      commune: '',
-      city: '',
-      region_name: '',
-      status: 'active',
-      notes: '',
-      year_num: new Date().getFullYear()
-    };
+   this.form = {
+  rut: '',
+  name: '',
+  legal_name: '',
+  business_type: '',
+  email: '',
+  phone: '',
+  address: '',
+  commune: '',
+  city: '',
+  region_name: '',
+  status: 'active',
+  notes: '',
+  year_num: new Date().getFullYear()
+   };
   }
 }
