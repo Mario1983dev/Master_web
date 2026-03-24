@@ -1,0 +1,43 @@
+<div class="page">
+  <div class="page-shell">
+
+    <h1>Plan de Cuentas</h1>
+
+    <div class="table-wrapper">
+      <table>
+
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Naturaleza</th>
+            <th>Nivel</th>
+            <th>Movimientos</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let acc of accounts">
+            <td>{{ acc.code }}</td>
+            <td>{{ acc.name }}</td>
+            <td>{{ acc.account_type }}</td>
+            <td>{{ acc.balance_nature }}</td>
+            <td>{{ acc.level_num }}</td>
+            <td>
+              {{ acc.allows_entries === 1 ? 'Sí' : 'No' }}
+            </td>
+          </tr>
+
+          <tr *ngIf="accounts.length === 0">
+            <td colspan="6">No hay cuentas</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+</div>

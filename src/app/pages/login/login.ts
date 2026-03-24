@@ -28,40 +28,59 @@ export class Login {
     if (this.loading) return;
 
     if (!this.identifier.trim() || !this.password.trim()) {
-      this.errorMsg = 'Ingresa usuario/email y contraseña.';
+      this.errorMsg = 'Ingresa usuario o correo y contraseña.';
       return;
     }
 
     this.loading = true;
     this.errorMsg = '';
 
-    this.auth.login(this.identifier, this.password).subscribe({
+    this.auth.login(this.identifier.trim(), this.password.trim()).subscribe({
       next: (res: any) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
+        console.log('RESP LOGIN:', res);
 
-        console.log('RESP:', res);
+        this.auth.setToken(res.token);
+        this.auth.setUser(res.user);
 
-        const scope = String(res?.user?.scope || '').trim();
-        const role = String(res?.user?.role || '').trim();
+        const scope = String(res?.user?.scope || '').trim().toLowerCase();
+        const role = String(res?.user?.role || '').trim().toUpperCase();
 
         if (scope === 'master' || role === 'MASTER') {
+          this.loading = false;
           this.router.navigate(['/master']);
-        } else if (scope === 'office_admin' || role === 'OFFICE_ADMIN') {
-          this.router.navigate(['/office']);
-        } else {
-          this.errorMsg = 'Rol de usuario no reconocido';
+          return;
         }
 
+        if (
+          scope === 'office_admin' ||
+          scope === 'office_user' ||
+          scope === 'office' ||
+          role === 'OFFICE_ADMIN' ||
+          role === 'OFFICE_USER'
+        ) {
+          this.loading = false;
+          this.router.navigate(['/office']);
+          return;
+        }
+
+        this.errorMsg = `Rol no reconocido. scope="${scope}" role="${role}"`;
         this.loading = false;
       },
 
       error: (err) => {
-        console.error('ERR:', err);
+        console.error('ERR LOGIN:', err);
 
-        this.errorMsg =
-          err?.error?.message ??
-          'Error de login. Revisa tus credenciales.';
+        if (err?.status === 401) {
+          this.errorMsg = 'Usuario o contraseña incorrectos.';
+        } else if (err?.status === 403) {
+          this.errorMsg = err?.error?.message || 'Usuario sin acceso.';
+        } else if (err?.status === 0) {
+          this.errorMsg = 'No se pudo conectar con el servidor.';
+        } else {
+          this.errorMsg =
+            err?.error?.message ||
+            'Error de login. Revisa tus credenciales.';
+        }
 
         this.loading = false;
       }

@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompaniesService } from '../../services/companies.service';
+import { AuthMaster } from '../../services/auth-master';
 
 export interface Company {
   id?: number;
@@ -33,13 +34,15 @@ export interface Company {
 })
 export class CompaniesComponent implements OnInit {
   private companiesService = inject(CompaniesService);
+  private auth = inject(AuthMaster);
   private cdr = inject(ChangeDetectorRef);
 
   companies: Company[] = [];
   editingCompanyId: number | null = null;
+  currentOfficeId: number | null = null;
 
   form: Company = {
-    office_id: 1,
+    office_id: undefined,
     rut: '',
     name: '',
     legal_name: '',
@@ -56,6 +59,14 @@ export class CompaniesComponent implements OnInit {
   };
 
   ngOnInit(): void {
+    this.currentOfficeId = this.auth.getOfficeId();
+
+    if (!this.currentOfficeId) {
+      alert('No se pudo identificar la oficina del usuario');
+      return;
+    }
+
+    this.form.office_id = this.currentOfficeId;
     this.loadCompanies();
   }
 
@@ -63,7 +74,11 @@ export class CompaniesComponent implements OnInit {
     this.companiesService.getCompanies().subscribe({
       next: (data) => {
         console.log('EMPRESAS API =>', data);
-        this.companies = [...data];
+
+        this.companies = [...data].filter(
+          company => company.office_id === this.currentOfficeId
+        );
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -74,8 +89,13 @@ export class CompaniesComponent implements OnInit {
   }
 
   saveCompany(): void {
+    if (!this.currentOfficeId) {
+      alert('No se pudo identificar la oficina activa');
+      return;
+    }
+
     const payload: Company = {
-      office_id: this.form.office_id ?? 1,
+      office_id: this.currentOfficeId,
       rut: this.form.rut?.trim() || '',
       name: this.form.name?.trim() || '',
       legal_name: this.form.legal_name?.trim() || '',
@@ -109,11 +129,6 @@ export class CompaniesComponent implements OnInit {
         }
       });
     } else {
-      if (!payload.office_id) {
-        alert('Office ID es obligatorio');
-        return;
-      }
-
       this.companiesService.createCompany(payload).subscribe({
         next: () => {
           alert('Empresa creada correctamente');
@@ -132,7 +147,7 @@ export class CompaniesComponent implements OnInit {
     this.editingCompanyId = company.id || null;
 
     this.form = {
-      office_id: company.office_id ?? 1,
+      office_id: company.office_id ?? this.currentOfficeId ?? undefined,
       rut: company.rut ?? '',
       name: company.name ?? '',
       legal_name: company.legal_name ?? '',
@@ -151,6 +166,10 @@ export class CompaniesComponent implements OnInit {
 
   toggleCompanyStatus(company: Company): void {
     if (!company.id) return;
+    if (!this.currentOfficeId) {
+      alert('No se pudo identificar la oficina activa');
+      return;
+    }
 
     const newStatus = company.status === 'active' ? 'inactive' : 'active';
     const actionText = newStatus === 'active' ? 'activar' : 'desactivar';
@@ -159,7 +178,7 @@ export class CompaniesComponent implements OnInit {
     if (!ok) return;
 
     const payload: Company = {
-      office_id: company.office_id ?? 1,
+      office_id: company.office_id ?? this.currentOfficeId,
       rut: company.rut ?? '',
       name: company.name ?? '',
       legal_name: company.legal_name ?? '',
@@ -189,20 +208,23 @@ export class CompaniesComponent implements OnInit {
   }
 
   resetForm(): void {
-   this.form = {
-  rut: '',
-  name: '',
-  legal_name: '',
-  business_type: '',
-  email: '',
-  phone: '',
-  address: '',
-  commune: '',
-  city: '',
-  region_name: '',
-  status: 'active',
-  notes: '',
-  year_num: new Date().getFullYear()
-   };
+    this.editingCompanyId = null;
+
+    this.form = {
+      office_id: this.currentOfficeId ?? undefined,
+      rut: '',
+      name: '',
+      legal_name: '',
+      business_type: '',
+      email: '',
+      phone: '',
+      address: '',
+      commune: '',
+      city: '',
+      region_name: '',
+      status: 'active',
+      notes: '',
+      year_num: new Date().getFullYear()
+    };
   }
 }

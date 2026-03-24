@@ -1,0 +1,153 @@
+<div class="page">
+  <div class="page-shell">
+
+    <section class="hero-card">
+      <div class="hero-copy">
+        <span class="eyebrow">OFFICE ERP · SOLUSOFT</span>
+        <h1>Asientos Contables</h1>
+        <p>Registro de comprobantes contables con validación de cuadre.</p>
+      </div>
+    </section>
+
+    <section class="entry-layout">
+
+      <article class="entry-card">
+        <h2>Nuevo comprobante</h2>
+
+        <div class="entry-header-grid">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="entryDate">
+          </div>
+
+          <div class="field">
+            <label>Tipo comprobante</label>
+            <select [(ngModel)]="entryType">
+              <option value="DIARIO">Asiento de diario</option>
+              <option value="INGRESO">Comprobante de ingreso</option>
+              <option value="EGRESO">Comprobante de egreso</option>
+            </select>
+          </div>
+
+          <div class="field field-full">
+            <label>Glosa general</label>
+            <input type="text" [(ngModel)]="description" placeholder="Ej: Venta del día">
+          </div>
+        </div>
+
+        <div class="lines-toolbar">
+          <h3>Detalle del comprobante</h3>
+          <button type="button" class="btn btn-primary" (click)="addLine()">
+            Agregar línea
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cuenta</th>
+                <th>Glosa línea</th>
+                <th>Debe</th>
+                <th>Haber</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let line of lines(); let i = index">
+                <td>{{ i + 1 }}</td>
+
+                <td>
+                  <select
+                    [ngModel]="line.account_id"
+                    (ngModelChange)="updateLine(i, 'account_id', $event)">
+                    <option [ngValue]="null">Seleccione cuenta</option>
+                    <option *ngFor="let acc of accounts" [ngValue]="acc.id">
+                      {{ acc.code }} - {{ acc.name }}
+                    </option>
+                  </select>
+                </td>
+
+                <td>
+                  <input
+                    type="text"
+                    [ngModel]="line.description"
+                    (ngModelChange)="updateLine(i, 'description', $event)"
+                    placeholder="Detalle opcional">
+                </td>
+
+                <td>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    [ngModel]="line.debit"
+                    (ngModelChange)="updateLine(i, 'debit', $event)">
+                </td>
+
+                <td>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    [ngModel]="line.credit"
+                    (ngModelChange)="updateLine(i, 'credit', $event)">
+                </td>
+
+                <td>
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="removeLine(i)">
+                    Quitar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="entry-actions">
+          <button type="button" class="btn btn-success" (click)="saveEntry()">
+            Guardar asiento
+          </button>
+
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Limpiar
+          </button>
+        </div>
+      </article>
+
+      <aside class="summary-card">
+        <h2>Resumen</h2>
+
+        <div class="summary-row">
+          <span>Total Debe</span>
+          <strong>{{ totalDebit() | number:'1.0-2' }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Total Haber</span>
+          <strong>{{ totalCredit() | number:'1.0-2' }}</strong>
+        </div>
+
+        <div class="summary-row difference" [class.ok]="difference() === 0" [class.bad]="difference() !== 0">
+          <span>Diferencia</span>
+          <strong>{{ difference() | number:'1.0-2' }}</strong>
+        </div>
+
+        <div class="summary-note" *ngIf="difference() === 0">
+          El asiento está cuadrado.
+        </div>
+
+        <div class="summary-note error" *ngIf="difference() !== 0">
+          Debe y Haber deben ser iguales antes de guardar.
+        </div>
+      </aside>
+
+    </section>
+
+  </div>
+</div>

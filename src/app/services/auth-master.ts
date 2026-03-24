@@ -4,20 +4,17 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthMaster {
-  private apiUrl = environment.apiUrl; // http://localhost:3000
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
   login(identifier: string, password: string) {
-    const value = identifier.trim();
-
-    const body = value.includes('@')
-      ? { email: value, password }
-      : { username: value, password };
-
     return this.http.post<{ token: string; user: any }>(
       `${this.apiUrl}/api/login`,
-      body
+      {
+        usernameOrEmail: identifier.trim(),
+        password
+      }
     );
   }
 
@@ -27,6 +24,44 @@ export class AuthMaster {
 
   getToken() {
     return localStorage.getItem('token');
+  }
+
+  setUser(user: any) {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
+  getUser() {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+
+  getOfficeId(): number | null {
+    const user = this.getUser();
+    return user?.office_id ?? null;
+  }
+
+  isMaster(): boolean {
+    const user = this.getUser();
+    const scope = String(user?.scope || '').trim().toLowerCase();
+    const role = String(user?.role || '').trim().toUpperCase();
+
+    return scope === 'master' || role === 'MASTER';
+  }
+
+  isOfficeAdmin(): boolean {
+    const user = this.getUser();
+    const scope = String(user?.scope || '').trim().toLowerCase();
+    const role = String(user?.role || '').trim().toUpperCase();
+
+    return scope === 'office_admin' || role === 'OFFICE_ADMIN';
+  }
+
+  isOfficeUser(): boolean {
+    const user = this.getUser();
+    const scope = String(user?.scope || '').trim().toLowerCase();
+    const role = String(user?.role || '').trim().toUpperCase();
+
+    return scope === 'office_user' || role === 'OFFICE_USER';
   }
 
   logout() {

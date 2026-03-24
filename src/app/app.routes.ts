@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 
@@ -53,12 +52,12 @@ export const routes: Routes = [
       import('./pages/office-users/office-users').then(m => m.OfficeUsers),
   },
 
-{
-  path: 'master/companies',
-  canActivate: [authGuard],
-  loadComponent: () =>
-    import('./pages/companies/companies').then(m => m.CompaniesComponent),
-},
+  {
+    path: 'master/companies',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/companies/companies').then(m => m.CompaniesComponent),
+  },
 
   /* ======================================================
      OFFICE
@@ -68,6 +67,36 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/office/office').then(m => m.Office),
+  },
+
+  // 🔥 NUEVO: EMPRESAS PARA OFICINA
+  {
+    path: 'office/companies',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/companies/companies').then(m => m.CompaniesComponent),
+  },
+
+  // 🔥 NUEVO: USUARIOS DE OFICINA
+  {
+    path: 'office/office-users',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/office-users/office-users').then(m => m.OfficeUsers),
+  },
+
+  {
+    path: 'office/accounts',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/accounts/accounts').then(m => m.AccountsComponent),
+  },
+
+  {
+    path: 'office/journal-entries',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/journal-entries/journal-entries').then(m => m.JournalEntriesComponent),
   },
 
   /* ======================================================
