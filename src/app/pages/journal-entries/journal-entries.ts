@@ -1,7 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AccountsService, Account } from '../../services/accounts.service';
+import { AuthMaster } from '../../services/auth-master';
 import {
   JournalEntriesService,
   JournalEntryPayload
@@ -24,9 +26,10 @@ interface EntryLineForm {
 export class JournalEntriesComponent implements OnInit {
   private accountsService = inject(AccountsService);
   private journalEntriesService = inject(JournalEntriesService);
+  private auth = inject(AuthMaster);
+  private router = inject(Router);
 
-  companyId = 5;
-
+  companyId: number | null = null;
   accounts: Account[] = [];
 
   entryDate = this.getToday();
@@ -51,13 +54,26 @@ export class JournalEntriesComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.companyId = this.auth.getSelectedCompanyId();
+
+    if (!this.companyId) {
+      alert('Debes seleccionar una empresa primero.');
+      this.router.navigate(['/office']);
+      return;
+    }
+
     this.loadAccounts();
   }
 
   loadAccounts(): void {
+    if (!this.companyId) return;
+
     this.accountsService.getByCompany(this.companyId).subscribe({
-      next: (data) => {
-        this.accounts = data.filter(a => a.is_active === 1 && a.allows_entries === 1);
+      next: (data: Account[]) => {
+        this.accounts = (Array.isArray(data) ? data : []).filter(
+          (a: Account) =>
+            Number(a.is_active) === 1 && Number(a.allows_entries) === 1
+        );
       },
       error: (err) => {
         console.error('ERROR LOAD ACCOUNTS:', err);
@@ -78,16 +94,24 @@ export class JournalEntriesComponent implements OnInit {
       if (current.length <= 2) {
         return current;
       }
+
       return current.filter((_, i) => i !== index);
     });
   }
 
-  updateLine<K extends keyof EntryLineForm>(index: number, field: K, value: EntryLineForm[K]): void {
+  updateLine<K extends keyof EntryLineForm>(
+    index: number,
+    field: K,
+    value: EntryLineForm[K]
+  ): void {
     this.lines.update(current =>
       current.map((line, i) => {
         if (i !== index) return line;
 
-        const updated = { ...line, [field]: value };
+        const updated: EntryLineForm = {
+          ...line,
+          [field]: value
+        } as EntryLineForm;
 
         if (field === 'debit' && Number(value || 0) > 0) {
           updated.credit = null;
@@ -103,14 +127,11 @@ export class JournalEntriesComponent implements OnInit {
   }
 
   saveEntry(): void {
-    const cleanLines = this.lines()
-      .map(line => ({
-        account_id: line.account_id,
-        description: line.description?.trim() || '',
-        debit: Number(line.debit || 0),
-        credit: Number(line.credit || 0)
-      }))
-      .filter(line => line.account_id && (line.debit > 0 || line.credit > 0));
+    if (!this.companyId) {
+      alert('Debes seleccionar una empresa primero.');
+      this.router.navigate(['/office']);
+      return;
+    }
 
     if (!this.entryDate || !this.entryType) {
       alert('Fecha y tipo de comprobante son obligatorios');
@@ -121,6 +142,17 @@ export class JournalEntriesComponent implements OnInit {
       alert('La glosa es obligatoria');
       return;
     }
+
+    const cleanLines = this.lines()
+      .map(line => ({
+        account_id: line.account_id,
+        description: (line.description || '').trim(),
+        debit: Number(line.debit || 0),
+        credit: Number(line.credit || 0)
+      }))
+      .filter(
+        line => Number(line.account_id) > 0 && (line.debit > 0 || line.credit > 0)
+      );
 
     if (cleanLines.length < 2) {
       alert('Debes ingresar al menos 2 líneas válidas');
@@ -172,6 +204,7 @@ export class JournalEntriesComponent implements OnInit {
     const yyyy = now.getFullYear();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const dd = String(now.getDate()).padStart(2, '0');
+
     return `${yyyy}-${mm}-${dd}`;
   }
 }

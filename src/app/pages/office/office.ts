@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthMaster } from '../../services/auth-master';
 import { CompaniesService } from '../../services/companies.service';
 
@@ -8,8 +8,8 @@ import { CompaniesService } from '../../services/companies.service';
   selector: 'app-office',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: 'office.html',
-  styleUrls: ['office.scss']
+  templateUrl: './office.html',
+  styleUrls: ['./office.scss']
 })
 export class Office implements OnInit {
   companies: any[] = [];
@@ -19,7 +19,8 @@ export class Office implements OnInit {
 
   constructor(
     public auth: AuthMaster,
-    private companiesService: CompaniesService
+    private companiesService: CompaniesService,
+    private router: Router // 👈 agregado
   ) {}
 
   ngOnInit(): void {
@@ -36,25 +37,30 @@ export class Office implements OnInit {
         this.companies = Array.isArray(rows) ? rows : [];
         this.loadingCompanies = false;
 
-        const saved = this.getSavedActiveCompany();
+        const saved = this.auth.getSelectedCompany();
 
         if (saved?.id) {
-          const exists = this.companies.find(c => Number(c.id) === Number(saved.id));
+          const exists = this.companies.find(
+            c => Number(c.id) === Number(saved.id)
+          );
 
           if (exists) {
             this.activeCompanyId = Number(exists.id);
-            localStorage.setItem('active_company', JSON.stringify(exists));
+            this.auth.setSelectedCompany(exists);
             return;
           }
 
-          localStorage.removeItem('active_company');
+          this.auth.clearSelectedCompany();
           this.activeCompanyId = null;
         }
 
         if (this.companies.length === 1) {
           const onlyCompany = this.companies[0];
           this.activeCompanyId = Number(onlyCompany.id);
-          localStorage.setItem('active_company', JSON.stringify(onlyCompany));
+          this.auth.setSelectedCompany(onlyCompany);
+
+          // 🚀 auto entrar si hay solo una
+          this.router.navigate(['/office/accounts']);
         }
       },
       error: (err) => {
@@ -71,7 +77,7 @@ export class Office implements OnInit {
 
     if (!id) {
       this.activeCompanyId = null;
-      localStorage.removeItem('active_company');
+      this.auth.clearSelectedCompany();
       return;
     }
 
@@ -79,29 +85,23 @@ export class Office implements OnInit {
 
     if (!company) {
       this.activeCompanyId = null;
-      localStorage.removeItem('active_company');
+      this.auth.clearSelectedCompany();
       return;
     }
 
     this.activeCompanyId = id;
-    localStorage.setItem('active_company', JSON.stringify(company));
+    this.auth.setSelectedCompany(company);
+
+    // 🚀 CLAVE: entrar al ERP
+    this.router.navigate(['/office/accounts']);
+  }
+
+  hasActiveCompany(): boolean {
+    return !!this.activeCompanyId;
   }
 
   private restoreActiveCompany(): void {
-    const saved = this.getSavedActiveCompany();
+    const saved = this.auth.getSelectedCompany();
     this.activeCompanyId = saved?.id ? Number(saved.id) : null;
-  }
-
-  private getSavedActiveCompany(): any | null {
-    const raw = localStorage.getItem('active_company');
-
-    if (!raw) return null;
-
-    try {
-      return JSON.parse(raw);
-    } catch {
-      localStorage.removeItem('active_company');
-      return null;
-    }
   }
 }

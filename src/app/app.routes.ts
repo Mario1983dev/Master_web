@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { companySelectedGuard } from './guards/company-selected.guard';
 
 export const routes: Routes = [
   {
@@ -69,7 +70,7 @@ export const routes: Routes = [
       import('./pages/office/office').then(m => m.Office),
   },
 
-  // 🔥 NUEVO: EMPRESAS PARA OFICINA
+  // 🔥 EMPRESAS (solo admin)
   {
     path: 'office/companies',
     canActivate: [authGuard],
@@ -77,7 +78,7 @@ export const routes: Routes = [
       import('./pages/companies/companies').then(m => m.CompaniesComponent),
   },
 
-  // 🔥 NUEVO: USUARIOS DE OFICINA
+  // 🔥 USUARIOS (solo admin)
   {
     path: 'office/office-users',
     canActivate: [authGuard],
@@ -85,16 +86,18 @@ export const routes: Routes = [
       import('./pages/office-users/office-users').then(m => m.OfficeUsers),
   },
 
+  // 🔥 PLAN DE CUENTAS (requiere empresa seleccionada)
   {
     path: 'office/accounts',
-    canActivate: [authGuard],
+    canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
       import('./pages/accounts/accounts').then(m => m.AccountsComponent),
   },
 
+  // 🔥 ASIENTOS (requiere empresa seleccionada)
   {
     path: 'office/journal-entries',
-    canActivate: [authGuard],
+    canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
       import('./pages/journal-entries/journal-entries').then(m => m.JournalEntriesComponent),
   },

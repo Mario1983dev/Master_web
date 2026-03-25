@@ -64,8 +64,27 @@ export class AuthMaster {
     return scope === 'office_user' || role === 'OFFICE_USER';
   }
 
+  setSelectedCompany(company: any) {
+    localStorage.setItem('selected_company', JSON.stringify(company));
+  }
+
+  getSelectedCompany() {
+    const company = localStorage.getItem('selected_company');
+    return company ? JSON.parse(company) : null;
+  }
+
+  getSelectedCompanyId(): number | null {
+    const company = this.getSelectedCompany();
+    return company?.id ?? null;
+  }
+
+  clearSelectedCompany() {
+    localStorage.removeItem('selected_company');
+  }
+
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('selected_company');
   }
 }

@@ -41,6 +41,7 @@ export class Login {
 
         this.auth.setToken(res.token);
         this.auth.setUser(res.user);
+        this.auth.clearSelectedCompany();
 
         const scope = String(res?.user?.scope || '').trim().toLowerCase();
         const role = String(res?.user?.role || '').trim().toUpperCase();

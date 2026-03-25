@@ -25,9 +25,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     scope === 'office_user' || role === 'OFFICE_USER';
   const isOffice = isOfficeAdmin || isOfficeUser;
 
-  // =========================
-  // RUTAS MASTER
-  // =========================
   if (url.startsWith('/master')) {
     if (isMaster) {
       return true;
@@ -36,9 +33,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     return router.createUrlTree(['/login']);
   }
 
-  // =========================
-  // RUTAS OFFICE SOLO ADMIN
-  // =========================
   if (
     url.startsWith('/office/companies') ||
     url.startsWith('/office/office-users')
@@ -50,9 +44,6 @@ export const authGuard: CanActivateFn = (route, state) => {
     return router.createUrlTree(['/office']);
   }
 
-  // =========================
-  // RUTAS OFFICE GENERALES
-  // =========================
   if (url.startsWith('/office')) {
     if (isOffice) {
       return true;

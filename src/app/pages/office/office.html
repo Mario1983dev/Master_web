@@ -9,6 +9,35 @@
       </div>
     </section>
 
+    <section class="selector-card">
+      <h3>Empresa activa</h3>
+
+      <div *ngIf="loadingCompanies" class="state-card">
+        Cargando empresas...
+      </div>
+
+      <div *ngIf="!loadingCompanies && companiesError" class="state-card error">
+        {{ companiesError }}
+      </div>
+
+      <div *ngIf="!loadingCompanies && !companiesError">
+        <select
+          class="company-select"
+          [value]="activeCompanyId || ''"
+          (change)="onSelectCompany($event)"
+        >
+          <option value="">Selecciona una empresa</option>
+          <option *ngFor="let company of companies" [value]="company.id">
+            {{ company.name }}
+          </option>
+        </select>
+
+        <p *ngIf="!hasActiveCompany()" class="warning-msg">
+          Debes seleccionar una empresa para entrar al plan de cuentas y a los asientos contables.
+        </p>
+      </div>
+    </section>
+
     <section class="grid-cards">
 
       <article *ngIf="auth.isOfficeAdmin()" class="module-card">
@@ -30,17 +59,35 @@
       <article class="module-card">
         <h3>Plan de cuentas</h3>
         <p>Visualizar las cuentas contables de la empresa activa.</p>
-        <a routerLink="/office/accounts" class="coming">
+
+        <a
+          *ngIf="hasActiveCompany(); else noCompanyAccounts"
+          routerLink="/office/accounts"
+          class="coming"
+        >
           Ir a cuentas
         </a>
+
+        <ng-template #noCompanyAccounts>
+          <span class="disabled-link">Selecciona una empresa primero</span>
+        </ng-template>
       </article>
 
       <article class="module-card">
         <h3>Asientos contables</h3>
         <p>Registrar comprobantes y movimientos contables.</p>
-        <a routerLink="/office/journal-entries" class="coming">
+
+        <a
+          *ngIf="hasActiveCompany(); else noCompanyJournal"
+          routerLink="/office/journal-entries"
+          class="coming"
+        >
           Ir a asientos
         </a>
+
+        <ng-template #noCompanyJournal>
+          <span class="disabled-link">Selecciona una empresa primero</span>
+        </ng-template>
       </article>
 
     </section>
