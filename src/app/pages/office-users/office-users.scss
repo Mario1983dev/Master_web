@@ -1,23 +1,34 @@
+:host {
+  display: block;
+}
+
 .office-users-page {
-  padding: 24px;
-  background: #f6f8fb;
   min-height: 100vh;
+  padding: 32px;
+  background:
+    radial-gradient(circle at top left, rgba(13, 71, 161, 0.08), transparent 28%),
+    linear-gradient(180deg, #eef3f9 0%, #e8eef6 100%);
 }
 
 .page-header {
   margin-bottom: 24px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+  border: 1px solid rgba(13, 71, 161, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
 
   h1 {
     margin: 0 0 6px;
-    font-size: 30px;
-    font-weight: 700;
+    font-size: 34px;
+    font-weight: 800;
     color: #0f172a;
   }
 
   p {
     margin: 0;
     color: #64748b;
-    font-size: 14px;
+    font-size: 15px;
   }
 }
 
@@ -28,10 +39,10 @@
 
 .card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 .card-header {
@@ -42,23 +53,28 @@
 
   h2 {
     margin: 0;
-    font-size: 20px;
+    font-size: 22px;
     color: #0f172a;
+    font-weight: 800;
   }
 }
 
 .badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: #e0edff;
   color: #1d4ed8;
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
   gap: 18px;
   margin-bottom: 20px;
 }
@@ -71,22 +87,22 @@
 label {
   margin-bottom: 8px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #334155;
 }
 
 input,
 select {
   width: 100%;
-  height: 44px;
+  height: 46px;
   border: 1px solid #cbd5e1;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0 14px;
   font-size: 14px;
-  background: #fff;
+  background: #ffffff;
   color: #0f172a;
   box-sizing: border-box;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 input::placeholder {
@@ -96,8 +112,8 @@ input::placeholder {
 input:focus,
 select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.12);
 }
 
 .actions {
@@ -108,25 +124,33 @@ select:focus {
 
 .btn {
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 11px 16px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
 }
 
 .btn:hover {
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
 .btn-primary {
-  background: #2563eb;
-  color: white;
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(13, 71, 161, 0.18);
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
+  box-shadow: 0 14px 26px rgba(13, 71, 161, 0.22);
 }
 
 .btn-secondary {
@@ -140,7 +164,9 @@ select:focus {
 
 .table-wrapper {
   overflow-x: auto;
-  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #ffffff;
 }
 
 table {
@@ -152,7 +178,7 @@ thead th {
   text-align: left;
   font-size: 13px;
   color: #475569;
-  font-weight: 700;
+  font-weight: 800;
   padding: 14px 12px;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
@@ -196,7 +222,7 @@ tr.inactive-row:hover {
 .btn-sm {
   padding: 8px 12px;
   font-size: 13px;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 .btn-edit {
@@ -224,7 +250,7 @@ tr.inactive-row:hover {
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 
@@ -255,6 +281,18 @@ tr.inactive-row:hover {
 }
 
 @media (max-width: 900px) {
+  .office-users-page {
+    padding: 20px;
+  }
+
+  .page-header {
+    padding: 20px 22px;
+
+    h1 {
+      font-size: 28px;
+    }
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }

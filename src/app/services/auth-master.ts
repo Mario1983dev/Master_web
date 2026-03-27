@@ -35,6 +35,18 @@ export class AuthMaster {
     return user ? JSON.parse(user) : null;
   }
 
+  // 👇 NUEVO: devuelve el rol directamente
+  getUserRole(): string {
+    const user = this.getUser();
+    return String(user?.role || '').trim();
+  }
+
+  // 👇 NUEVO: devuelve el scope directamente
+  getUserScope(): string {
+    const user = this.getUser();
+    return String(user?.scope || '').trim();
+  }
+
   getOfficeId(): number | null {
     const user = this.getUser();
     return user?.office_id ?? null;
@@ -62,6 +74,11 @@ export class AuthMaster {
     const role = String(user?.role || '').trim().toUpperCase();
 
     return scope === 'office_user' || role === 'OFFICE_USER';
+  }
+
+  // 👇 NUEVO: permiso específico para plan de cuentas
+  canManageAccounts(): boolean {
+    return this.isOfficeAdmin() || this.isMaster();
   }
 
   setSelectedCompany(company: any) {

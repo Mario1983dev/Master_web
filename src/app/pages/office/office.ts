@@ -1,13 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AuthMaster } from '../../services/auth-master';
 import { CompaniesService } from '../../services/companies.service';
 
 @Component({
   selector: 'app-office',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './office.html',
   styleUrls: ['./office.scss']
 })
@@ -20,20 +21,27 @@ export class Office implements OnInit {
   constructor(
     public auth: AuthMaster,
     private companiesService: CompaniesService,
-    private router: Router // 👈 agregado
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    console.log('🚀 OFFICE NGONINIT');
     this.restoreActiveCompany();
     this.loadCompanies();
   }
 
   loadCompanies(): void {
+    console.log('📡 LOAD COMPANIES INICIANDO');
+
     this.loadingCompanies = true;
     this.companiesError = '';
+    this.cdr.detectChanges();
 
     this.companiesService.getCompanies().subscribe({
       next: (rows: any[]) => {
+        console.log('✅ EMPRESAS RECIBIDAS =>', rows);
+
         this.companies = Array.isArray(rows) ? rows : [];
         this.loadingCompanies = false;
 
@@ -47,6 +55,8 @@ export class Office implements OnInit {
           if (exists) {
             this.activeCompanyId = Number(exists.id);
             this.auth.setSelectedCompany(exists);
+            console.log('♻️ EMPRESA RESTAURADA Y VALIDADA =>', exists);
+            this.cdr.detectChanges();
             return;
           }
 
@@ -54,54 +64,89 @@ export class Office implements OnInit {
           this.activeCompanyId = null;
         }
 
-        if (this.companies.length === 1) {
-          const onlyCompany = this.companies[0];
-          this.activeCompanyId = Number(onlyCompany.id);
-          this.auth.setSelectedCompany(onlyCompany);
+        if (this.companies.length > 0) {
+          const firstCompany = this.companies[0];
+          this.activeCompanyId = Number(firstCompany.id);
+          this.auth.setSelectedCompany(firstCompany);
 
-          // 🚀 auto entrar si hay solo una
-          this.router.navigate(['/office/accounts']);
+          console.log('🏢 EMPRESA AUTOSELECCIONADA =>', firstCompany);
+          this.cdr.detectChanges();
+          return;
         }
+
+        this.activeCompanyId = null;
+        this.auth.clearSelectedCompany();
+        this.cdr.detectChanges();
       },
+
       error: (err) => {
-        console.error('ERROR CARGANDO EMPRESAS:', err);
+        console.error('❌ ERROR CARGANDO EMPRESAS =>', err);
+
+        if (err.status === 403) {
+          this.companiesError = 'No tienes permisos para ver empresas';
+        } else if (err.status === 401) {
+          this.companiesError = 'Sesión expirada, vuelve a iniciar sesión';
+        } else {
+          this.companiesError = 'No se pudieron cargar las empresas';
+        }
+
         this.loadingCompanies = false;
-        this.companiesError = 'No se pudieron cargar las empresas.';
+        this.activeCompanyId = null;
+        this.auth.clearSelectedCompany();
+        this.cdr.detectChanges();
       }
     });
   }
 
-  onSelectCompany(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const id = Number(target.value);
+  onSelectCompany(): void {
+    const company = this.companies.find(
+      c => Number(c.id) === Number(this.activeCompanyId)
+    );
 
-    if (!id) {
-      this.activeCompanyId = null;
-      this.auth.clearSelectedCompany();
-      return;
-    }
-
-    const company = this.companies.find(c => Number(c.id) === id);
+    console.log('🏢 EMPRESA SELECCIONADA =>', this.activeCompanyId);
 
     if (!company) {
       this.activeCompanyId = null;
       this.auth.clearSelectedCompany();
+      this.cdr.detectChanges();
       return;
     }
 
-    this.activeCompanyId = id;
+    this.activeCompanyId = Number(company.id);
     this.auth.setSelectedCompany(company);
+    this.cdr.detectChanges();
+  }
 
-    // 🚀 CLAVE: entrar al ERP
+  goToAccounts(): void {
+    if (!this.hasActiveCompany()) return;
+
+    console.log('➡️ IR A PLAN DE CUENTAS');
     this.router.navigate(['/office/accounts']);
   }
 
+  goToJournalEntries(): void {
+    if (!this.hasActiveCompany()) return;
+
+    console.log('➡️ IR A ASIENTOS');
+    this.router.navigate(['/office/journal-entries']);
+  }
+
   hasActiveCompany(): boolean {
-    return !!this.activeCompanyId;
+    return this.activeCompanyId !== null && this.activeCompanyId > 0;
   }
 
   private restoreActiveCompany(): void {
     const saved = this.auth.getSelectedCompany();
     this.activeCompanyId = saved?.id ? Number(saved.id) : null;
+
+    console.log('♻️ EMPRESA RESTAURADA =>', saved);
+    this.cdr.detectChanges();
   }
+  isOfficeAdmin(): boolean {
+  return this.auth.isOfficeAdmin();
+}
+
+isOfficeUser(): boolean {
+  return this.auth.isOfficeUser();
+}
 }

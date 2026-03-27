@@ -70,7 +70,6 @@ export const routes: Routes = [
       import('./pages/office/office').then(m => m.Office),
   },
 
-  // 🔥 EMPRESAS (solo admin)
   {
     path: 'office/companies',
     canActivate: [authGuard],
@@ -78,7 +77,6 @@ export const routes: Routes = [
       import('./pages/companies/companies').then(m => m.CompaniesComponent),
   },
 
-  // 🔥 USUARIOS (solo admin)
   {
     path: 'office/office-users',
     canActivate: [authGuard],
@@ -86,20 +84,18 @@ export const routes: Routes = [
       import('./pages/office-users/office-users').then(m => m.OfficeUsers),
   },
 
-  // 🔥 PLAN DE CUENTAS (requiere empresa seleccionada)
   {
     path: 'office/accounts',
     canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
-      import('./pages/accounts/accounts').then(m => m.AccountsComponent),
+      import('./pages/accounts/accounts').then(m => m.Accounts),
   },
 
-  // 🔥 ASIENTOS (requiere empresa seleccionada)
   {
     path: 'office/journal-entries',
     canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
-      import('./pages/journal-entries/journal-entries').then(m => m.JournalEntriesComponent),
+      import('./pages/journal-entries/journal-entries').then(m => m.JournalEntries), // 🔥 CORREGIDO
   },
 
   /* ======================================================

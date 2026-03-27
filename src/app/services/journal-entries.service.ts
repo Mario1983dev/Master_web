@@ -27,4 +27,9 @@ export class JournalEntriesService {
   create(payload: JournalEntryPayload): Observable<any> {
     return this.http.post<any>(this.apiUrl, payload);
   }
+  getJournalEntries(companyId: number) {
+  return this.http.get<any[]>(
+    `${this.apiUrl}?company_id=${companyId}`
+  );
+}
 }

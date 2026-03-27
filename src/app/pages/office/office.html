@@ -5,7 +5,9 @@
       <div class="hero-copy">
         <span class="eyebrow">OFFICE ERP · SOLUSOFT</span>
         <h1>Panel de Oficina</h1>
-        <p>Administración de usuarios, empresas y cuentas de la oficina.</p>
+        <p>
+          Administración de usuarios, empresas y módulos contables de la oficina.
+        </p>
       </div>
     </section>
 
@@ -23,17 +25,24 @@
       <div *ngIf="!loadingCompanies && !companiesError">
         <select
           class="company-select"
-          [value]="activeCompanyId || ''"
-          (change)="onSelectCompany($event)"
+          [(ngModel)]="activeCompanyId"
+          (ngModelChange)="onSelectCompany()"
         >
-          <option value="">Selecciona una empresa</option>
-          <option *ngFor="let company of companies" [value]="company.id">
+          <option [ngValue]="null">Selecciona una empresa</option>
+          <option *ngFor="let company of companies" [ngValue]="company.id">
             {{ company.name }}
           </option>
         </select>
 
-        <p *ngIf="!hasActiveCompany()" class="warning-msg">
-          Debes seleccionar una empresa para entrar al plan de cuentas y a los asientos contables.
+        <p *ngIf="companies.length === 0" class="warning-msg">
+          No hay empresas disponibles para esta oficina.
+        </p>
+
+        <p
+          *ngIf="companies.length > 0 && !hasActiveCompany()"
+          class="warning-msg"
+        >
+          Debes seleccionar una empresa para acceder al plan de cuentas y a los asientos contables.
         </p>
       </div>
     </section>
@@ -42,7 +51,7 @@
 
       <article *ngIf="auth.isOfficeAdmin()" class="module-card">
         <h3>Usuarios de oficina</h3>
-        <p>Crear, editar y administrar usuarios de la oficina.</p>
+        <p>Crear, editar y administrar usuarios asociados a esta oficina.</p>
         <a routerLink="/office/office-users" class="coming">
           Ir a usuarios
         </a>
@@ -50,7 +59,7 @@
 
       <article *ngIf="auth.isOfficeAdmin()" class="module-card">
         <h3>Empresas</h3>
-        <p>Crear y administrar empresas asociadas a esta oficina.</p>
+        <p>Crear, editar y administrar empresas asociadas a esta oficina.</p>
         <a routerLink="/office/companies" class="coming">
           Ir a empresas
         </a>
@@ -60,34 +69,36 @@
         <h3>Plan de cuentas</h3>
         <p>Visualizar las cuentas contables de la empresa activa.</p>
 
-        <a
-          *ngIf="hasActiveCompany(); else noCompanyAccounts"
-          routerLink="/office/accounts"
+        <button
+          type="button"
           class="coming"
+          (click)="goToAccounts()"
+          [disabled]="!hasActiveCompany()"
         >
           Ir a cuentas
-        </a>
+        </button>
 
-        <ng-template #noCompanyAccounts>
-          <span class="disabled-link">Selecciona una empresa primero</span>
-        </ng-template>
+        <p *ngIf="!hasActiveCompany()" class="warning-msg">
+          Selecciona una empresa primero.
+        </p>
       </article>
 
       <article class="module-card">
         <h3>Asientos contables</h3>
-        <p>Registrar comprobantes y movimientos contables.</p>
+        <p>Registrar comprobantes y movimientos contables de la empresa activa.</p>
 
-        <a
-          *ngIf="hasActiveCompany(); else noCompanyJournal"
-          routerLink="/office/journal-entries"
+        <button
+          type="button"
           class="coming"
+          (click)="goToJournalEntries()"
+          [disabled]="!hasActiveCompany()"
         >
           Ir a asientos
-        </a>
+        </button>
 
-        <ng-template #noCompanyJournal>
-          <span class="disabled-link">Selecciona una empresa primero</span>
-        </ng-template>
+        <p *ngIf="!hasActiveCompany()" class="warning-msg">
+          Selecciona una empresa primero.
+        </p>
       </article>
 
     </section>

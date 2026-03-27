@@ -21,11 +21,16 @@ export interface Account {
   providedIn: 'root'
 })
 export class AccountsService {
-
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:3000/accounts';
 
-  getByCompany(companyId: number): Observable<Account[]> {
-    return this.http.get<Account[]>(`${this.apiUrl}?company_id=${companyId}`);
+  getAccounts(companyId: number): Observable<Account[]> {
+    return this.http.get<Account[]>(
+      `${this.apiUrl}?company_id=${companyId}`
+    );
+  }
+
+  createAccount(data: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, data);
   }
 }
