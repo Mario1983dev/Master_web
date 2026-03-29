@@ -1,0 +1,72 @@
+<section class="page">
+  <div class="hero-card">
+    <p class="eyebrow">MASTER ERP · SOLUSOFT</p>
+    <h1>Configuración Contable</h1>
+    <p class="subtitle">
+      Define las cuentas base que usará automáticamente la empresa en compras, ventas y procesos contables.
+    </p>
+    <p class="company" *ngIf="companyName">
+      Empresa activa: <strong>{{ companyName }}</strong>
+    </p>
+  </div>
+
+  <div *ngIf="loading" class="info-box">
+    Cargando configuración...
+  </div>
+
+  <div *ngIf="error && !loading" class="alert error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="success && !loading" class="alert success">
+    {{ success }}
+  </div>
+
+  <div class="table-card" *ngIf="!loading && companyId">
+    <table>
+      <thead>
+        <tr>
+          <th>Clave</th>
+          <th>Cuenta</th>
+          <th>Nota</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td>
+            <div class="mapping-label">
+              <strong>{{ row.label }}</strong>
+              <small>{{ row.key }}</small>
+            </div>
+          </td>
+
+          <td>
+            <select [(ngModel)]="row.account_id">
+              <option [ngValue]="null">Seleccione una cuenta</option>
+              <option
+                *ngFor="let acc of accounts"
+                [ngValue]="acc.id">
+                {{ acc.code }} - {{ acc.name }}
+              </option>
+            </select>
+          </td>
+
+          <td>
+            <input
+              type="text"
+              [(ngModel)]="row.notes"
+              placeholder="Observación opcional" />
+          </td>
+
+          <td>
+            <button type="button" (click)="saveRow(row)" [disabled]="saving">
+              {{ row.existing_id ? 'Actualizar' : 'Guardar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

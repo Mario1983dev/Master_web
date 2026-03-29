@@ -91,11 +91,18 @@ export const routes: Routes = [
       import('./pages/accounts/accounts').then(m => m.Accounts),
   },
 
+{
+  path: 'office/journal-entries',  // ✅ CORRECTO
+  canActivate: [authGuard, companySelectedGuard],
+  loadComponent: () =>
+    import('./pages/journal-entries/journal-entries').then(m => m.JournalEntries),
+},
+
   {
-    path: 'office/journal-entries',
+    path: 'office/configuration',
     canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
-      import('./pages/journal-entries/journal-entries').then(m => m.JournalEntries), // 🔥 CORREGIDO
+      import('./pages/configuration/configuration').then(m => m.Configuration),
   },
 
   /* ======================================================
@@ -104,5 +111,5 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login',
-  },
+  }
 ];

@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Account {
   id: number;
@@ -22,13 +23,13 @@ export interface Account {
 })
 export class AccountsService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/accounts';
+  private apiUrl = `${environment.apiUrl}/accounts`;
 
-  getAccounts(companyId: number): Observable<Account[]> {
-    return this.http.get<Account[]>(
-      `${this.apiUrl}?company_id=${companyId}`
-    );
-  }
+getAccounts(companyId: number): Observable<Account[]> {
+  return this.http.get<Account[]>(
+    `${this.apiUrl}?company_id=${companyId}&_=${Date.now()}`
+  );
+}
 
   createAccount(data: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);

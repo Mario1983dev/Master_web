@@ -11,25 +11,28 @@ export interface JournalEntryLinePayload {
 }
 
 export interface JournalEntryPayload {
-  company_id: number | null;
+  company_id: number;
   entry_date: string;
   entry_type: string;
   description: string;
   lines: JournalEntryLinePayload[];
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class JournalEntriesService {
   private apiUrl = `${environment.apiUrl}/journal-entries`;
 
   constructor(private http: HttpClient) {}
 
-  create(payload: JournalEntryPayload): Observable<any> {
+  createJournalEntry(payload: JournalEntryPayload): Observable<any> {
     return this.http.post<any>(this.apiUrl, payload);
   }
-  getJournalEntries(companyId: number) {
-  return this.http.get<any[]>(
-    `${this.apiUrl}?company_id=${companyId}`
-  );
-}
+
+  getJournalEntries(companyId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${this.apiUrl}?company_id=${companyId}`
+    );
+  }
 }
