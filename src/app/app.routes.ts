@@ -8,7 +8,6 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
-
   {
     path: 'login',
     loadComponent: () =>
@@ -24,35 +23,30 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/master/master').then(m => m.Master),
   },
-
   {
     path: 'master/offices',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/master/offices/offices').then(m => m.Offices),
   },
-
   {
     path: 'master/offices/new',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
   },
-
   {
     path: 'master/offices/edit/:id',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
   },
-
   {
     path: 'master/office-users',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/office-users/office-users').then(m => m.OfficeUsers),
   },
-
   {
     path: 'master/companies',
     canActivate: [authGuard],
@@ -65,42 +59,46 @@ export const routes: Routes = [
   ====================================================== */
   {
     path: 'office',
+    redirectTo: 'office/dashboard',
+    pathMatch: 'full',
+  },
+  {
+    path: 'office/dashboard',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./pages/office/office').then(m => m.Office),
+      import('./pages/office/office-dashboard/office-dashboard').then(
+        m => m.OfficeDashboard
+      ),
   },
-
   {
     path: 'office/companies',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/companies/companies').then(m => m.CompaniesComponent),
   },
-
   {
     path: 'office/office-users',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/office-users/office-users').then(m => m.OfficeUsers),
   },
-
   {
     path: 'office/accounts',
-    canActivate: [authGuard, companySelectedGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/accounts/accounts').then(m => m.Accounts),
   },
-
-{
-  path: 'office/journal-entries',  // ✅ CORRECTO
-  canActivate: [authGuard, companySelectedGuard],
-  loadComponent: () =>
-    import('./pages/journal-entries/journal-entries').then(m => m.JournalEntries),
-},
-
+  {
+    path: 'office/journal-entries',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/journal-entries/journal-entries').then(
+        m => m.JournalEntries
+      ),
+  },
   {
     path: 'office/configuration',
-    canActivate: [authGuard, companySelectedGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/configuration/configuration').then(m => m.Configuration),
   },
@@ -111,5 +109,5 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login',
-  }
+  },
 ];

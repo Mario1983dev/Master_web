@@ -60,7 +60,7 @@ export class Login {
           role === 'OFFICE_USER'
         ) {
           this.loading = false;
-          this.router.navigate(['/office']);
+          this.router.navigate(['/office/dashboard']);
           return;
         }
 

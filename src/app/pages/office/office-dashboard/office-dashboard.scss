@@ -1,0 +1,149 @@
+.office-dashboard {
+  padding: 24px;
+  min-height: 100vh;
+  background: #f4f7fb;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+}
+
+.hero-card .eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
+.hero-card h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.hero-card p {
+  margin: 0;
+  font-size: 15px;
+  opacity: 0.92;
+}
+
+.company-selector-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.company-selector-card h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.company-selector-card p {
+  margin: 0 0 16px;
+  color: #4b5563;
+}
+
+.selector-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.selector-row select {
+  min-width: 320px;
+  flex: 1;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.primary-btn,
+.secondary-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: #0f172a;
+  color: #fff;
+}
+
+.secondary-btn {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.helper {
+  margin-top: 12px;
+  color: #374151;
+  font-size: 14px;
+}
+
+.helper.error {
+  color: #b91c1c;
+}
+
+.active-company {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  color: #1e3a8a;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+
+.module-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 22px;
+  color: #111827;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  border-color: #cbd5e1;
+}
+
+.module-card h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.module-card p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4b5563;
+}

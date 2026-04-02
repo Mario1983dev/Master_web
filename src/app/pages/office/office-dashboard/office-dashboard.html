@@ -1,0 +1,108 @@
+<section class="office-dashboard">
+
+  <div class="hero-card">
+    <div class="eyebrow">MASTER ERP · SOLUSOFT</div>
+    <h1>Panel de Oficina</h1>
+    <p>Accede a los módulos principales de la oficina desde un solo lugar.</p>
+  </div>
+
+  <div class="company-selector-card">
+    <div class="company-selector-header">
+      <div>
+        <h2>Empresa activa</h2>
+        <p>Selecciona la empresa con la que trabajarás en esta sesión.</p>
+      </div>
+    </div>
+
+    <div class="selector-row">
+      <select
+        [(ngModel)]="selectedCompanyId"
+        (ngModelChange)="onCompanyChange()"
+        [disabled]="loadingCompanies"
+      >
+        <option [ngValue]="null">
+          {{ loadingCompanies ? 'Cargando empresas...' : 'Selecciona una empresa' }}
+        </option>
+
+        <option *ngFor="let company of companies" [ngValue]="company.id">
+          {{ company.label }}
+        </option>
+      </select>
+
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="clearCompany()"
+        *ngIf="selectedCompany"
+      >
+        Limpiar
+      </button>
+    </div>
+
+    <div class="helper" *ngIf="loadingCompanies">
+      ⏳ Cargando empresas...
+    </div>
+
+    <div class="helper error" *ngIf="errorMsg">
+      {{ errorMsg }}
+    </div>
+
+    <div class="active-company" *ngIf="selectedCompany">
+      <strong>Empresa activa:</strong>
+      {{ selectedCompany.label }}
+    </div>
+  </div>
+
+  <div class="modules-grid">
+
+    <button
+      *ngIf="isOfficeAdmin"
+      class="module-card"
+      type="button"
+      (click)="goTo('/office/configuration', true)"
+    >
+      <h2>Configuración</h2>
+      <p>Parámetros generales y administración funcional.</p>
+    </button>
+
+    <button
+      class="module-card"
+      type="button"
+      (click)="goTo('/office/accounts', true)"
+    >
+      <h2>Plan de cuentas</h2>
+      <p>Consulta y administración del plan de cuentas.</p>
+    </button>
+
+    <button
+      class="module-card"
+      type="button"
+      (click)="goTo('/office/journal-entries', true)"
+    >
+      <h2>Asientos</h2>
+      <p>Registro y revisión de asientos contables.</p>
+    </button>
+
+    <button
+      *ngIf="isOfficeAdmin"
+      class="module-card"
+      type="button"
+      (click)="goTo('/office/office-users')"
+    >
+      <h2>Usuarios</h2>
+      <p>Gestión de usuarios de la oficina.</p>
+    </button>
+
+    <button
+      *ngIf="isOfficeAdmin"
+      class="module-card"
+      type="button"
+      (click)="goTo('/office/companies')"
+    >
+      <h2>Empresas</h2>
+      <p>Administración de empresas asociadas a la oficina.</p>
+    </button>
+
+  </div>
+
+</section>
