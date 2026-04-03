@@ -29,13 +29,50 @@
   </div>
 
   <div class="table-card" *ngIf="!loading && companyId">
+    <div class="period-header">
+      <h2>Período Contable</h2>
+      <p class="period-subtitle">
+        Define el período anual activo para operar la contabilidad de esta empresa.
+      </p>
+    </div>
+
+    <div class="period-grid">
+      <div class="field">
+        <label for="periodYear">Año</label>
+        <input
+          id="periodYear"
+          type="number"
+          [(ngModel)]="periodYear"
+          min="2000"
+          max="2100"
+          placeholder="Ejemplo: 2026" />
+      </div>
+
+      <div class="field">
+        <label for="periodStatus">Estado</label>
+        <select id="periodStatus" [(ngModel)]="periodStatus">
+          <option value="OPEN">Abierto</option>
+          <option value="CLOSED">Cerrado</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="period-summary">
+      <strong>Período actual:</strong>
+      Año {{ periodYear }}
+      <span class="status-chip" [class.closed]="periodStatus === 'CLOSED'">
+        {{ periodStatus === 'OPEN' ? 'Abierto' : 'Cerrado' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="table-card" *ngIf="!loading && companyId">
     <table>
       <thead>
         <tr>
           <th>Clave</th>
           <th>Cuenta</th>
           <th>Nota</th>
-          <th>Acción</th>
         </tr>
       </thead>
 
@@ -57,7 +94,7 @@
                 placeholder="Buscar por código o nombre" />
 
               <div class="selected-account" *ngIf="row.account_id">
-                <span class="selected-label">Cuenta seleccionada:</span>
+                Seleccionada:
                 <strong>{{ getSelectedAccountLabel(row.account_id) }}</strong>
               </div>
 
@@ -74,12 +111,7 @@
 
               <div
                 class="no-results"
-                *ngIf="
-                  row.searchText &&
-                  row.filteredAccounts &&
-                  row.filteredAccounts.length === 0 &&
-                  row.searchText !== getSelectedAccountLabel(row.account_id)
-                "
+                *ngIf="row.searchText && row.filteredAccounts && row.filteredAccounts.length === 0"
               >
                 No se encontraron cuentas.
               </div>
@@ -92,14 +124,19 @@
               [(ngModel)]="row.notes"
               placeholder="Observación opcional" />
           </td>
-
-          <td>
-            <button type="button" (click)="saveRow(row)" [disabled]="saving">
-              {{ row.existing_id ? 'Actualizar' : 'Guardar' }}
-            </button>
-          </td>
         </tr>
       </tbody>
     </table>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        class="save-all-btn"
+        (click)="saveAll()"
+        [disabled]="saving"
+      >
+        {{ getSaveButtonLabel() }}
+      </button>
+    </div>
   </div>
 </section>

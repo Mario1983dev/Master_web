@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
 
 import { AuthMaster } from '../../services/auth-master';
 import { AccountsService, Account } from '../../services/accounts.service';
@@ -44,6 +45,10 @@ export class Configuration implements OnInit {
 
   accounts: Account[] = [];
   mappings: AccountMapping[] = [];
+
+  periodId: number | null = null;
+  periodYear = new Date().getFullYear();
+  periodStatus: 'OPEN' | 'CLOSED' = 'OPEN';
 
   rows: MappingRow[] = [
     { key: 'CAJA', label: 'Caja', account_id: null, notes: '', existing_id: null, searchText: '', filteredAccounts: [] },
@@ -89,9 +94,10 @@ export class Configuration implements OnInit {
 
     let accountsLoaded = false;
     let mappingsLoaded = false;
+    let periodLoaded = false;
 
     const finishLoading = () => {
-      if (accountsLoaded && mappingsLoaded) {
+      if (accountsLoaded && mappingsLoaded && periodLoaded) {
         this.loading = false;
         this.cdr.detectChanges();
       }
@@ -130,6 +136,32 @@ export class Configuration implements OnInit {
         this.bindMappingsToRows();
         this.error = err?.error?.message || 'Error al cargar configuración';
         mappingsLoaded = true;
+        finishLoading();
+      }
+    });
+
+    this.configurationService.getAccountingPeriod(this.companyId).subscribe({
+      next: (period: any) => {
+        if (period) {
+          this.periodId = Number(period.id);
+          this.periodYear = Number(period.year_num);
+          this.periodStatus = String(period.status || 'OPEN').trim().toUpperCase() as 'OPEN' | 'CLOSED';
+        } else {
+          this.periodId = null;
+          this.periodYear = new Date().getFullYear();
+          this.periodStatus = 'OPEN';
+        }
+
+        periodLoaded = true;
+        finishLoading();
+      },
+      error: (err) => {
+        console.error('ERROR PERIOD:', err);
+        this.periodId = null;
+        this.periodYear = new Date().getFullYear();
+        this.periodStatus = 'OPEN';
+        this.error = err?.error?.message || 'Error al cargar período contable';
+        periodLoaded = true;
         finishLoading();
       }
     });
@@ -213,18 +245,45 @@ export class Configuration implements OnInit {
     this.cdr.detectChanges();
   }
 
-  saveRow(row: MappingRow): void {
+  hasExistingConfiguration(): boolean {
+    return !!this.periodId || this.rows.some((row) => !!row.existing_id);
+  }
+
+  getSaveButtonLabel(): string {
+    return this.hasExistingConfiguration()
+      ? 'Actualizar configuración'
+      : 'Guardar configuración';
+  }
+
+  private validateBeforeSave(): boolean {
     if (!this.companyId) {
       this.error = 'Debes seleccionar una empresa';
       this.success = '';
       this.cdr.detectChanges();
-      return;
+      return false;
     }
 
-    if (!row.account_id) {
-      this.error = `Selecciona cuenta para ${row.label}`;
+    if (!this.periodYear || this.periodYear < 2000) {
+      this.error = 'Ingresa un año válido para el período contable';
       this.success = '';
       this.cdr.detectChanges();
+      return false;
+    }
+
+    const requiredRows = this.rows.filter((row) => !row.account_id);
+
+    if (requiredRows.length) {
+      this.error = `Debes seleccionar cuenta para: ${requiredRows.map((r) => r.label).join(', ')}`;
+      this.success = '';
+      this.cdr.detectChanges();
+      return false;
+    }
+
+    return true;
+  }
+
+  saveAll(): void {
+    if (!this.validateBeforeSave()) {
       return;
     }
 
@@ -233,46 +292,86 @@ export class Configuration implements OnInit {
     this.success = '';
     this.cdr.detectChanges();
 
-    const payload = {
-      account_id: row.account_id,
-      notes: row.notes
-    };
+    const savePeriod$ = this.periodId
+      ? this.configurationService.updateAccountingPeriod(this.periodId, {
+          year_num: this.periodYear,
+          status: this.periodStatus
+        } as any)
+      : this.configurationService.createAccountingPeriod({
+          company_id: this.companyId!,
+          year_num: this.periodYear,
+          status: this.periodStatus
+        } as any);
 
-    const doneOk = () => {
-      this.success = row.existing_id
-        ? `Configuración actualizada: ${row.label}`
-        : `Configuración guardada: ${row.label}`;
+    savePeriod$.subscribe({
+      next: () => {
+        this.configurationService.getAccountingPeriod(this.companyId!).subscribe({
+          next: (period: any) => {
+            if (period) {
+              this.periodId = Number(period.id);
+            }
 
-      this.saving = false;
-      row.filteredAccounts = [];
-      row.searchText = this.getSelectedAccountLabel(row.account_id);
-      this.cdr.detectChanges();
-      this.loadAll();
-    };
+            const mappingRequests = this.rows.map((row) => {
+              const payload = {
+                account_id: row.account_id!,
+                notes: row.notes
+              };
 
-    const doneError = (err: any) => {
-      console.error('ERROR SAVE CONFIG:', err);
-      this.error = err?.error?.message || 'Error al guardar configuración';
-      this.saving = false;
-      this.cdr.detectChanges();
-    };
+              if (row.existing_id) {
+                return this.configurationService.updateAccountMapping(row.existing_id, payload);
+              }
 
-    if (row.existing_id) {
-      this.configurationService.updateAccountMapping(row.existing_id, payload).subscribe({
-        next: doneOk,
-        error: doneError
-      });
-      return;
-    }
+              return this.configurationService.createAccountMapping({
+                company_id: this.companyId!,
+                mapping_key: row.key,
+                account_id: row.account_id!,
+                notes: row.notes
+              });
+            });
 
-    this.configurationService.createAccountMapping({
-      company_id: this.companyId,
-      mapping_key: row.key,
-      account_id: row.account_id,
-      notes: row.notes
-    }).subscribe({
-      next: doneOk,
-      error: doneError
+            if (!mappingRequests.length) {
+              this.success = 'Configuración guardada correctamente';
+              this.saving = false;
+              this.cdr.detectChanges();
+              this.loadAll();
+              return;
+            }
+
+            forkJoin(mappingRequests).subscribe({
+              next: () => {
+                this.success = this.hasExistingConfiguration()
+                  ? 'Configuración actualizada correctamente'
+                  : 'Configuración guardada correctamente';
+
+                this.saving = false;
+                this.cdr.detectChanges();
+                this.loadAll();
+              },
+              error: (err) => {
+                console.error('ERROR SAVE MAPPINGS:', err);
+                this.error = err?.error?.message || 'Error al guardar configuración contable';
+                this.success = '';
+                this.saving = false;
+                this.cdr.detectChanges();
+              }
+            });
+          },
+          error: (err) => {
+            console.error('ERROR RELOAD PERIOD:', err);
+            this.error = err?.error?.message || 'Error al recargar período contable';
+            this.success = '';
+            this.saving = false;
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: (err) => {
+        console.error('ERROR SAVE PERIOD:', err);
+        this.error = err?.error?.message || 'Error al guardar período contable';
+        this.success = '';
+        this.saving = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 }
