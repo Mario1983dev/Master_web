@@ -1,5 +1,11 @@
 <section class="page">
   <div class="hero-card">
+    <div class="hero-top">
+      <button type="button" class="back-btn" (click)="goBack()">
+        ← Volver
+      </button>
+    </div>
+
     <p class="eyebrow">MASTER ERP · SOLUSOFT</p>
     <h1>Configuración Contable</h1>
     <p class="subtitle">
@@ -43,14 +49,41 @@
           </td>
 
           <td>
-            <select [(ngModel)]="row.account_id">
-              <option [ngValue]="null">Seleccione una cuenta</option>
-              <option
-                *ngFor="let acc of accounts"
-                [ngValue]="acc.id">
-                {{ acc.code }} - {{ acc.name }}
-              </option>
-            </select>
+            <div class="account-search-box">
+              <input
+                type="text"
+                [(ngModel)]="row.searchText"
+                (input)="filterAccounts(row)"
+                placeholder="Buscar por código o nombre" />
+
+              <div class="selected-account" *ngIf="row.account_id">
+                <span class="selected-label">Cuenta seleccionada:</span>
+                <strong>{{ getSelectedAccountLabel(row.account_id) }}</strong>
+              </div>
+
+              <div class="results-list" *ngIf="row.filteredAccounts?.length">
+                <button
+                  type="button"
+                  class="result-item"
+                  *ngFor="let acc of row.filteredAccounts"
+                  (click)="selectAccount(row, acc.id || null)"
+                >
+                  {{ acc.code }} - {{ acc.name }}
+                </button>
+              </div>
+
+              <div
+                class="no-results"
+                *ngIf="
+                  row.searchText &&
+                  row.filteredAccounts &&
+                  row.filteredAccounts.length === 0 &&
+                  row.searchText !== getSelectedAccountLabel(row.account_id)
+                "
+              >
+                No se encontraron cuentas.
+              </div>
+            </div>
           </td>
 
           <td>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -38,6 +38,7 @@ export class OfficeDashboard implements OnInit {
   private companiesService = inject(CompaniesService);
   private auth = inject(AuthMaster);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   companies: Company[] = [];
   selectedCompanyId: number | null = null;
@@ -72,24 +73,38 @@ export class OfficeDashboard implements OnInit {
     if (!officeId) {
       this.errorMsg = 'No se pudo identificar la oficina del usuario.';
       this.loadingCompanies = false;
+      this.cdr.detectChanges();
       return;
     }
 
     this.loadingCompanies = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
 
     this.companiesService.getCompanies().subscribe({
       next: (data: Company[]) => {
         console.log('COMPANIES API:', data);
 
-        this.companies = (data || [])
+        const filteredCompanies = (data || [])
           .filter(company => Number(company.office_id) === Number(officeId))
           .map(company => ({
             ...company,
             label: this.buildCompanyLabel(company)
           }));
 
+        this.companies = filteredCompanies;
+
         console.log('EMPRESAS NORMALIZADAS:', this.companies);
+
+        if (this.companies.length === 0) {
+          this.selectedCompanyId = null;
+          this.selectedCompany = null;
+          this.auth.clearSelectedCompany();
+          this.errorMsg = 'No hay empresas disponibles para esta oficina.';
+          this.loadingCompanies = false;
+          this.cdr.detectChanges();
+          return;
+        }
 
         if (
           this.selectedCompanyId &&
@@ -100,21 +115,35 @@ export class OfficeDashboard implements OnInit {
           this.auth.clearSelectedCompany();
         }
 
+        if (!this.selectedCompanyId && this.companies.length === 1) {
+          this.selectedCompanyId = Number(this.companies[0].id);
+        }
+
         if (this.selectedCompanyId) {
-          const found = this.companies.find(
-            c => Number(c.id) === Number(this.selectedCompanyId)
-          );
-          this.selectedCompany = found || null;
+          const found =
+            this.companies.find(c => Number(c.id) === Number(this.selectedCompanyId)) || null;
+
+          this.selectedCompany = found;
+
+          if (found) {
+            this.auth.setSelectedCompany(found);
+            console.log('EMPRESA ACTIVA:', found);
+          } else {
+            this.selectedCompany = null;
+            this.auth.clearSelectedCompany();
+          }
         } else {
           this.selectedCompany = null;
         }
 
         this.loadingCompanies = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('ERROR LOAD DASHBOARD COMPANIES:', err);
         this.errorMsg = 'No se pudieron cargar las empresas.';
         this.loadingCompanies = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -135,6 +164,7 @@ export class OfficeDashboard implements OnInit {
       this.selectedCompany = null;
       this.auth.clearSelectedCompany();
       this.errorMsg = '';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -152,6 +182,8 @@ export class OfficeDashboard implements OnInit {
       this.auth.clearSelectedCompany();
       this.errorMsg = 'La empresa seleccionada no es válida.';
     }
+
+    this.cdr.detectChanges();
   }
 
   clearCompany(): void {
@@ -159,11 +191,13 @@ export class OfficeDashboard implements OnInit {
     this.selectedCompany = null;
     this.selectedCompanyId = null;
     this.errorMsg = '';
+    this.cdr.detectChanges();
   }
 
   goTo(route: string, requiresCompany: boolean = false): void {
     if (requiresCompany && !this.selectedCompany) {
       this.errorMsg = 'Debes seleccionar una empresa primero.';
+      this.cdr.detectChanges();
       return;
     }
 

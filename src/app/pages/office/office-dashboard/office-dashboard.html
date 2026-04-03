@@ -17,8 +17,8 @@
     <div class="selector-row">
       <select
         [(ngModel)]="selectedCompanyId"
-        (ngModelChange)="onCompanyChange()"
-        [disabled]="loadingCompanies"
+        (change)="onCompanyChange()"
+        [disabled]="loadingCompanies || companies.length === 0"
       >
         <option [ngValue]="null">
           {{ loadingCompanies ? 'Cargando empresas...' : 'Selecciona una empresa' }}
@@ -41,6 +41,14 @@
 
     <div class="helper" *ngIf="loadingCompanies">
       ⏳ Cargando empresas...
+    </div>
+
+    <div class="helper" *ngIf="!loadingCompanies && companies.length > 0">
+      ✅ Empresas cargadas: {{ companies.length }}
+    </div>
+
+    <div class="helper" *ngIf="!loadingCompanies && companies.length === 0 && !errorMsg">
+      No hay empresas disponibles.
     </div>
 
     <div class="helper error" *ngIf="errorMsg">
