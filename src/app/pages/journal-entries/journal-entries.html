@@ -5,7 +5,7 @@
       <div class="hero-copy">
         <span class="eyebrow">OFFICE ERP · SOLUSOFT</span>
         <h1>Asientos contables</h1>
-        <p>Registro y consulta de asientos de la empresa activa: {{ companyName }}</p>
+        <p>Empresa activa: {{ companyName }}</p>
       </div>
     </section>
 
@@ -18,20 +18,22 @@
     </div>
 
     <div class="entry-layout">
+
       <section class="entry-card">
+
         <div class="section-header">
-          <h2>Nuevo asiento</h2>
+          <h2>{{ form.id ? 'Editar asiento' : 'Nuevo asiento' }}</h2>
         </div>
 
         <div class="entry-header-grid">
           <div class="field">
             <label>Fecha</label>
-            <input type="date" [(ngModel)]="form.entry_date" />
+            <input type="date" [(ngModel)]="form.entry_date" name="entry_date" />
           </div>
 
           <div class="field">
             <label>Tipo</label>
-            <select [(ngModel)]="form.entry_type">
+            <select [(ngModel)]="form.entry_type" name="entry_type">
               <option value="MANUAL">MANUAL</option>
               <option value="APERTURA">APERTURA</option>
               <option value="AJUSTE">AJUSTE</option>
@@ -44,7 +46,8 @@
             <input
               type="text"
               [(ngModel)]="form.description"
-              placeholder="Ej: Compra de mercadería al contado"
+              name="description"
+              placeholder="Ej: Compra de mercadería"
             />
           </div>
         </div>
@@ -52,7 +55,7 @@
         <div class="lines-toolbar">
           <h3>Detalle del asiento</h3>
           <button type="button" class="btn btn-secondary" (click)="addLine()">
-            + Agregar línea
+            + Línea
           </button>
         </div>
 
@@ -63,27 +66,47 @@
                 <th>Cuenta</th>
                 <th>Debe</th>
                 <th>Haber</th>
-                <th>Glosa línea</th>
-                <th>Acción</th>
+                <th>Glosa</th>
+                <th></th>
               </tr>
             </thead>
+
             <tbody>
               <tr *ngFor="let line of lines; let i = index">
 
-                <td>
-                  <select [(ngModel)]="line.account_id" (change)="onAccountChange(line)">
-                    <option [ngValue]="null">Seleccione cuenta</option>
-                    <option *ngFor="let acc of accounts" [ngValue]="acc.id">
-                      {{ acc.code }} - {{ acc.name }}
-                    </option>
-                  </select>
+                <td class="account-cell">
+                  <input
+                    type="text"
+                    [(ngModel)]="line.account_search"
+                    [name]="'account_' + i"
+                    placeholder="Digite código o nombre"
+                    autocomplete="off"
+                    (input)="onSearchAccount(i)"
+                    (focus)="onSearchAccount(i)"
+                    (blur)="hideAccountSuggestions(i)"
+                  />
+
+                  <div
+                    class="autocomplete"
+                    *ngIf="line.filteredAccounts?.length > 0"
+                  >
+                    <button
+                      type="button"
+                      class="autocomplete-item"
+                      *ngFor="let acc of line.filteredAccounts"
+                      (mousedown)="selectAccount(i, acc)"
+                    >
+                      <span class="account-code">{{ acc.code }}</span>
+                      <span class="account-name">{{ acc.name }}</span>
+                    </button>
+                  </div>
                 </td>
 
                 <td>
                   <input
                     type="number"
                     min="0"
-                    step="0.01"
+                    step="1"
                     [(ngModel)]="line.debit"
                     [name]="'debit_' + i"
                     (ngModelChange)="onDebitChange(i)"
@@ -94,10 +117,11 @@
                   <input
                     type="number"
                     min="0"
-                    step="0.01"
+                    step="1"
                     [(ngModel)]="line.credit"
                     [name]="'credit_' + i"
                     (ngModelChange)="onCreditChange(i)"
+                    (keydown)="onKeyDown($event, i)"
                   />
                 </td>
 
@@ -117,7 +141,7 @@
                     (click)="removeLine(i)"
                     [disabled]="lines.length === 1"
                   >
-                    Quitar
+                    ✕
                   </button>
                 </td>
 
@@ -133,36 +157,48 @@
             (click)="saveEntry()"
             [disabled]="saving"
           >
-            {{ saving ? 'Guardando...' : 'Guardar asiento' }}
+            {{ saving ? 'Guardando...' : 'Guardar' }}
+          </button>
+
+          <button
+            *ngIf="form.id"
+            type="button"
+            class="btn btn-secondary"
+            (click)="resetForm()"
+          >
+            Nuevo
           </button>
         </div>
+
       </section>
 
       <div class="summary-column">
+
         <aside class="summary-card">
           <h3>Resumen</h3>
 
           <div class="summary-row">
-            <span>Total Debe</span>
+            <span>Debe</span>
             <strong>{{ totalDebit | number:'1.0-2' }}</strong>
           </div>
 
           <div class="summary-row">
-            <span>Total Haber</span>
+            <span>Haber</span>
             <strong>{{ totalCredit | number:'1.0-2' }}</strong>
           </div>
 
-          <div class="summary-row difference" [ngClass]="difference === 0 ? 'ok' : 'bad'">
+          <div class="summary-row difference"
+               [ngClass]="difference === 0 ? 'ok' : 'bad'">
             <span>Diferencia</span>
             <strong>{{ difference | number:'1.0-2' }}</strong>
           </div>
 
           <div *ngIf="difference === 0 && totalDebit > 0" class="summary-note">
-            El asiento está cuadrado.
+            ✔ Asiento cuadrado
           </div>
 
           <div *ngIf="difference !== 0" class="summary-note error">
-            El asiento no cuadra. El Debe debe ser igual al Haber.
+            ✖ No cuadra
           </div>
         </aside>
 
@@ -175,7 +211,7 @@
           </div>
 
           <div class="summary-row">
-            <span>Impacto asiento</span>
+            <span>Impacto</span>
             <strong
               [class.negative]="impactoCaja < 0"
               [class.positive]="impactoCaja > 0">
@@ -184,7 +220,7 @@
           </div>
 
           <div class="summary-row">
-            <span>Caja proyectada</span>
+            <span>Proyectado</span>
             <strong
               [class.negative]="cajaProyectada < 0"
               [class.positive]="cajaProyectada > 0">
@@ -192,7 +228,9 @@
             </strong>
           </div>
         </aside>
+
       </div>
+
     </div>
 
     <section class="content-card">
@@ -201,36 +239,37 @@
       </div>
 
       <div *ngIf="loading" class="state-card">
-        Cargando asientos...
+        Cargando...
       </div>
 
-      <div *ngIf="!loading && error && entries.length === 0" class="state-card error">
-        {{ error }}
-      </div>
+      <table *ngIf="entries.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Glosa</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
 
-      <div *ngIf="!loading && !error">
-        <div *ngIf="entries.length === 0" class="state-card">
-          No hay asientos para la empresa seleccionada.
-        </div>
+        <tbody>
+          <tr *ngFor="let entry of entries">
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.entry_date }}</td>
+            <td>{{ entry.entry_type }}</td>
+            <td>{{ entry.description }}</td>
+            <td class="actions">
+              <button class="btn btn-sm" (click)="editEntry(entry)">Editar</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteEntry(entry)">Eliminar</button>
+              <button class="btn btn-sm btn-secondary" (click)="printEntry(entry)">PDF</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-        <table *ngIf="entries.length > 0" class="data-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>Glosa</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let entry of entries">
-              <td>{{ entry.id }}</td>
-              <td>{{ entry.entry_date || entry.date }}</td>
-              <td>{{ entry.entry_type || '-' }}</td>
-              <td>{{ entry.description || '-' }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div *ngIf="entries.length === 0 && !loading" class="state-card">
+        Sin registros
       </div>
     </section>
 

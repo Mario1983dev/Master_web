@@ -1,5 +1,7 @@
 .page {
   padding: 24px;
+  background: #f4f7fb;
+  min-height: 100vh;
 }
 
 .page-shell {
@@ -9,8 +11,9 @@
 
 .hero-card,
 .entry-card,
-.summary-card {
-  background: #fff;
+.summary-card,
+.content-card {
+  background: #ffffff;
   border-radius: 22px;
   padding: 24px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
@@ -18,6 +21,19 @@
 
 .hero-card {
   margin-bottom: 24px;
+}
+
+.hero-copy h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 1.1;
+  color: #0f172a;
+}
+
+.hero-copy p {
+  margin: 0;
+  color: #475569;
+  font-size: 15px;
 }
 
 .eyebrow {
@@ -31,8 +47,35 @@
 
 .entry-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) 320px;
   gap: 24px;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+.entry-card {
+  min-width: 0;
+}
+
+.summary-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section-header h2,
+.lines-toolbar h3,
+.summary-card h3 {
+  margin: 0;
+  color: #0f172a;
 }
 
 .entry-header-grid {
@@ -54,6 +97,8 @@
 
 label {
   font-weight: 600;
+  color: #334155;
+  font-size: 14px;
 }
 
 input,
@@ -63,24 +108,16 @@ select {
   border-radius: 12px;
   padding: 0 12px;
   font-size: 14px;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.table-wrapper {
-  overflow-x: auto;
-  margin-bottom: 20px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #edf1f5;
-  text-align: left;
-  vertical-align: middle;
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #0d47a1;
+  box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.12);
 }
 
 .lines-toolbar,
@@ -94,13 +131,74 @@ td {
 
 .entry-actions {
   justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border: 1px solid #edf1f5;
+  border-radius: 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+  background: #fff;
+}
+
+thead {
+  background: #f8fafc;
+}
+
+th,
+td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #edf1f5;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+th {
+  font-weight: 700;
+  color: #334155;
+  white-space: nowrap;
+}
+
+td input,
+td select {
+  width: 100%;
+  min-width: 120px;
+}
+
+tbody tr:hover {
+  background: #fafcff;
+}
+
+.summary-card {
+  min-width: 0;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
   padding: 12px 0;
   border-bottom: 1px solid #edf1f5;
+}
+
+.summary-row span {
+  color: #475569;
+  font-size: 14px;
+}
+
+.summary-row strong {
+  color: #0f172a;
+  text-align: right;
 }
 
 .summary-row.difference.ok strong {
@@ -113,15 +211,66 @@ td {
 
 .summary-note {
   margin-top: 16px;
-  padding: 12px;
+  padding: 12px 14px;
   border-radius: 12px;
   background: #eef7ee;
   color: #1b5e20;
+  font-size: 14px;
 }
 
 .summary-note.error {
   background: #fdeeee;
   color: #b71c1c;
+}
+
+.caja-panel .positive {
+  color: #1b5e20;
+}
+
+.caja-panel .negative {
+  color: #b71c1c;
+}
+
+.content-card {
+  margin-top: 24px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 16px;
+  min-width: 720px;
+}
+
+.data-table thead {
+  background: #f8fafc;
+}
+
+.data-table th,
+.data-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.state-card {
+  padding: 18px;
+  border-radius: 16px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e5e7eb;
+}
+
+.state-card.error {
+  background: #fdeeee;
+  color: #b71c1c;
+  border-color: #f5c2c7;
 }
 
 .btn {
@@ -130,6 +279,21 @@ td {
   padding: 10px 14px;
   font-weight: 600;
   cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:hover {
+  opacity: 0.95;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-primary {
@@ -152,12 +316,69 @@ td {
   color: #842029;
 }
 
-@media (max-width: 1024px) {
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+@media (max-width: 1200px) {
   .entry-layout {
     grid-template-columns: 1fr;
   }
 
+  .summary-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .page {
+    padding: 18px;
+  }
+
   .entry-header-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-copy h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 14px;
+  }
+
+  .hero-card,
+  .entry-card,
+  .summary-card,
+  .content-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .summary-column {
+    grid-template-columns: 1fr;
+  }
+
+  .lines-toolbar,
+  .entry-actions,
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn,
+  .btn-sm {
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 10px 8px;
   }
 }

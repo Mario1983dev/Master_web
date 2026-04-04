@@ -35,4 +35,22 @@ export class JournalEntriesService {
       `${this.apiUrl}?company_id=${companyId}`
     );
   }
+
+  getJournalEntryById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  }
+
+  updateJournalEntry(id: number, payload: JournalEntryPayload): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload);
+  }
+
+  getCashBalance(companyId: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrl}/cash-balance?company_id=${companyId}`
+    );
+  }
+
+  deleteJournalEntry(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
 }
