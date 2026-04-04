@@ -63,24 +63,22 @@
                 <th>Cuenta</th>
                 <th>Debe</th>
                 <th>Haber</th>
-                <th>Glosa línea</th> <!-- 🔥 NUEVO -->
+                <th>Glosa línea</th>
                 <th>Acción</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let line of lines; let i = index">
 
-                <!-- CUENTA -->
                 <td>
-                 <select [(ngModel)]="line.account_id">
-  <option [ngValue]="null">Seleccione cuenta</option>
-  <option *ngFor="let acc of accounts" [ngValue]="acc.id">
-    {{ acc.code }} - {{ acc.name }}
-  </option>
-</select>
+                  <select [(ngModel)]="line.account_id" (change)="onAccountChange(line)">
+                    <option [ngValue]="null">Seleccione cuenta</option>
+                    <option *ngFor="let acc of accounts" [ngValue]="acc.id">
+                      {{ acc.code }} - {{ acc.name }}
+                    </option>
+                  </select>
                 </td>
 
-                <!-- DEBE -->
                 <td>
                   <input
                     type="number"
@@ -92,7 +90,6 @@
                   />
                 </td>
 
-                <!-- HABER -->
                 <td>
                   <input
                     type="number"
@@ -104,7 +101,6 @@
                   />
                 </td>
 
-                <!-- 🔥 DESCRIPCIÓN DE LA LÍNEA -->
                 <td>
                   <input
                     type="text"
@@ -114,7 +110,6 @@
                   />
                 </td>
 
-                <!-- ACCIÓN -->
                 <td>
                   <button
                     type="button"
@@ -143,36 +138,63 @@
         </div>
       </section>
 
-      <!-- RESUMEN -->
-      <aside class="summary-card">
-        <h3>Resumen</h3>
+      <div class="summary-column">
+        <aside class="summary-card">
+          <h3>Resumen</h3>
 
-        <div class="summary-row">
-          <span>Total Debe</span>
-          <strong>{{ totalDebit | number:'1.0-2' }}</strong>
-        </div>
+          <div class="summary-row">
+            <span>Total Debe</span>
+            <strong>{{ totalDebit | number:'1.0-2' }}</strong>
+          </div>
 
-        <div class="summary-row">
-          <span>Total Haber</span>
-          <strong>{{ totalCredit | number:'1.0-2' }}</strong>
-        </div>
+          <div class="summary-row">
+            <span>Total Haber</span>
+            <strong>{{ totalCredit | number:'1.0-2' }}</strong>
+          </div>
 
-        <div class="summary-row difference" [ngClass]="difference === 0 ? 'ok' : 'bad'">
-          <span>Diferencia</span>
-          <strong>{{ difference | number:'1.0-2' }}</strong>
-        </div>
+          <div class="summary-row difference" [ngClass]="difference === 0 ? 'ok' : 'bad'">
+            <span>Diferencia</span>
+            <strong>{{ difference | number:'1.0-2' }}</strong>
+          </div>
 
-        <div *ngIf="difference === 0 && totalDebit > 0" class="summary-note">
-          El asiento está cuadrado.
-        </div>
+          <div *ngIf="difference === 0 && totalDebit > 0" class="summary-note">
+            El asiento está cuadrado.
+          </div>
 
-        <div *ngIf="difference !== 0" class="summary-note error">
-          El asiento no cuadra. El Debe debe ser igual al Haber.
-        </div>
-      </aside>
+          <div *ngIf="difference !== 0" class="summary-note error">
+            El asiento no cuadra. El Debe debe ser igual al Haber.
+          </div>
+        </aside>
+
+        <aside class="summary-card caja-panel">
+          <h3>Caja / Liquidez</h3>
+
+          <div class="summary-row">
+            <span>Saldo actual</span>
+            <strong>{{ saldoCaja | number:'1.0-0' }}</strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Impacto asiento</span>
+            <strong
+              [class.negative]="impactoCaja < 0"
+              [class.positive]="impactoCaja > 0">
+              {{ impactoCaja | number:'1.0-0' }}
+            </strong>
+          </div>
+
+          <div class="summary-row">
+            <span>Caja proyectada</span>
+            <strong
+              [class.negative]="cajaProyectada < 0"
+              [class.positive]="cajaProyectada > 0">
+              {{ cajaProyectada | number:'1.0-0' }}
+            </strong>
+          </div>
+        </aside>
+      </div>
     </div>
 
-    <!-- LISTADO -->
     <section class="content-card">
       <div class="section-header">
         <h2>Asientos registrados</h2>

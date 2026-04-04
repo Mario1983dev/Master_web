@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthMaster } from '../../services/auth-master';
@@ -22,6 +22,9 @@ export class JournalEntries implements OnInit {
   success = '';
   companyName = '';
 
+  codigoCuentaCaja = '1010101';
+  saldoCaja = 1000000; // temporal, después vendrá desde backend
+
   form = {
     entry_date: this.getToday(),
     description: '',
@@ -30,12 +33,14 @@ export class JournalEntries implements OnInit {
 
   lines: Array<{
     account_id: number | null;
+    account_code?: string;
     description: string;
     debit: number;
     credit: number;
   }> = [
     {
       account_id: null,
+      account_code: '',
       description: '',
       debit: 0,
       credit: 0
@@ -45,7 +50,8 @@ export class JournalEntries implements OnInit {
   constructor(
     private auth: AuthMaster,
     private journalEntriesService: JournalEntriesService,
-    private accountsService: AccountsService
+    private accountsService: AccountsService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -75,12 +81,31 @@ export class JournalEntries implements OnInit {
   }
 
   loadAccounts(companyId: number): void {
+    console.log('📡 CARGANDO CUENTAS PARA EMPRESA =>', companyId);
+
     this.accountsService.getAccounts(companyId).subscribe({
       next: (rows: Account[]) => {
-        this.accounts = (rows || []).filter(acc => Number(acc.allows_entries) === 1);
+        console.log('✅ CUENTAS RECIBIDAS RAW =>', rows);
+
+        this.accounts = [];
+        this.cdr.detectChanges();
+
+        setTimeout(() => {
+          this.accounts = Array.isArray(rows) ? rows : [];
+
+          console.log('✅ CUENTAS CARGADAS EN SELECT =>', this.accounts);
+
+          if (this.accounts.length === 0) {
+            console.warn('⚠️ NO HAY CUENTAS DISPONIBLES PARA ESTA EMPRESA');
+          }
+
+          this.cdr.detectChanges();
+        }, 0);
       },
       error: (err: any) => {
         console.error('❌ ERROR CARGANDO CUENTAS PARA ASIENTOS =>', err);
+        this.error = 'No se pudieron cargar las cuentas';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -96,11 +121,13 @@ export class JournalEntries implements OnInit {
         console.log('✅ ASIENTOS RECIBIDOS =>', rows);
         this.entries = Array.isArray(rows) ? rows : [];
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('❌ ERROR CARGANDO ASIENTOS =>', err);
         this.loading = false;
         this.error = 'No se pudieron cargar los asientos';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -108,6 +135,7 @@ export class JournalEntries implements OnInit {
   addLine(): void {
     this.lines.push({
       account_id: null,
+      account_code: '',
       description: '',
       debit: 0,
       credit: 0
@@ -119,6 +147,11 @@ export class JournalEntries implements OnInit {
       return;
     }
     this.lines.splice(index, 1);
+  }
+
+  onAccountChange(line: any): void {
+    const cuenta = this.accounts.find(a => a.id == line.account_id);
+    line.account_code = cuenta ? cuenta.code : '';
   }
 
   onDebitChange(index: number): void {
@@ -145,6 +178,27 @@ export class JournalEntries implements OnInit {
 
   get difference(): number {
     return this.totalDebit - this.totalCredit;
+  }
+
+  get impactoCaja(): number {
+    let impacto = 0;
+
+    for (const line of this.lines) {
+      const codigo = String(line.account_code || '').trim();
+      const debe = Number(line.debit || 0);
+      const haber = Number(line.credit || 0);
+
+      if (codigo === this.codigoCuentaCaja) {
+        impacto += debe;
+        impacto -= haber;
+      }
+    }
+
+    return impacto;
+  }
+
+  get cajaProyectada(): number {
+    return this.saldoCaja + this.impactoCaja;
   }
 
   get canSave(): boolean {
@@ -208,18 +262,22 @@ export class JournalEntries implements OnInit {
         this.lines = [
           {
             account_id: null,
+            account_code: '',
             description: '',
             debit: 0,
             credit: 0
           }
         ];
 
+        this.loadAccounts(Number(company.id));
         this.loadJournalEntries(Number(company.id));
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         console.error('❌ ERROR GUARDANDO ASIENTO =>', err);
         this.saving = false;
         this.error = err?.error?.message || 'No se pudo guardar el asiento';
+        this.cdr.detectChanges();
       }
     });
   }

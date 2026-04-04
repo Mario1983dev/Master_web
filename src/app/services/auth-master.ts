@@ -10,7 +10,7 @@ export class AuthMaster {
 
   login(identifier: string, password: string) {
     return this.http.post<{ token: string; user: any }>(
-      `${this.apiUrl}/api/login`,
+      `${this.apiUrl}/login`,
       {
         usernameOrEmail: identifier.trim(),
         password
@@ -35,13 +35,11 @@ export class AuthMaster {
     return user ? JSON.parse(user) : null;
   }
 
-  // 👇 NUEVO: devuelve el rol directamente
   getUserRole(): string {
     const user = this.getUser();
     return String(user?.role || '').trim();
   }
 
-  // 👇 NUEVO: devuelve el scope directamente
   getUserScope(): string {
     const user = this.getUser();
     return String(user?.scope || '').trim();
@@ -76,7 +74,6 @@ export class AuthMaster {
     return scope === 'office_user' || role === 'OFFICE_USER';
   }
 
-  // 👇 NUEVO: permiso específico para plan de cuentas
   canManageAccounts(): boolean {
     return this.isOfficeAdmin() || this.isMaster();
   }
