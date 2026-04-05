@@ -268,16 +268,24 @@ export class JournalEntries implements OnInit {
       : this.journalEntriesService.createJournalEntry(payload);
 
     request.subscribe({
-      next: () => {
+      next: (resp: any) => {
+        const company = this.auth.getSelectedCompany();
+
         this.success = this.form.id
           ? 'Asiento actualizado correctamente'
           : 'Asiento guardado correctamente';
+
+        const entryId = this.form.id || resp?.id || null;
 
         this.resetForm();
         this.loadJournalEntries(company.id);
         this.loadCaja();
         this.saving = false;
         this.cdr.detectChanges();
+
+        if (entryId) {
+          this.printEntry({ id: entryId });
+        }
       },
       error: (err) => {
         this.error = err?.error?.message || 'Error al guardar';
@@ -317,19 +325,14 @@ export class JournalEntries implements OnInit {
         this.error = '';
         this.success = '';
         this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('ERROR CARGANDO ASIENTO', err);
-        this.error = 'No se pudo cargar el asiento para edición';
-        this.cdr.detectChanges();
       }
     });
   }
 
-  deleteEntry(entry: any): void {
+  deleteEntry(id: number): void {
     if (!confirm('¿Eliminar asiento?')) return;
 
-    this.journalEntriesService.deleteJournalEntry(entry.id).subscribe({
+    this.journalEntriesService.deleteJournalEntry(id).subscribe({
       next: () => {
         const company = this.auth.getSelectedCompany();
         this.success = 'Asiento eliminado';
@@ -353,6 +356,18 @@ export class JournalEntries implements OnInit {
   }
 
   printEntry(entry: any): void {
-    window.open(`/asientos/${entry.id}/pdf`, '_blank');
+    this.journalEntriesService.getJournalEntryPdf(entry.id).subscribe({
+      next: (blob: Blob) => {
+        const fileURL = URL.createObjectURL(blob);
+        window.open(fileURL, '_blank');
+
+        setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
+      },
+      error: (err) => {
+        console.error('Error PDF:', err);
+        this.error = 'No se pudo abrir el PDF';
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

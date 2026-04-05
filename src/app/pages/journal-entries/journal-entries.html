@@ -261,7 +261,7 @@
             <td>{{ entry.description }}</td>
             <td class="actions">
               <button class="btn btn-sm" (click)="editEntry(entry)">Editar</button>
-              <button class="btn btn-sm btn-danger" (click)="deleteEntry(entry)">Eliminar</button>
+              <button class="btn btn-sm btn-danger" (click)="deleteEntry(entry.id)">Eliminar</button>
               <button class="btn btn-sm btn-secondary" (click)="printEntry(entry)">PDF</button>
             </td>
           </tr>

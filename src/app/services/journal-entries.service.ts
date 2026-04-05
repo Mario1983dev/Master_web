@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
@@ -31,9 +31,7 @@ export class JournalEntriesService {
   }
 
   getJournalEntries(companyId: number): Observable<any[]> {
-    return this.http.get<any[]>(
-      `${this.apiUrl}?company_id=${companyId}`
-    );
+    return this.http.get<any[]>(`${this.apiUrl}?company_id=${companyId}`);
   }
 
   getJournalEntryById(id: number): Observable<any> {
@@ -45,12 +43,21 @@ export class JournalEntriesService {
   }
 
   getCashBalance(companyId: number): Observable<any> {
-    return this.http.get<any>(
-      `${this.apiUrl}/cash-balance?company_id=${companyId}`
-    );
+    return this.http.get<any>(`${this.apiUrl}/cash-balance?company_id=${companyId}`);
   }
 
   deleteJournalEntry(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
+
+  getJournalEntryPdf(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/pdf`, {
+      responseType: 'blob'
+    });
+  }
+
+  private handleError(err: HttpErrorResponse): never {
+    console.error('HTTP ERROR:', err);
+    throw err;
   }
 }
