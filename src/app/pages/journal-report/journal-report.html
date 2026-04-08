@@ -1,0 +1,117 @@
+<section class="journal-report-page">
+
+  <!-- HEADER -->
+  <div class="report-header">
+    <div>
+      <div class="eyebrow">REPORTES · CONTABILIDAD</div>
+      <h1>Libro Diario</h1>
+      <p>Consulta cronológica de asientos contables registrados.</p>
+    </div>
+
+    <button type="button" class="secondary-btn" (click)="goBack()">
+      Volver
+    </button>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="filters-card">
+    <div class="filters-grid">
+
+      <div class="field">
+        <label>Desde</label>
+        <input type="date" [(ngModel)]="fromDate" />
+      </div>
+
+      <div class="field">
+        <label>Hasta</label>
+        <input type="date" [(ngModel)]="toDate" />
+      </div>
+
+      <div class="field actions">
+        <button type="button" class="primary-btn" (click)="search()">
+          Buscar
+        </button>
+
+        <!-- 🔥 BOTÓN PDF MÁS VISIBLE -->
+        <button
+          type="button"
+          class="primary-btn pdf-btn"
+          (click)="exportPdf()"
+        >
+          📄 Exportar PDF
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- EMPRESA -->
+  <div class="summary-card">
+    <strong>Empresa activa:</strong>
+    {{ companyName || 'Sin empresa seleccionada' }}
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="errorMsg" class="error-box">
+    {{ errorMsg }}
+  </div>
+
+  <!-- TABLA -->
+  <div class="table-card">
+
+    <div class="table-header">
+      <h2>Detalle del Libro Diario</h2>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state">
+      Cargando movimientos...
+    </div>
+
+    <!-- VACÍO -->
+    <div *ngIf="!loading && groupedEntries.length === 0" class="empty-state">
+      No hay movimientos en este rango.
+    </div>
+
+    <!-- DATA -->
+    <div *ngIf="!loading && groupedEntries.length > 0">
+
+      <div *ngFor="let entry of groupedEntries" class="entry-block">
+
+        <!-- CABECERA ASIENTO -->
+        <div class="entry-meta">
+          <div><strong>Fecha:</strong> {{ entry.entry_date | date:'dd-MM-yyyy' }}</div>
+          <div><strong>Tipo:</strong> {{ entry.entry_type }}</div>
+          <div><strong>Glosa:</strong> {{ entry.description }}</div>
+        </div>
+
+        <!-- TABLA -->
+        <table class="journal-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Cuenta</th>
+              <th>Descripción</th>
+              <th>Debe</th>
+              <th>Haber</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let line of entry.lines">
+              <td>{{ line.account_code }}</td>
+              <td>{{ line.account_name }}</td>
+              <td>{{ line.line_description }}</td>
+              <td>{{ line.debit | number:'1.0-0' }}</td>
+              <td>{{ line.credit | number:'1.0-0' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
