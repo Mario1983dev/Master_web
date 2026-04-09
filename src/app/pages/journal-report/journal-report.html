@@ -32,7 +32,6 @@
           Buscar
         </button>
 
-        <!-- 🔥 BOTÓN PDF MÁS VISIBLE -->
         <button
           type="button"
           class="primary-btn pdf-btn"
@@ -75,7 +74,6 @@
 
     <!-- DATA -->
     <div *ngIf="!loading && groupedEntries.length > 0">
-
       <div *ngFor="let entry of groupedEntries" class="entry-block">
 
         <!-- CABECERA ASIENTO -->
@@ -86,30 +84,31 @@
         </div>
 
         <!-- TABLA -->
-        <table class="journal-table">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Cuenta</th>
-              <th>Descripción</th>
-              <th>Debe</th>
-              <th>Haber</th>
-            </tr>
-          </thead>
+        <div class="table-wrapper">
+          <table class="journal-table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Cuenta</th>
+                <th>Descripción</th>
+                <th class="text-right">Debe</th>
+                <th class="text-right">Haber</th>
+              </tr>
+            </thead>
 
-          <tbody>
-            <tr *ngFor="let line of entry.lines">
-              <td>{{ line.account_code }}</td>
-              <td>{{ line.account_name }}</td>
-              <td>{{ line.line_description }}</td>
-              <td>{{ line.debit | number:'1.0-0' }}</td>
-              <td>{{ line.credit | number:'1.0-0' }}</td>
-            </tr>
-          </tbody>
-        </table>
+            <tbody>
+              <tr *ngFor="let line of entry.lines">
+                <td>{{ line.account_code }}</td>
+                <td>{{ line.account_name }}</td>
+                <td>{{ line.line_description }}</td>
+                <td class="text-right">{{ line.debit | number:'1.0-0' }}</td>
+                <td class="text-right">{{ line.credit | number:'1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
       </div>
-
     </div>
 
   </div>

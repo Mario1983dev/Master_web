@@ -96,6 +96,17 @@ export const routes: Routes = [
         m => m.JournalEntries
       ),
   },
+
+ 
+  {
+    path: 'office/journal-report',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/journal-report/journal-report-page').then(
+        m => m.JournalReport
+      ),
+  },
+
   {
     path: 'office/configuration',
     canActivate: [authGuard],
