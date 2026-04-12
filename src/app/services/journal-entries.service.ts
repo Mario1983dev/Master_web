@@ -1,7 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+export interface EntryType {
+  id: number;
+  code: string;
+  name: string;
+  description?: string;
+  affects_balance?: number;
+  is_system?: number;
+  created_at?: string;
+}
 
 export interface JournalEntryLinePayload {
   account_id: number | null;
@@ -19,14 +29,27 @@ export interface JournalEntryPayload {
   copy_until_december?: boolean;
 }
 
-export interface EntryType {
+export interface JournalEntryItem {
   id: number;
-  code: string;
-  name: string;
-  description?: string;
-  affects_balance?: number;
-  is_system?: number;
+  entry_date: string;
+  entry_type: string;
+  description: string;
+  company_id?: number;
+  status?: number;
   created_at?: string;
+  total_debit?: number;
+  total_credit?: number;
+}
+
+export interface JournalEntryLineDetail {
+  id?: number;
+  entry_id?: number;
+  account_id: number;
+  account_code?: string;
+  account_name?: string;
+  description: string;
+  debit: number;
+  credit: number;
 }
 
 export interface JournalReportRow {
@@ -37,11 +60,25 @@ export interface JournalReportRow {
   description: string;
   status: number;
   line_id: number;
+  account_id: number;
+  account_code: string;
+  account_name: string;
   line_description: string;
   debit: number;
   credit: number;
+}
+
+export interface JournalEntryDetail extends JournalEntryItem {
+  lines: JournalEntryLineDetail[];
+}
+
+export interface CashBalanceResponse {
+  saldo: number;
+  total_debe?: number;
+  total_haber?: number;
+  account_id: number | null;
   account_code: string;
-  account_name: string;
+  account_name?: string;
 }
 
 @Injectable({
@@ -49,24 +86,62 @@ export interface JournalReportRow {
 })
 export class JournalEntriesService {
   private apiUrl = `${environment.apiUrl}/journal-entries`;
-  private entryTypesUrl = `${environment.apiUrl}/entry-types`;
 
   constructor(private http: HttpClient) {}
 
-  createJournalEntry(payload: JournalEntryPayload): Observable<any> {
+  getEntryTypes(): Observable<EntryType[]> {
+    return this.http.get<EntryType[]>(`${this.apiUrl}/types`);
+  }
+
+  getEntries(companyId: number): Observable<JournalEntryItem[]> {
+    const params = new HttpParams()
+      .set('company_id', companyId.toString())
+      .set('_', Date.now().toString());
+
+    return this.http.get<JournalEntryItem[]>(this.apiUrl, { params });
+  }
+
+  getEntryById(id: number): Observable<JournalEntryDetail> {
+    return this.http.get<JournalEntryDetail>(`${this.apiUrl}/${id}`);
+  }
+
+  createEntry(payload: JournalEntryPayload): Observable<any> {
     return this.http.post<any>(this.apiUrl, payload);
   }
 
-  getJournalEntries(companyId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}?company_id=${companyId}`);
+  updateEntry(id: number, payload: JournalEntryPayload): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload);
   }
 
-  getJournalReport(companyId: number, dateFrom: string, dateTo: string): Observable<JournalReportRow[]> {
-    const url = `${this.apiUrl}/report?company_id=${companyId}&date_from=${dateFrom}&date_to=${dateTo}`;
-    return this.http.get<JournalReportRow[]>(url);
+  voidEntry(id: number): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/void`, {});
   }
 
-  getEntryTypes(): Observable<EntryType[]> {
-    return this.http.get<EntryType[]>(this.entryTypesUrl);
+  getCashBalance(companyId: number): Observable<CashBalanceResponse> {
+    const params = new HttpParams()
+      .set('company_id', companyId.toString())
+      .set('_', Date.now().toString());
+
+    return this.http.get<CashBalanceResponse>(
+      `${this.apiUrl}/cash-balance`,
+      { params }
+    );
+  }
+
+  getJournalReport(
+    companyId: number,
+    fromDate: string,
+    toDate: string
+  ): Observable<JournalReportRow[]> {
+    const params = new HttpParams()
+      .set('company_id', companyId.toString())
+      .set('from_date', fromDate)
+      .set('to_date', toDate)
+      .set('_', Date.now().toString());
+
+    return this.http.get<JournalReportRow[]>(
+      `${this.apiUrl}/report`,
+      { params }
+    );
   }
 }

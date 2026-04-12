@@ -60,7 +60,10 @@ export class ConfigurationService {
     );
   }
 
-  updateAccountMapping(id: number, payload: UpdateAccountMappingPayload): Observable<any> {
+  updateAccountMapping(
+    id: number,
+    payload: UpdateAccountMappingPayload
+  ): Observable<any> {
     return this.http.put<any>(
       `${this.apiUrl}/account-mappings/${id}`,
       payload

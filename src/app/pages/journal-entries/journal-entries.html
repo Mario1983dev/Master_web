@@ -1,41 +1,48 @@
-<div class="page">
-  <div class="page-shell">
+<section class="journal-entry-page">
 
-    <section class="hero-card">
-      <div class="hero-copy">
-        <span class="eyebrow">OFFICE ERP · SOLUSOFT</span>
-        <h1>Asientos contables</h1>
-        <p>Registro y consulta de asientos de la empresa activa: {{ companyName }}</p>
-      </div>
-    </section>
-
-    <div *ngIf="success" class="summary-note">
-      {{ success }}
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">CONTABILIDAD · ASIENTOS</div>
+      <h1>Ingreso de Asientos</h1>
+      <p>Registre asientos manuales y visualice el impacto en caja.</p>
     </div>
 
-    <div *ngIf="error" class="summary-note error">
-      {{ error }}
-    </div>
+    <button type="button" class="secondary-btn" (click)="goBack()">
+      Volver
+    </button>
+  </div>
 
-    <div class="entry-layout">
-      <section class="entry-card">
-        <div class="section-header">
-          <h2>Nuevo asiento</h2>
+  <div class="entry-content">
+    <div class="entry-main">
+
+      <div class="form-card">
+
+        <div *ngIf="successMsg" class="success-box">
+          {{ successMsg }}
         </div>
 
-        <div class="entry-header-grid">
+        <div *ngIf="errorMsg" class="error-box">
+          {{ errorMsg }}
+        </div>
+
+        <div *ngIf="editingEntryId" class="info-box">
+          Editando asiento ID {{ editingEntryId }}
+        </div>
+
+        <div class="form-grid">
+
           <div class="field">
             <label>Fecha</label>
-            <input type="date" [(ngModel)]="form.entry_date" />
+            <input type="date" [(ngModel)]="entryDate" />
           </div>
 
           <div class="field">
-            <label>Tipo</label>
-            <select [(ngModel)]="form.entry_type">
-              <option value="MANUAL">MANUAL</option>
-              <option value="APERTURA">APERTURA</option>
-              <option value="AJUSTE">AJUSTE</option>
-              <option value="CIERRE">CIERRE</option>
+            <label>Tipo de asiento</label>
+            <select [(ngModel)]="entryType" name="entryType">
+              <option value="">Seleccione</option>
+              <option *ngFor="let type of entryTypes" [value]="type.code">
+                {{ type.name }}
+              </option>
             </select>
           </div>
 
@@ -43,196 +50,242 @@
             <label>Glosa</label>
             <input
               type="text"
-              [(ngModel)]="form.description"
-              placeholder="Ej: Compra de mercadería al contado"
+              [(ngModel)]="description"
+              placeholder="Ingrese la glosa"
             />
           </div>
+
         </div>
 
-        <div class="lines-toolbar">
-          <h3>Detalle del asiento</h3>
-          <button type="button" class="btn btn-secondary" (click)="addLine()">
-            + Agregar línea
+        <div class="repeat-box">
+          <label class="check-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="copyUntilDecember"
+              [disabled]="!!editingEntryId"
+            />
+            Repetir este asiento hasta diciembre
+          </label>
+        </div>
+
+        <div class="lines-card">
+
+          <div class="lines-header">
+            <h2>Detalle del asiento</h2>
+
+            <button type="button" class="secondary-btn" (click)="addLine()">
+              + Agregar línea
+            </button>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="lines-table">
+
+              <thead>
+                <tr>
+                  <th>Cuenta (código o nombre)</th>
+                  <th>Descripción</th>
+                  <th>Debe</th>
+                  <th>Haber</th>
+                  <th></th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let line of lines; let i = index; trackBy: trackByIndex">
+
+                  <td>
+                    <input
+                      type="text"
+                      [(ngModel)]="line.account_search"
+                      [attr.list]="'accounts-list-' + i"
+                      placeholder="Ej: 1010101 o Caja"
+                      (ngModelChange)="onAccountSearchChange(i)"
+                    />
+
+                    <datalist [id]="'accounts-list-' + i">
+                      <option
+                        *ngFor="let account of availableAccounts"
+                        [value]="account.code + ' - ' + account.name">
+                      </option>
+                    </datalist>
+
+                    <small *ngIf="line.account_code || line.account_name">
+                      {{ line.account_code }} - {{ line.account_name }}
+                    </small>
+                  </td>
+
+                  <td>
+                    <input type="text" [(ngModel)]="line.description" />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      [(ngModel)]="line.debit"
+                      (ngModelChange)="onDebitChange(i)"
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      [(ngModel)]="line.credit"
+                      (ngModelChange)="onCreditChange(i)"
+                    />
+                  </td>
+
+                  <td>
+                    <button
+                      type="button"
+                      class="danger-btn small-btn"
+                      (click)="removeLine(i)"
+                    >
+                      Quitar
+                    </button>
+                  </td>
+
+                </tr>
+              </tbody>
+
+              <tfoot>
+                <tr>
+                  <td colspan="2"><strong>Totales</strong></td>
+                  <td><strong>$ {{ formatMoney(totalDebit) }}</strong></td>
+                  <td><strong>$ {{ formatMoney(totalCredit) }}</strong></td>
+                  <td></td>
+                </tr>
+
+                <tr>
+                  <td colspan="5">
+                    <strong>Diferencia: $ {{ formatMoney(difference) }}</strong>
+                  </td>
+                </tr>
+              </tfoot>
+
+            </table>
+          </div>
+
+        </div>
+
+        <div class="actions-row">
+          <button type="button" class="primary-btn" (click)="saveEntry()">
+            {{ editingEntryId ? 'Actualizar asiento' : 'Guardar asiento' }}
+          </button>
+
+          <button type="button" class="secondary-btn" (click)="resetForm()">
+            {{ editingEntryId ? 'Cancelar edición' : 'Limpiar' }}
           </button>
         </div>
 
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Cuenta</th>
-                <th>Debe</th>
-                <th>Haber</th>
-                <th>Glosa línea</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let line of lines; let i = index">
-
-                <td>
-                  <select [(ngModel)]="line.account_id" (change)="onAccountChange(line)">
-                    <option [ngValue]="null">Seleccione cuenta</option>
-                    <option *ngFor="let acc of accounts" [ngValue]="acc.id">
-                      {{ acc.code }} - {{ acc.name }}
-                    </option>
-                  </select>
-                </td>
-
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    [(ngModel)]="line.debit"
-                    [name]="'debit_' + i"
-                    (ngModelChange)="onDebitChange(i)"
-                  />
-                </td>
-
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    [(ngModel)]="line.credit"
-                    [name]="'credit_' + i"
-                    (ngModelChange)="onCreditChange(i)"
-                  />
-                </td>
-
-                <td>
-                  <input
-                    type="text"
-                    [(ngModel)]="line.description"
-                    [name]="'desc_' + i"
-                    placeholder="Opcional"
-                  />
-                </td>
-
-                <td>
-                  <button
-                    type="button"
-                    class="btn btn-danger"
-                    (click)="removeLine(i)"
-                    [disabled]="lines.length === 1"
-                  >
-                    Quitar
-                  </button>
-                </td>
-
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="entry-actions">
-          <button
-            type="button"
-            class="btn btn-success"
-            (click)="saveEntry()"
-            [disabled]="saving"
-          >
-            {{ saving ? 'Guardando...' : 'Guardar asiento' }}
-          </button>
-        </div>
-      </section>
-
-      <div class="summary-column">
-        <aside class="summary-card">
-          <h3>Resumen</h3>
-
-          <div class="summary-row">
-            <span>Total Debe</span>
-            <strong>{{ totalDebit | number:'1.0-2' }}</strong>
-          </div>
-
-          <div class="summary-row">
-            <span>Total Haber</span>
-            <strong>{{ totalCredit | number:'1.0-2' }}</strong>
-          </div>
-
-          <div class="summary-row difference" [ngClass]="difference === 0 ? 'ok' : 'bad'">
-            <span>Diferencia</span>
-            <strong>{{ difference | number:'1.0-2' }}</strong>
-          </div>
-
-          <div *ngIf="difference === 0 && totalDebit > 0" class="summary-note">
-            El asiento está cuadrado.
-          </div>
-
-          <div *ngIf="difference !== 0" class="summary-note error">
-            El asiento no cuadra. El Debe debe ser igual al Haber.
-          </div>
-        </aside>
-
-        <aside class="summary-card caja-panel">
-          <h3>Caja / Liquidez</h3>
-
-          <div class="summary-row">
-            <span>Saldo actual</span>
-            <strong>{{ saldoCaja | number:'1.0-0' }}</strong>
-          </div>
-
-          <div class="summary-row">
-            <span>Impacto asiento</span>
-            <strong
-              [class.negative]="impactoCaja < 0"
-              [class.positive]="impactoCaja > 0">
-              {{ impactoCaja | number:'1.0-0' }}
-            </strong>
-          </div>
-
-          <div class="summary-row">
-            <span>Caja proyectada</span>
-            <strong
-              [class.negative]="cajaProyectada < 0"
-              [class.positive]="cajaProyectada > 0">
-              {{ cajaProyectada | number:'1.0-0' }}
-            </strong>
-          </div>
-        </aside>
       </div>
-    </div>
 
-    <section class="content-card">
-      <div class="section-header">
+      <div class="list-card">
+
         <h2>Asientos registrados</h2>
-      </div>
 
-      <div *ngIf="loading" class="state-card">
-        Cargando asientos...
-      </div>
-
-      <div *ngIf="!loading && error && entries.length === 0" class="state-card error">
-        {{ error }}
-      </div>
-
-      <div *ngIf="!loading && !error">
-        <div *ngIf="entries.length === 0" class="state-card">
-          No hay asientos para la empresa seleccionada.
+        <div *ngIf="loadingEntries" class="loading-box">
+          Cargando...
         </div>
 
-        <table *ngIf="entries.length > 0" class="data-table">
+        <div *ngIf="!loadingEntries && (!entries || entries.length === 0)" class="empty-box">
+          No hay asientos registrados.
+        </div>
+
+        <table *ngIf="entries && entries.length > 0" class="entries-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Fecha</th>
               <th>Tipo</th>
-              <th>Glosa</th>
+              <th>Descripción</th>
+              <th>Debe</th>
+              <th>Haber</th>
+              <th>Acciones</th>
             </tr>
           </thead>
+
           <tbody>
             <tr *ngFor="let entry of entries">
               <td>{{ entry.id }}</td>
-              <td>{{ entry.entry_date || entry.date }}</td>
-              <td>{{ entry.entry_type || '-' }}</td>
-              <td>{{ entry.description || '-' }}</td>
+              <td>{{ formatDate(entry.entry_date) }}</td>
+              <td>{{ entry.entry_type }}</td>
+              <td>{{ entry.description }}</td>
+              <td>$ {{ formatMoney(entry.total_debit || 0) }}</td>
+              <td>$ {{ formatMoney(entry.total_credit || 0) }}</td>
+              <td class="actions-cell">
+                <button
+                  type="button"
+                  class="secondary-btn small-btn"
+                  (click)="editEntry(entry)"
+                >
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  class="secondary-btn small-btn"
+                  (click)="exportEntryPdf(entry)"
+                  [disabled]="loadingPdf"
+                >
+                  PDF
+                </button>
+
+                <button
+                  type="button"
+                  class="danger-btn small-btn"
+                  (click)="deleteEntry(entry.id)"
+                >
+                  Eliminar
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
+
       </div>
-    </section>
+
+    </div>
+
+    <aside class="liquidity-panel">
+
+      <div class="liquidity-card">
+
+        <div class="eyebrow">CAJA / LIQUIDEZ</div>
+        <h2>Impacto</h2>
+
+        <div class="liquidity-row">
+          <span>Cuenta Caja</span>
+          <strong>{{ cashAccountCode }}</strong>
+        </div>
+
+        <div class="liquidity-row">
+          <span>Saldo actual</span>
+          <strong>$ {{ formatMoney(currentCashBalance) }}</strong>
+        </div>
+
+        <div class="liquidity-row" [ngClass]="cashImpactClass">
+          <span>Impacto</span>
+          <strong>{{ cashDraftImpactText }}</strong>
+        </div>
+
+        <div class="liquidity-row">
+          <span>Proyectado</span>
+          <strong>$ {{ formatMoney(projectedCashBalance) }}</strong>
+        </div>
+
+        <div class="liquidity-note" [ngClass]="cashImpactClass">
+          {{ cashImpactLabel }}
+        </div>
+
+      </div>
+
+    </aside>
 
   </div>
-</div>
+
+</section>

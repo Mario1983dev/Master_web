@@ -60,6 +60,7 @@ export class OfficeDashboard implements OnInit {
 
     if (current?.id) {
       this.selectedCompanyId = Number(current.id);
+      localStorage.setItem('company_id', String(current.id));
     }
 
     this.loadCompanies();
@@ -100,6 +101,7 @@ export class OfficeDashboard implements OnInit {
           this.selectedCompanyId = null;
           this.selectedCompany = null;
           this.auth.clearSelectedCompany();
+          localStorage.removeItem('company_id');
           this.errorMsg = 'No hay empresas disponibles para esta oficina.';
           this.loadingCompanies = false;
           this.cdr.detectChanges();
@@ -113,6 +115,7 @@ export class OfficeDashboard implements OnInit {
           this.selectedCompanyId = null;
           this.selectedCompany = null;
           this.auth.clearSelectedCompany();
+          localStorage.removeItem('company_id');
         }
 
         if (!this.selectedCompanyId && this.companies.length === 1) {
@@ -127,13 +130,16 @@ export class OfficeDashboard implements OnInit {
 
           if (found) {
             this.auth.setSelectedCompany(found);
+            localStorage.setItem('company_id', String(found.id));
             console.log('EMPRESA ACTIVA:', found);
           } else {
             this.selectedCompany = null;
             this.auth.clearSelectedCompany();
+            localStorage.removeItem('company_id');
           }
         } else {
           this.selectedCompany = null;
+          localStorage.removeItem('company_id');
         }
 
         this.loadingCompanies = false;
@@ -163,6 +169,7 @@ export class OfficeDashboard implements OnInit {
     if (!this.selectedCompanyId) {
       this.selectedCompany = null;
       this.auth.clearSelectedCompany();
+      localStorage.removeItem('company_id');
       this.errorMsg = '';
       this.cdr.detectChanges();
       return;
@@ -175,11 +182,13 @@ export class OfficeDashboard implements OnInit {
 
     if (company) {
       this.auth.setSelectedCompany(company);
+      localStorage.setItem('company_id', String(company.id));
       this.errorMsg = '';
       console.log('EMPRESA ACTIVADA:', company);
     } else {
       this.selectedCompany = null;
       this.auth.clearSelectedCompany();
+      localStorage.removeItem('company_id');
       this.errorMsg = 'La empresa seleccionada no es válida.';
     }
 
@@ -188,6 +197,7 @@ export class OfficeDashboard implements OnInit {
 
   clearCompany(): void {
     this.auth.clearSelectedCompany();
+    localStorage.removeItem('company_id');
     this.selectedCompany = null;
     this.selectedCompanyId = null;
     this.errorMsg = '';

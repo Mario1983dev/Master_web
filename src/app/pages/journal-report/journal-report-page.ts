@@ -90,12 +90,12 @@ export class JournalReport implements OnInit {
     this.journalService
       .getJournalReport(this.companyId, this.fromDate, this.toDate)
       .subscribe({
-        next: (data) => {
+        next: (data: any[]) => {
           this.rows = Array.isArray(data) ? data : [];
           this.loading = false;
           this.cdr.detectChanges();
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('ERROR REPORT:', error);
           this.errorMsg = 'No se pudo cargar el libro diario.';
           this.rows = [];

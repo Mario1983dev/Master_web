@@ -10,7 +10,7 @@ export class AuthMaster {
 
   login(identifier: string, password: string) {
     return this.http.post<{ token: string; user: any }>(
-      `${this.apiUrl}/login`,
+      `${this.apiUrl}/api/login`, // 🔥 CORREGIDO AQUÍ
       {
         usernameOrEmail: identifier.trim(),
         password
