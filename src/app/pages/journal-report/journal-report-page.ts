@@ -32,11 +32,14 @@ export class JournalReport implements OnInit {
   companyName = '';
   companyId: number | null = null;
 
-  ngOnInit(): void {
-    this.setCurrentMonthDates();
-    this.loadSelectedCompany();
+ ngOnInit(): void {
+  this.setCurrentMonthDates();
+  this.loadSelectedCompany();
+
+  if (this.companyId) {
     this.loadReport();
   }
+}
 
   setCurrentMonthDates(): void {
     const today = new Date();
@@ -75,12 +78,17 @@ export class JournalReport implements OnInit {
   }
 
   loadReport(): void {
-    if (!this.companyId) {
-      this.rows = [];
-      this.loading = false;
-      this.cdr.detectChanges();
-      return;
-    }
+  console.log('LOAD REPORT');
+  console.log('companyId:', this.companyId);
+  console.log('fromDate:', this.fromDate);
+  console.log('toDate:', this.toDate);
+   if (!this.companyId) {
+  console.warn('NO HAY COMPANY ID');
+  this.rows = [];
+  this.loading = false;
+  this.cdr.detectChanges();
+  return;
+}
 
     this.loading = true;
     this.errorMsg = '';

@@ -85,18 +85,33 @@ export interface CashBalanceResponse {
   providedIn: 'root'
 })
 export class JournalEntriesService {
-  private apiUrl = `${environment.apiUrl}/journal-entries`;
+  private readonly apiUrl = `${environment.apiUrl}/journal-entries`;
 
   constructor(private http: HttpClient) {}
+
+  private buildNoCacheParams(baseParams?: Record<string, string | number | boolean>): HttpParams {
+    let params = new HttpParams();
+
+    if (baseParams) {
+      Object.keys(baseParams).forEach((key) => {
+        const value = baseParams[key];
+        if (value !== null && value !== undefined && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return params.set('_', Date.now().toString());
+  }
 
   getEntryTypes(): Observable<EntryType[]> {
     return this.http.get<EntryType[]>(`${this.apiUrl}/types`);
   }
 
   getEntries(companyId: number): Observable<JournalEntryItem[]> {
-    const params = new HttpParams()
-      .set('company_id', companyId.toString())
-      .set('_', Date.now().toString());
+    const params = this.buildNoCacheParams({
+      company_id: companyId
+    });
 
     return this.http.get<JournalEntryItem[]>(this.apiUrl, { params });
   }
@@ -118,14 +133,13 @@ export class JournalEntriesService {
   }
 
   getCashBalance(companyId: number): Observable<CashBalanceResponse> {
-    const params = new HttpParams()
-      .set('company_id', companyId.toString())
-      .set('_', Date.now().toString());
+    const params = this.buildNoCacheParams({
+      company_id: companyId
+    });
 
-    return this.http.get<CashBalanceResponse>(
-      `${this.apiUrl}/cash-balance`,
-      { params }
-    );
+    return this.http.get<CashBalanceResponse>(`${this.apiUrl}/cash-balance`, {
+      params
+    });
   }
 
   getJournalReport(
@@ -133,15 +147,14 @@ export class JournalEntriesService {
     fromDate: string,
     toDate: string
   ): Observable<JournalReportRow[]> {
-    const params = new HttpParams()
-      .set('company_id', companyId.toString())
-      .set('from_date', fromDate)
-      .set('to_date', toDate)
-      .set('_', Date.now().toString());
+    const params = this.buildNoCacheParams({
+      company_id: companyId,
+      from_date: fromDate,
+      to_date: toDate
+    });
 
-    return this.http.get<JournalReportRow[]>(
-      `${this.apiUrl}/report`,
-      { params }
-    );
+    return this.http.get<JournalReportRow[]>(`${this.apiUrl}/report`, {
+      params
+    });
   }
 }
