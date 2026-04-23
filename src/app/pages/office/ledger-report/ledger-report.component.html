@@ -1,0 +1,48 @@
+<section class="ledger-page">
+  <div class="header">
+    <h1>Libro Mayor</h1>
+    <button type="button" (click)="goBack()">Volver</button>
+  </div>
+
+  <div class="filters">
+    <select [(ngModel)]="selectedAccountId">
+      <option [ngValue]="null">Seleccione cuenta</option>
+      <option *ngFor="let acc of accounts" [ngValue]="acc.id">
+        {{ acc.code }} - {{ acc.name }}
+      </option>
+    </select>
+
+    <input type="date" [(ngModel)]="fromDate" />
+    <input type="date" [(ngModel)]="toDate" />
+
+    <button type="button" (click)="search()">Buscar</button>
+  </div>
+
+  <p *ngIf="ledger.length === 0">
+    No hay movimientos para esta cuenta en el rango seleccionado.
+  </p>
+
+  <table *ngIf="ledger.length > 0">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Cuenta</th>
+        <th>Glosa</th>
+        <th>Debe</th>
+        <th>Haber</th>
+        <th>Saldo</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of ledger">
+        <td>{{ row.entry_date | date:'dd-MM-yyyy':'UTC' }}</td>
+        <td>{{ row.account_code }} - {{ row.account_name }}</td>
+        <td>{{ row.line_description || row.entry_description }}</td>
+        <td>{{ row.debit | number:'1.0-0' }}</td>
+        <td>{{ row.credit | number:'1.0-0' }}</td>
+        <td>{{ row.saldo | number:'1.0-0' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

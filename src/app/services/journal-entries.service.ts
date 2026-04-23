@@ -68,6 +68,21 @@ export interface JournalReportRow {
   credit: number;
 }
 
+export interface LedgerRow {
+  entry_id: number;
+  entry_date: string;
+  entry_type: string;
+  entry_description: string;
+  line_id: number;
+  line_description: string;
+  debit: number;
+  credit: number;
+  account_id: number;
+  account_code: string;
+  account_name: string;
+  saldo: number;
+}
+
 export interface JournalEntryDetail extends JournalEntryItem {
   lines: JournalEntryLineDetail[];
 }
@@ -86,6 +101,7 @@ export interface CashBalanceResponse {
 })
 export class JournalEntriesService {
   private readonly apiUrl = `${environment.apiUrl}/journal-entries`;
+  private readonly ledgerUrl = `${environment.apiUrl}/api/ledger`;
 
   constructor(private http: HttpClient) {}
 
@@ -156,5 +172,21 @@ export class JournalEntriesService {
     return this.http.get<JournalReportRow[]>(`${this.apiUrl}/report`, {
       params
     });
+  }
+
+  getLedger(
+    companyId: number,
+    accountId: number,
+    fromDate: string,
+    toDate: string
+  ): Observable<LedgerRow[]> {
+    const params = this.buildNoCacheParams({
+      company_id: companyId,
+      account_id: accountId,
+      fromDate,
+      toDate
+    });
+
+    return this.http.get<LedgerRow[]>(this.ledgerUrl, { params });
   }
 }

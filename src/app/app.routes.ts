@@ -97,13 +97,22 @@ export const routes: Routes = [
       ),
   },
 
- 
   {
     path: 'office/journal-report',
-    canActivate: [authGuard],
+    canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
       import('./pages/journal-report/journal-report-page').then(
         m => m.JournalReport
+      ),
+  },
+
+  // 🔥 NUEVA RUTA LIBRO MAYOR
+  {
+    path: 'office/ledger-report',
+    canActivate: [authGuard, companySelectedGuard],
+    loadComponent: () =>
+      import('./pages/office/ledger-report/ledger-report.component').then(
+        m => m.LedgerReportComponent
       ),
   },
 
