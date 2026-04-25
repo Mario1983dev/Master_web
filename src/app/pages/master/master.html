@@ -1,40 +1,36 @@
-
 <div class="master-page">
-
   <header class="topbar">
     <div class="brand">
+      <img class="brand-logo" src="assets/logo-solusoft.jpg" alt="SoluSoft" />
       <div class="brand-text">
-        <div class="app-name">Master ERP</div>
-        <div class="app-sub">Panel de administración</div>
+        <div class="app-name">MASTER ERP · SOLUSOFT</div>
+        <div class="app-sub">Panel de administración general</div>
       </div>
     </div>
 
     <div class="actions">
-      <button class="logout-btn" (click)="logout()">Salir</button>
+      <button class="logout-btn" type="button" (click)="logout()">Salir</button>
     </div>
   </header>
 
   <main class="content">
-
     <section class="hero">
-      <h1>Master Panel</h1>
-      <p>Gestiona oficinas y la configuración base del sistema.</p>
+      <span class="eyebrow">Administración SaaS</span>
+      <h1>Panel Master</h1>
+      <p>Desde aquí se crean y mantienen las oficinas que usarán el ERP contable.</p>
     </section>
 
-    <section class="grid">
+    <section class="grid" aria-label="Módulos master">
       <a class="card" [routerLink]="['/master/offices']">
+        <div class="card-icon">🏢</div>
         <div class="card-title">Oficinas</div>
-        <div class="card-desc">
-          Crear, editar y administrar oficinas.
-        </div>
+        <div class="card-desc">Crear, editar y administrar oficinas/clientes.</div>
         <div class="card-cta">Ir a Oficinas →</div>
       </a>
     </section>
-
   </main>
 
   <footer class="footer">
     <span>© {{ year }} SoluSoft SPA</span>
   </footer>
-
 </div>

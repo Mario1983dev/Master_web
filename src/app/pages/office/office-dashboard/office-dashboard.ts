@@ -51,11 +51,6 @@ export class OfficeDashboard implements OnInit {
   ngOnInit(): void {
     this.isOfficeAdmin = this.auth.isOfficeAdmin();
 
-    console.log('USER LOGUEADO:', this.auth.getUser());
-    console.log('ES OFFICE ADMIN:', this.isOfficeAdmin);
-    console.log('ES OFFICE USER:', this.auth.isOfficeUser());
-    console.log('ES MASTER:', this.auth.isMaster());
-
     const current = this.auth.getSelectedCompany();
 
     if (current?.id) {
@@ -68,8 +63,6 @@ export class OfficeDashboard implements OnInit {
 
   loadCompanies(): void {
     const officeId = this.auth.getOfficeId();
-
-    console.log('OFFICE ID USUARIO:', officeId);
 
     if (!officeId) {
       this.errorMsg = 'No se pudo identificar la oficina del usuario.';
@@ -84,8 +77,6 @@ export class OfficeDashboard implements OnInit {
 
     this.companiesService.getCompanies().subscribe({
       next: (data: Company[]) => {
-        console.log('COMPANIES API:', data);
-
         const filteredCompanies = (data || [])
           .filter(company => Number(company.office_id) === Number(officeId))
           .map(company => ({
@@ -94,8 +85,6 @@ export class OfficeDashboard implements OnInit {
           }));
 
         this.companies = filteredCompanies;
-
-        console.log('EMPRESAS NORMALIZADAS:', this.companies);
 
         if (this.companies.length === 0) {
           this.selectedCompanyId = null;
@@ -106,16 +95,6 @@ export class OfficeDashboard implements OnInit {
           this.loadingCompanies = false;
           this.cdr.detectChanges();
           return;
-        }
-
-        if (
-          this.selectedCompanyId &&
-          !this.companies.some(c => Number(c.id) === Number(this.selectedCompanyId))
-        ) {
-          this.selectedCompanyId = null;
-          this.selectedCompany = null;
-          this.auth.clearSelectedCompany();
-          localStorage.removeItem('company_id');
         }
 
         if (!this.selectedCompanyId && this.companies.length === 1) {
@@ -131,22 +110,13 @@ export class OfficeDashboard implements OnInit {
           if (found) {
             this.auth.setSelectedCompany(found);
             localStorage.setItem('company_id', String(found.id));
-            console.log('EMPRESA ACTIVA:', found);
-          } else {
-            this.selectedCompany = null;
-            this.auth.clearSelectedCompany();
-            localStorage.removeItem('company_id');
           }
-        } else {
-          this.selectedCompany = null;
-          localStorage.removeItem('company_id');
         }
 
         this.loadingCompanies = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('ERROR LOAD DASHBOARD COMPANIES:', err);
+      error: () => {
         this.errorMsg = 'No se pudieron cargar las empresas.';
         this.loadingCompanies = false;
         this.cdr.detectChanges();
@@ -170,7 +140,6 @@ export class OfficeDashboard implements OnInit {
       this.selectedCompany = null;
       this.auth.clearSelectedCompany();
       localStorage.removeItem('company_id');
-      this.errorMsg = '';
       this.cdr.detectChanges();
       return;
     }
@@ -183,13 +152,6 @@ export class OfficeDashboard implements OnInit {
     if (company) {
       this.auth.setSelectedCompany(company);
       localStorage.setItem('company_id', String(company.id));
-      this.errorMsg = '';
-      console.log('EMPRESA ACTIVADA:', company);
-    } else {
-      this.selectedCompany = null;
-      this.auth.clearSelectedCompany();
-      localStorage.removeItem('company_id');
-      this.errorMsg = 'La empresa seleccionada no es válida.';
     }
 
     this.cdr.detectChanges();
@@ -200,7 +162,6 @@ export class OfficeDashboard implements OnInit {
     localStorage.removeItem('company_id');
     this.selectedCompany = null;
     this.selectedCompanyId = null;
-    this.errorMsg = '';
     this.cdr.detectChanges();
   }
 
@@ -211,7 +172,6 @@ export class OfficeDashboard implements OnInit {
       return;
     }
 
-    this.errorMsg = '';
     this.router.navigate([route]);
   }
 }

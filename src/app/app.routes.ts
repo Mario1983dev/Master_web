@@ -96,7 +96,6 @@ export const routes: Routes = [
         m => m.JournalEntries
       ),
   },
-
   {
     path: 'office/journal-report',
     canActivate: [authGuard, companySelectedGuard],
@@ -106,13 +105,23 @@ export const routes: Routes = [
       ),
   },
 
-  // 🔥 NUEVA RUTA LIBRO MAYOR
+  // 🔥 LIBRO MAYOR
   {
     path: 'office/ledger-report',
     canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
       import('./pages/office/ledger-report/ledger-report.component').then(
         m => m.LedgerReportComponent
+      ),
+  },
+
+  // 🔥 BALANCE (NUEVO)
+  {
+    path: 'office/trial-balance',
+    canActivate: [authGuard, companySelectedGuard],
+    loadComponent: () =>
+      import('./pages/office/trial-balance/trial-balance.component').then(
+        m => m.TrialBalanceComponent
       ),
   },
 

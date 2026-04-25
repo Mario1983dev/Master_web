@@ -1,16 +1,25 @@
 <section class="office-dashboard">
+  <header class="hero-card">
+    <div class="hero-brand">
+     <img class="brand-logo" src="assets/logo-solusoft.jpg" alt="SoluSoft Logo">
+      <div>
+        <div class="eyebrow">OFFICE ERP · SOLUSOFT</div>
+        <h1>Panel de Oficina</h1>
+        <p>Selecciona una empresa y accede a los módulos contables principales.</p>
+      </div>
+    </div>
+  </header>
 
-  <div class="hero-card">
-    <div class="eyebrow">MASTER ERP · SOLUSOFT</div>
-    <h1>Panel de Oficina</h1>
-    <p>Accede a los módulos principales de la oficina desde un solo lugar.</p>
-  </div>
-
-  <div class="company-selector-card">
+  <section class="company-selector-card" aria-label="Empresa activa">
     <div class="company-selector-header">
       <div>
+        <span class="section-kicker">Paso 1</span>
         <h2>Empresa activa</h2>
-        <p>Selecciona la empresa con la que trabajarás en esta sesión.</p>
+        <p>Todos los módulos contables trabajan con la empresa seleccionada.</p>
+      </div>
+
+      <div class="status-pill" [class.ok]="selectedCompany" [class.warning]="!selectedCompany">
+        {{ selectedCompany ? 'Empresa seleccionada' : 'Falta seleccionar empresa' }}
       </div>
     </div>
 
@@ -19,6 +28,7 @@
         [(ngModel)]="selectedCompanyId"
         (change)="onCompanyChange()"
         [disabled]="loadingCompanies || companies.length === 0"
+        aria-label="Seleccionar empresa activa"
       >
         <option [ngValue]="null">
           {{ loadingCompanies ? 'Cargando empresas...' : 'Selecciona una empresa' }}
@@ -35,101 +45,96 @@
         (click)="clearCompany()"
         *ngIf="selectedCompany"
       >
-        Limpiar
+        Cambiar empresa
       </button>
     </div>
 
-    <div class="helper" *ngIf="loadingCompanies">
-      ⏳ Cargando empresas...
+    <div class="helper" *ngIf="loadingCompanies">Cargando empresas...</div>
+    <div class="helper success" *ngIf="!loadingCompanies && companies.length > 0">
+      Empresas disponibles: {{ companies.length }}
     </div>
-
-    <div class="helper" *ngIf="!loadingCompanies && companies.length > 0">
-      ✅ Empresas cargadas: {{ companies.length }}
-    </div>
-
     <div class="helper" *ngIf="!loadingCompanies && companies.length === 0 && !errorMsg">
       No hay empresas disponibles.
     </div>
-
-    <div class="helper error" *ngIf="errorMsg">
-      {{ errorMsg }}
-    </div>
+    <div class="helper error" *ngIf="errorMsg">{{ errorMsg }}</div>
 
     <div class="active-company" *ngIf="selectedCompany">
-      <strong>Empresa activa:</strong>
-      {{ selectedCompany.label }}
+      <span>Trabajando con</span>
+      <strong>{{ selectedCompany.label }}</strong>
     </div>
-  </div>
+  </section>
 
-  <div class="modules-grid">
+  <section class="modules-section" aria-label="Módulos del ERP">
+    <div class="section-title-row">
+      <div>
+        <span class="section-kicker">Paso 2</span>
+        <h2>Módulos disponibles</h2>
+        <p>El flujo recomendado es: Plan de cuentas → Asientos → Libros → Balance.</p>
+      </div>
+    </div>
 
-    <button
-      *ngIf="isOfficeAdmin"
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/configuration', true)"
-    >
-      <h2>Configuración</h2>
-      <p>Parámetros generales y administración funcional.</p>
-    </button>
+    <div class="modules-grid">
+      <button
+        *ngIf="isOfficeAdmin"
+        class="module-card admin-card"
+        type="button"
+        (click)="goTo('/office/configuration', true)"
+        [class.disabled]="!selectedCompany"
+      >
+        <span class="module-icon">⚙️</span>
+        <span class="module-tag">Administración</span>
+        <h3>Configuración</h3>
+        <p>Define parámetros y cuentas asociadas a compras, ventas y caja.</p>
+      </button>
 
-    <button
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/accounts', true)"
-    >
-      <h2>Plan de cuentas</h2>
-      <p>Consulta y administración del plan de cuentas.</p>
-    </button>
+      <button class="module-card" type="button" (click)="goTo('/office/accounts', true)" [class.disabled]="!selectedCompany">
+        <span class="module-icon">📘</span>
+        <span class="module-tag">Base contable</span>
+        <h3>Plan de cuentas</h3>
+        <p>Consulta y administra las cuentas contables de la empresa.</p>
+      </button>
 
-    <button
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/journal-entries', true)"
-    >
-      <h2>Asientos</h2>
-      <p>Registro y revisión de asientos contables.</p>
-    </button>
+      <button class="module-card featured" type="button" (click)="goTo('/office/journal-entries', true)" [class.disabled]="!selectedCompany">
+        <span class="module-icon">✍️</span>
+        <span class="module-tag">Operación diaria</span>
+        <h3>Asientos</h3>
+        <p>Registra movimientos contables con débito y crédito balanceados.</p>
+      </button>
 
-    <button
-      *ngIf="isOfficeAdmin"
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/office-users')"
-    >
-      <h2>Usuarios</h2>
-      <p>Gestión de usuarios de la oficina.</p>
-    </button>
+      <button *ngIf="isOfficeAdmin" class="module-card admin-card" type="button" (click)="goTo('/office/office-users')">
+        <span class="module-icon">👥</span>
+        <span class="module-tag">Administración</span>
+        <h3>Usuarios</h3>
+        <p>Gestiona los usuarios que tendrán acceso a la oficina.</p>
+      </button>
 
-    <button
-      *ngIf="isOfficeAdmin"
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/companies')"
-    >
-      <h2>Empresas</h2>
-      <p>Administración de empresas asociadas a la oficina.</p>
-    </button>
+      <button *ngIf="isOfficeAdmin" class="module-card admin-card" type="button" (click)="goTo('/office/companies')">
+        <span class="module-icon">🏢</span>
+        <span class="module-tag">Administración</span>
+        <h3>Empresas</h3>
+        <p>Crea y mantiene empresas asociadas a esta oficina.</p>
+      </button>
 
-    <button
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/journal-report', true)"
-    >
-      <h2>Libro Diario</h2>
-      <p>Consulta cronológica de asientos contables registrados.</p>
-    </button>
+      <button class="module-card" type="button" (click)="goTo('/office/journal-report', true)" [class.disabled]="!selectedCompany">
+        <span class="module-icon">📄</span>
+        <span class="module-tag">Reportes</span>
+        <h3>Libro Diario</h3>
+        <p>Revisa los asientos en orden cronológico.</p>
+      </button>
 
-    <!-- 🔥 NUEVO: LIBRO MAYOR -->
-    <button
-      class="module-card"
-      type="button"
-      (click)="goTo('/office/ledger-report', true)"
-    >
-      <h2>Libro Mayor</h2>
-      <p>Consulta movimientos por cuenta.</p>
-    </button>
+      <button class="module-card" type="button" (click)="goTo('/office/ledger-report', true)" [class.disabled]="!selectedCompany">
+        <span class="module-icon">📚</span>
+        <span class="module-tag">Reportes</span>
+        <h3>Libro Mayor</h3>
+        <p>Consulta movimientos agrupados por cuenta contable.</p>
+      </button>
 
-  </div>
-
+      <button class="module-card" type="button" (click)="goTo('/office/trial-balance', true)" [class.disabled]="!selectedCompany">
+        <span class="module-icon">📊</span>
+        <span class="module-tag">Reportes</span>
+        <h3>Balance</h3>
+        <p>Revisa débitos, créditos y saldos para validar la contabilidad.</p>
+      </button>
+    </div>
+  </section>
 </section>

@@ -1,0 +1,52 @@
+<section class="trial-balance">
+
+  <h1>Balance de comprobación</h1>
+
+  <div class="filters">
+    <label>Desde</label>
+    <input type="date" [(ngModel)]="fromDate">
+
+    <label>Hasta</label>
+    <input type="date" [(ngModel)]="toDate">
+
+    <button (click)="search()">Buscar</button>
+    <button (click)="goBack()">Volver</button>
+  </div>
+
+  <div *ngIf="loading">Cargando...</div>
+
+  <table *ngIf="rows.length > 0">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Cuenta</th>
+        <th>Débito</th>
+        <th>Crédito</th>
+        <th>Saldo Deudor</th>
+        <th>Saldo Acreedor</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let r of rows">
+        <td>{{ r.code }}</td>
+        <td>{{ r.name }}</td>
+        <td>{{ r.total_debit | number }}</td>
+        <td>{{ r.total_credit | number }}</td>
+        <td>{{ r.saldo_deudor | number }}</td>
+        <td>{{ r.saldo_acreedor | number }}</td>
+      </tr>
+    </tbody>
+
+    <tfoot>
+      <tr>
+        <td colspan="2"><strong>Totales</strong></td>
+        <td>{{ totalDebit | number }}</td>
+        <td>{{ totalCredit | number }}</td>
+        <td>{{ totalDebtor | number }}</td>
+        <td>{{ totalCreditor | number }}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+</section>
