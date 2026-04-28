@@ -40,8 +40,9 @@
             type="password"
             name="password"
             [(ngModel)]="form.password"
-            placeholder="Ingrese contraseña"
+            placeholder="Ingrese contraseña (mínimo 6 caracteres)"
           />
+          <small>Debe tener al menos 6 caracteres</small>
         </div>
 
         <div class="form-group">
@@ -91,16 +92,26 @@
               <td>#{{ user.id }}</td>
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
+
               <td>
-                <span class="role-pill" [class.admin]="user.role === 'admin'">
-                  {{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}
+                <span
+                  class="role-pill"
+                  [class.admin]="(user.role + '') === 'OFFICE_ADMIN' || user.role === 'admin'"
+                >
+                  {{
+                    (user.role + '') === 'OFFICE_ADMIN' || user.role === 'admin'
+                      ? 'Administrador'
+                      : 'Usuario'
+                  }}
                 </span>
               </td>
+
               <td>
                 <span class="status-pill" [class.inactive]="user.status !== 1">
                   {{ user.status === 1 ? 'Activo' : 'Inactivo' }}
                 </span>
               </td>
+
               <td class="actions-cell">
                 <button
                   type="button"

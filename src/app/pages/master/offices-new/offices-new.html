@@ -8,7 +8,7 @@
         <p>
           {{ isEdit
             ? 'Actualiza los datos de la oficina del panel master'
-            : 'Crea una nueva oficina para el panel master' }}
+            : 'Crea una nueva oficina y su administrador principal' }}
         </p>
       </div>
     </section>
@@ -52,7 +52,7 @@
           </div>
 
           <div class="field">
-            <label>Email</label>
+            <label>Email oficina</label>
             <input
               type="email"
               name="email"
@@ -73,15 +73,47 @@
 
           <div class="field">
             <label>Estado</label>
-            <select
-              name="status"
-              [(ngModel)]="form.status"
-            >
+            <select name="status" [(ngModel)]="form.status">
               <option [ngValue]="1">Activa</option>
               <option [ngValue]="0">Inactiva</option>
             </select>
           </div>
 
+        </div>
+
+        <div class="grid" *ngIf="!isEdit">
+          <div class="field">
+            <label>Nombre administrador</label>
+            <input
+              type="text"
+              name="admin_name"
+              [(ngModel)]="form.admin_name"
+              placeholder="Ej: Administrador Oficina"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label>Correo administrador</label>
+            <input
+              type="email"
+              name="admin_email"
+              [(ngModel)]="form.admin_email"
+              placeholder="admin@empresa.cl"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label>Contraseña administrador</label>
+            <input
+              type="password"
+              name="admin_password"
+              [(ngModel)]="form.admin_password"
+              placeholder="Mínimo 6 caracteres"
+              required
+            />
+          </div>
         </div>
 
         <div *ngIf="errorMsg" class="state-card error">
@@ -106,7 +138,7 @@
             {{
               loading
                 ? (isEdit ? 'Actualizando...' : 'Guardando...')
-                : (isEdit ? 'Actualizar oficina' : 'Guardar oficina')
+                : (isEdit ? 'Actualizar oficina' : 'Guardar oficina y administrador')
             }}
           </button>
 

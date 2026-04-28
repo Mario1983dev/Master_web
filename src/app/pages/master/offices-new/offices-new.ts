@@ -23,7 +23,11 @@ export class OfficesNew implements OnInit {
     legal_name: '',
     email: '',
     phone: '',
-    status: 1
+    status: 1,
+
+    admin_name: '',
+    admin_email: '',
+    admin_password: ''
   };
 
   constructor(
@@ -36,7 +40,6 @@ export class OfficesNew implements OnInit {
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    console.log('ROUTE ID:', id);
 
     if (id) {
       this.isEdit = true;
@@ -49,12 +52,8 @@ export class OfficesNew implements OnInit {
     this.loading = true;
     this.errorMsg = '';
 
-    console.log('LOAD OFFICE ID:', id);
-
     this.officesSrv.getById(id).subscribe({
       next: (resp: any) => {
-        console.log('GET OFFICE RESPONSE:', resp);
-
         const office = resp?.data || resp;
 
         this.zone.run(() => {
@@ -65,15 +64,11 @@ export class OfficesNew implements OnInit {
           this.form.phone = String(office?.phone ?? '');
           this.form.status = Number(office?.status ?? 1);
 
-          console.log('FORM CARGADO:', this.form);
-
           this.loading = false;
           this.cdr.detectChanges();
         });
       },
       error: (err: any) => {
-        console.error('GET OFFICE ERROR:', err);
-
         this.zone.run(() => {
           this.errorMsg = err?.error?.message || 'Error al cargar oficina';
           this.loading = false;
@@ -88,45 +83,68 @@ export class OfficesNew implements OnInit {
     this.errorMsg = '';
 
     if (this.isEdit) {
-      console.log('UPDATE ID:', this.officeId);
-      console.log('UPDATE PAYLOAD:', this.form);
+      const officePayload = {
+        rut: this.form.rut,
+        name: this.form.name,
+        legal_name: this.form.legal_name,
+        email: this.form.email,
+        phone: this.form.phone,
+        status: this.form.status
+      };
 
-      this.officesSrv.update(this.officeId, this.form).subscribe({
+      this.officesSrv.update(this.officeId, officePayload).subscribe({
         next: () => {
           this.loading = false;
           alert('Oficina actualizada correctamente');
           this.router.navigate(['/master/offices']);
         },
         error: (err: any) => {
-          console.error('UPDATE OFFICE ERROR:', err);
           this.errorMsg = err?.error?.message || 'Error al actualizar oficina';
           this.loading = false;
           this.cdr.detectChanges();
         }
       });
-    } else {
-      this.officesSrv.create(this.form).subscribe({
-        next: (resp: any) => {
-          this.loading = false;
 
-          alert(
-            'Oficina creada correctamente\n\n' +
-            'Administrador de la oficina\n' +
-            'Usuario: ' + (resp?.admin_user || 'N/D') + '\n' +
-            'Clave temporal: ' + (resp?.temp_password || 'N/D') + '\n\n' +
-            'Guarde esta información. La clave se muestra solo una vez.'
-          );
-
-          this.router.navigate(['/master/offices']);
-        },
-        error: (err: any) => {
-          console.error('CREATE OFFICE ERROR:', err);
-          this.errorMsg = err?.error?.message || 'Error al crear oficina';
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-      });
+      return;
     }
+
+    if (!this.form.admin_name?.trim()) {
+      alert('El nombre del administrador es obligatorio');
+      this.loading = false;
+      return;
+    }
+
+    if (!this.form.admin_email?.trim()) {
+      alert('El correo del administrador es obligatorio');
+      this.loading = false;
+      return;
+    }
+
+    if (!this.form.admin_password?.trim()) {
+      alert('La contraseña del administrador es obligatoria');
+      this.loading = false;
+      return;
+    }
+
+    if (this.form.admin_password.trim().length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres');
+      this.loading = false;
+      return;
+    }
+
+    this.officesSrv.create(this.form).subscribe({
+      next: () => {
+        this.loading = false;
+        alert('Oficina y administrador creados correctamente');
+        this.router.navigate(['/master/offices']);
+      },
+      error: (err: any) => {
+        console.error('CREATE OFFICE + ADMIN ERROR:', err);
+        this.errorMsg = err?.error?.message || 'Error al crear oficina y administrador';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   cancel(): void {

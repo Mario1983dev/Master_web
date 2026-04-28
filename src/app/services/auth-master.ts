@@ -8,11 +8,11 @@ export class AuthMaster {
 
   constructor(private http: HttpClient) {}
 
-  login(identifier: string, password: string) {
+  login(email: string, password: string) {
     return this.http.post<{ token: string; user: any }>(
-      `${this.apiUrl}/api/login`, // 🔥 CORREGIDO AQUÍ
+      `${this.apiUrl}/api/login`,
       {
-        usernameOrEmail: identifier.trim(),
+        email: email.trim().toLowerCase(),
         password
       }
     );

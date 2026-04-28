@@ -17,21 +17,21 @@
       </div>
 
       <div class="field">
-        <label for="identifier">Usuario o correo</label>
+        <label for="email">Correo electrónico</label>
         <div class="input">
           <input
-            id="identifier"
-            name="identifier"
-            type="text"
-            autocomplete="username"
-            placeholder="admin4 o correo@empresa.cl"
-            [(ngModel)]="identifier"
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            placeholder="correo@empresa.cl"
+            [(ngModel)]="email"
             required
-            [class.invalid]="f.submitted && !identifier"
+            [class.invalid]="f.submitted && !email"
           />
         </div>
-        <div class="hint error" *ngIf="f.submitted && !identifier">
-          Ingresa tu usuario o correo.
+        <div class="hint error" *ngIf="f.submitted && !email">
+          Ingresa tu correo electrónico.
         </div>
       </div>
 

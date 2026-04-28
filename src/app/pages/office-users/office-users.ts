@@ -16,20 +16,14 @@ export class OfficeUsers implements OnInit {
 
   users: OfficeUser[] = [];
   officeId: number | null = null;
+  editingUserId: number | null = null;
 
-  form: {
-    name: string;
-    email: string;
-    password: string;
-    role: 'admin' | 'user';
-  } = {
+  form = {
     name: '',
     email: '',
     password: '',
-    role: 'user'
+    role: 'user' as 'admin' | 'user'
   };
-
-  editingUserId: number | null = null;
 
   ngOnInit(): void {
     this.loadOfficeId();
@@ -41,7 +35,6 @@ export class OfficeUsers implements OnInit {
       const rawUser = localStorage.getItem('user');
 
       if (!rawUser) {
-        console.error('No se encontró el usuario en localStorage');
         this.officeId = null;
         return;
       }
@@ -49,21 +42,26 @@ export class OfficeUsers implements OnInit {
       const user = JSON.parse(rawUser);
       this.officeId = Number(user.office_id);
 
-      console.log('OFFICE ID ACTUAL =>', this.officeId);
-
       if (!this.officeId) {
-        console.error('office_id inválido en localStorage:', user);
         this.officeId = null;
       }
-    } catch (error) {
-      console.error('Error leyendo usuario desde localStorage:', error);
+    } catch {
       this.officeId = null;
     }
   }
 
+  private normalizeRoleToForm(role: string): 'admin' | 'user' {
+    const value = String(role || '').trim().toUpperCase();
+
+    if (value === 'OFFICE_ADMIN' || value === 'ADMIN') {
+      return 'admin';
+    }
+
+    return 'user';
+  }
+
   loadUsers(): void {
     if (!this.officeId) {
-      console.error('No hay officeId válido para cargar usuarios');
       this.users = [];
       this.cdr.detectChanges();
       return;
@@ -71,12 +69,10 @@ export class OfficeUsers implements OnInit {
 
     this.officeUsersService.getByOffice(this.officeId).subscribe({
       next: (data: OfficeUser[]) => {
-        console.log('USUARIOS API:', data);
         this.users = Array.isArray(data) ? [...data] : [];
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('ERROR LOAD USERS:', err);
+      error: () => {
         this.users = [];
         this.cdr.detectChanges();
       }
@@ -85,16 +81,22 @@ export class OfficeUsers implements OnInit {
 
   save(): void {
     if (!this.officeId) {
-      console.error('No hay officeId válido para guardar usuario');
+      alert('No hay oficina válida para guardar usuario');
       return;
     }
 
-    if (
-      !this.form.name.trim() ||
-      !this.form.email.trim() ||
-      (!this.editingUserId && !this.form.password.trim())
-    ) {
-      console.error('Nombre, correo y contraseña son obligatorios');
+    if (!this.form.name.trim() || !this.form.email.trim()) {
+      alert('Nombre y correo son obligatorios');
+      return;
+    }
+
+    if (!this.editingUserId && !this.form.password.trim()) {
+      alert('La contraseña es obligatoria');
+      return;
+    }
+
+    if (!this.editingUserId && this.form.password.trim().length < 6) {
+      alert('La contraseña debe tener al menos 6 caracteres');
       return;
     }
 
@@ -102,39 +104,43 @@ export class OfficeUsers implements OnInit {
       const payload = {
         name: this.form.name.trim(),
         email: this.form.email.trim().toLowerCase(),
-        password: this.form.password,
-        role: this.form.role
+        role: this.form.role,
+        status: 1
       };
-
-      console.log('PAYLOAD UPDATE USER =>', payload);
 
       this.officeUsersService.update(this.editingUserId, payload).subscribe({
         next: () => {
           this.cancelEdit();
           this.loadUsers();
         },
-        error: (err) => console.error('ERROR UPDATE USER:', err)
+        error: (err) => {
+          console.error('ERROR UPDATE USER:', err);
+          alert(err?.error?.message || 'Error al actualizar usuario');
+        }
       });
-    } else {
-      const payload = {
-        office_id: this.officeId,
-        name: this.form.name.trim(),
-        username: this.form.email.trim().toLowerCase().split('@')[0],
-        email: this.form.email.trim().toLowerCase(),
-        password: this.form.password,
-        role: this.form.role
-      };
 
-      console.log('PAYLOAD CREATE USER =>', payload);
-
-      this.officeUsersService.create(payload).subscribe({
-        next: () => {
-          this.cancelEdit();
-          this.loadUsers();
-        },
-        error: (err) => console.error('ERROR CREATE USER:', err)
-      });
+      return;
     }
+
+    const payload = {
+      office_id: this.officeId,
+      name: this.form.name.trim(),
+      email: this.form.email.trim().toLowerCase(),
+      password: this.form.password.trim(),
+      role: this.form.role,
+      status: 1
+    };
+
+    this.officeUsersService.create(payload).subscribe({
+      next: () => {
+        this.cancelEdit();
+        this.loadUsers();
+      },
+      error: (err) => {
+        console.error('ERROR CREATE USER:', err);
+        alert(err?.error?.message || 'Error al crear usuario');
+      }
+    });
   }
 
   edit(user: OfficeUser): void {
@@ -143,7 +149,7 @@ export class OfficeUsers implements OnInit {
       name: user.name,
       email: user.email,
       password: '',
-      role: user.role
+      role: this.normalizeRoleToForm(user.role)
     };
   }
 
@@ -161,10 +167,11 @@ export class OfficeUsers implements OnInit {
     const newStatus = user.status === 1 ? 0 : 1;
 
     this.officeUsersService.changeStatus(user.id, newStatus).subscribe({
-      next: () => {
-        this.loadUsers();
-      },
-      error: (err) => console.error('ERROR CHANGE STATUS:', err)
+      next: () => this.loadUsers(),
+      error: (err) => {
+        console.error('ERROR CHANGE STATUS:', err);
+        alert(err?.error?.message || 'Error al cambiar estado');
+      }
     });
   }
 }

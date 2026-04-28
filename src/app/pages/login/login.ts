@@ -12,7 +12,7 @@ import { AuthMaster } from '../../services/auth-master';
   styleUrls: ['./login.scss']
 })
 export class Login {
-  identifier = '';
+  email = '';
   password = '';
 
   showPass = false;
@@ -27,15 +27,15 @@ export class Login {
   onSubmit() {
     if (this.loading) return;
 
-    if (!this.identifier.trim() || !this.password.trim()) {
-      this.errorMsg = 'Ingresa usuario o correo y contraseña.';
+    if (!this.email.trim() || !this.password.trim()) {
+      this.errorMsg = 'Ingresa email y contraseña.';
       return;
     }
 
     this.loading = true;
     this.errorMsg = '';
 
-    this.auth.login(this.identifier.trim(), this.password.trim()).subscribe({
+    this.auth.login(this.email.trim(), this.password.trim()).subscribe({
       next: (res: any) => {
         console.log('RESP LOGIN:', res);
 
@@ -55,7 +55,6 @@ export class Login {
         if (
           scope === 'office_admin' ||
           scope === 'office_user' ||
-          scope === 'office' ||
           role === 'OFFICE_ADMIN' ||
           role === 'OFFICE_USER'
         ) {
@@ -72,7 +71,7 @@ export class Login {
         console.error('ERR LOGIN:', err);
 
         if (err?.status === 401) {
-          this.errorMsg = 'Usuario o contraseña incorrectos.';
+          this.errorMsg = 'Email o contraseña incorrectos.';
         } else if (err?.status === 403) {
           this.errorMsg = err?.error?.message || 'Usuario sin acceso.';
         } else if (err?.status === 0) {
