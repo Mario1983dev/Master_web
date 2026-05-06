@@ -101,7 +101,7 @@ export interface CashBalanceResponse {
 })
 export class JournalEntriesService {
   private readonly apiUrl = `${environment.apiUrl}/journal-entries`;
-  private readonly ledgerUrl = `${environment.apiUrl}/api/ledger`;
+  private readonly ledgerUrl = `${environment.apiUrl}/ledger`;
 
   constructor(private http: HttpClient) {}
 

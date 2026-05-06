@@ -19,10 +19,17 @@ export const authGuard: CanActivateFn = (route, state) => {
   const role = String(user?.role || '').trim().toUpperCase();
 
   const isMaster = scope === 'master' || role === 'MASTER';
+
   const isOfficeAdmin =
-    scope === 'office_admin' || role === 'OFFICE_ADMIN';
+    scope === 'office_admin' ||
+    role === 'OFFICE_ADMIN' ||
+    role === 'ADMIN';
+
   const isOfficeUser =
-    scope === 'office_user' || role === 'OFFICE_USER';
+    scope === 'office_user' ||
+    role === 'OFFICE_USER' ||
+    role === 'USER';
+
   const isOffice = isOfficeAdmin || isOfficeUser;
 
   if (url.startsWith('/master')) {

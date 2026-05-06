@@ -14,61 +14,32 @@
     </section>
 
     <section class="form-card">
-
       <form #f="ngForm" (ngSubmit)="save()">
 
         <div class="grid">
-
           <div class="field">
             <label>RUT</label>
-            <input
-              type="text"
-              name="rut"
-              [(ngModel)]="form.rut"
-              placeholder="76123456-7"
-              required
-            />
+            <input type="text" name="rut" [(ngModel)]="form.rut" placeholder="76123456-7" required />
           </div>
 
           <div class="field">
             <label>Nombre</label>
-            <input
-              type="text"
-              name="name"
-              [(ngModel)]="form.name"
-              placeholder="Oficina Santiago"
-              required
-            />
+            <input type="text" name="name" [(ngModel)]="form.name" placeholder="Oficina Santiago" required />
           </div>
 
           <div class="field">
             <label>Razón social</label>
-            <input
-              type="text"
-              name="legal_name"
-              [(ngModel)]="form.legal_name"
-              placeholder="SoluSoft SPA"
-            />
+            <input type="text" name="legal_name" [(ngModel)]="form.legal_name" placeholder="SoluSoft SPA" />
           </div>
 
           <div class="field">
             <label>Email oficina</label>
-            <input
-              type="email"
-              name="email"
-              [(ngModel)]="form.email"
-              placeholder="contacto@empresa.cl"
-            />
+            <input type="email" name="email" [(ngModel)]="form.email" placeholder="contacto@empresa.cl" />
           </div>
 
           <div class="field">
             <label>Teléfono</label>
-            <input
-              type="text"
-              name="phone"
-              [(ngModel)]="form.phone"
-              placeholder="+56 9 1111 2222"
-            />
+            <input type="text" name="phone" [(ngModel)]="form.phone" placeholder="+56 9 1111 2222" />
           </div>
 
           <div class="field">
@@ -78,10 +49,20 @@
               <option [ngValue]="0">Inactiva</option>
             </select>
           </div>
-
         </div>
 
         <div class="grid" *ngIf="!isEdit">
+          <div class="field">
+            <label>Usuario administrador</label>
+            <input
+              type="text"
+              name="admin_username"
+              [(ngModel)]="form.admin_username"
+              placeholder="Ej: admin"
+              required
+            />
+          </div>
+
           <div class="field">
             <label>Nombre administrador</label>
             <input
@@ -121,31 +102,20 @@
         </div>
 
         <div class="actions">
-
-          <button
-            type="button"
-            class="btn-secondary"
-            (click)="cancel()"
-          >
+          <button type="button" class="btn-secondary" (click)="cancel()">
             Cancelar
           </button>
 
-          <button
-            type="submit"
-            class="btn-primary"
-            [disabled]="loading || f.invalid"
-          >
+          <button type="submit" class="btn-primary" [disabled]="loading || f.invalid">
             {{
               loading
                 ? (isEdit ? 'Actualizando...' : 'Guardando...')
                 : (isEdit ? 'Actualizar oficina' : 'Guardar oficina y administrador')
             }}
           </button>
-
         </div>
 
       </form>
-
     </section>
 
   </div>

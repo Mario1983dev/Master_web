@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 })
 export class OfficesService {
 
-  private baseUrl = `${environment.apiUrl}/api/master/offices`;
+  private baseUrl = `${environment.apiUrl}/master/offices`;
 
   constructor(private http: HttpClient) {}
 

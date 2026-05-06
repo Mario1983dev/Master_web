@@ -1,7 +1,8 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { finalize } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -14,9 +15,11 @@ import { environment } from '../../../../environments/environment';
 export class TrialBalanceComponent implements OnInit {
   private http = inject(HttpClient);
   private location = inject(Location);
+  private cdr = inject(ChangeDetectorRef);
 
   rows: any[] = [];
   loading = false;
+  exportingPdf = false;
 
   fromDate = '';
   toDate = '';
@@ -25,13 +28,10 @@ export class TrialBalanceComponent implements OnInit {
     const today = new Date();
     this.fromDate = `${today.getFullYear()}-01-01`;
     this.toDate = `${today.getFullYear()}-12-31`;
-    // ❌ quitamos el auto search
   }
 
   search(): void {
-   const selected = localStorage.getItem('selected_company');
-const company = selected ? JSON.parse(selected) : null;
-const companyId = company?.id;
+    const companyId = this.getCompanyId();
 
     if (!companyId) {
       alert('Debes seleccionar una empresa activa.');
@@ -39,26 +39,101 @@ const companyId = company?.id;
     }
 
     const params = new HttpParams()
-      .set('company_id', companyId)
+      .set('company_id', String(companyId))
       .set('from', this.fromDate)
-      .set('to', this.toDate);
+      .set('to', this.toDate)
+      .set('_t', Date.now().toString());
 
     this.loading = true;
-    this.rows = []; // limpia resultados anteriores
+    this.rows = [];
+    this.cdr.detectChanges();
 
     this.http
-      .get<any[]>(`${environment.apiUrl}/api/reports/trial-balance`, { params })
+      .get<any[]>(`${environment.apiUrl}/trial-balance`, { params })
+      .pipe(
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: (res) => {
-          this.rows = res || [];
-          this.loading = false;
+          const data = Array.isArray(res) ? res : [];
+
+          this.rows = data.filter((r) =>
+            Number(r.debit || 0) !== 0 ||
+            Number(r.credit || 0) !== 0 ||
+            Number(r.saldo || 0) !== 0
+          );
+
+          this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Error cargando balance:', err);
-          this.loading = false;
-          // ❌ evitamos alert molesto
+          alert('Error cargando balance.');
         }
       });
+  }
+
+  exportPdf(): void {
+    const companyId = this.getCompanyId();
+
+    if (!companyId) {
+      alert('Debes seleccionar una empresa activa.');
+      return;
+    }
+
+    const params = new HttpParams()
+      .set('company_id', String(companyId))
+      .set('from', this.fromDate)
+      .set('to', this.toDate)
+      .set('_t', Date.now().toString());
+
+    this.exportingPdf = true;
+
+    this.http
+      .get(`${environment.apiUrl}/trial-balance/pdf`, {
+        params,
+        responseType: 'blob'
+      })
+      .pipe(
+        finalize(() => {
+          this.exportingPdf = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (blob) => {
+          const file = new Blob([blob], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(file);
+          window.open(url, '_blank');
+
+          setTimeout(() => {
+            window.URL.revokeObjectURL(url);
+          }, 10000);
+        },
+        error: (err) => {
+          console.error('Error exportando PDF:', err);
+          alert('Error exportando PDF.');
+        }
+      });
+  }
+
+  private getCompanyId(): string | number | null {
+    const selected = localStorage.getItem('selected_company');
+
+    if (selected) {
+      try {
+        const company = JSON.parse(selected);
+        if (company?.id) return company.id;
+      } catch {}
+    }
+
+    return localStorage.getItem('company_id');
+  }
+
+  trackByCode(index: number, item: any): string {
+    return item.account_code || item.code || index.toString();
   }
 
   goBack(): void {
@@ -66,18 +141,18 @@ const companyId = company?.id;
   }
 
   get totalDebit(): number {
-    return this.rows.reduce((sum, r) => sum + Number(r.total_debit || 0), 0);
+    return this.rows.reduce((sum, r) => sum + Number(r.debit || 0), 0);
   }
 
   get totalCredit(): number {
-    return this.rows.reduce((sum, r) => sum + Number(r.total_credit || 0), 0);
+    return this.rows.reduce((sum, r) => sum + Number(r.credit || 0), 0);
   }
 
-  get totalDebtor(): number {
-    return this.rows.reduce((sum, r) => sum + Number(r.saldo_deudor || 0), 0);
+  get totalSaldo(): number {
+    return this.rows.reduce((sum, r) => sum + Number(r.saldo || 0), 0);
   }
 
-  get totalCreditor(): number {
-    return this.rows.reduce((sum, r) => sum + Number(r.saldo_acreedor || 0), 0);
+  formatAmount(value: any): string {
+    return Number(value || 0).toLocaleString('es-CL');
   }
 }

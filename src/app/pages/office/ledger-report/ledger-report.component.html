@@ -3,26 +3,66 @@
     <h1>Libro Mayor</h1>
     <button type="button" (click)="goBack()">Volver</button>
   </div>
-
+<div class="build-version">
+  
+</div>
   <div class="filters">
-    <select [(ngModel)]="selectedAccountId">
-      <option [ngValue]="null">Seleccione cuenta</option>
+    <select
+      [(ngModel)]="selectedAccountId"
+      (ngModelChange)="onFiltersChanged()"
+      [disabled]="loadingAccounts"
+    >
+      <option [ngValue]="null">
+        {{ loadingAccounts ? 'Cargando cuentas...' : 'Seleccione cuenta' }}
+      </option>
+
       <option *ngFor="let acc of accounts" [ngValue]="acc.id">
         {{ acc.code }} - {{ acc.name }}
       </option>
     </select>
 
-    <input type="date" [(ngModel)]="fromDate" />
-    <input type="date" [(ngModel)]="toDate" />
+    <input
+      type="date"
+      [(ngModel)]="fromDate"
+      (ngModelChange)="onFiltersChanged()"
+    />
 
-    <button type="button" (click)="search()">Buscar</button>
+    <input
+      type="date"
+      [(ngModel)]="toDate"
+      (ngModelChange)="onFiltersChanged()"
+    />
+
+    <button
+      type="button"
+      (click)="search()"
+      [disabled]="loading || loadingAccounts || !selectedAccountId"
+    >
+      {{ loading ? 'Buscando...' : 'Buscar' }}
+    </button>
+
+    <button
+      type="button"
+      (click)="openPdf()"
+      [disabled]="loading || loadingAccounts || !selectedAccountId"
+    >
+      Ver PDF
+    </button>
   </div>
 
-  <p *ngIf="ledger.length === 0">
+  <p *ngIf="loadingAccounts">
+    Cargando cuentas...
+  </p>
+
+  <p *ngIf="loading">
+    Cargando movimientos...
+  </p>
+
+  <p *ngIf="searched && !loading && ledger.length === 0">
     No hay movimientos para esta cuenta en el rango seleccionado.
   </p>
 
-  <table *ngIf="ledger.length > 0">
+  <table *ngIf="!loading && ledger.length > 0">
     <thead>
       <tr>
         <th>Fecha</th>
