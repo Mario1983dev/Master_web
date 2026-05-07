@@ -1,62 +1,85 @@
 <section class="trial-balance">
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">REPORTES · CONTABILIDAD</div>
+      <h1>Balance de comprobación</h1>
+      <p>Revisa débitos, créditos y saldos del período seleccionado.</p>
+    </div>
 
-  <h1>Balance de comprobación</h1>
-
-  <div class="filters">
-    <label>Desde</label>
-    <input type="date" [(ngModel)]="fromDate">
-
-    <label>Hasta</label>
-    <input type="date" [(ngModel)]="toDate">
-
-    <button (click)="search()" [disabled]="loading">
-      {{ loading ? 'Buscando...' : 'Buscar' }}
-    </button>
-
-    <button (click)="exportPdf()" [disabled]="loading">
-      PDF
-    </button>
-
-    <button (click)="goBack()">Volver</button>
+    <button type="button" class="secondary-btn" (click)="goBack()">Volver</button>
   </div>
 
-  <div *ngIf="loading">Cargando...</div>
+  <div class="build-version">ERP SOLUSOFT v0.9.18 · UX QA</div>
 
-  <div *ngIf="!loading && rows.length === 0">
-    No hay datos para mostrar.
+  <section class="filters-card">
+    <div class="filters-grid">
+      <div class="field">
+        <label>Desde</label>
+        <input type="date" [(ngModel)]="fromDate">
+      </div>
+
+      <div class="field">
+        <label>Hasta</label>
+        <input type="date" [(ngModel)]="toDate">
+      </div>
+
+      <div class="actions">
+        <button type="button" class="primary-btn" (click)="search()" [disabled]="loading">
+          {{ loading ? 'Buscando...' : 'Buscar' }}
+        </button>
+
+        <button type="button" class="pdf-btn" (click)="exportPdf()" [disabled]="loading">
+          Ver PDF
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div *ngIf="loading" class="state-box">Cargando balance...</div>
+
+  <div *ngIf="!loading && rows.length === 0" class="state-box">
+    No hay datos para mostrar en este período.
   </div>
 
-  <table *ngIf="!loading && rows.length > 0">
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>Cuenta</th>
-        <th>Tipo</th>
-        <th>Débito</th>
-        <th>Crédito</th>
-        <th>Saldo</th>
-      </tr>
-    </thead>
+  <section class="table-card" *ngIf="!loading && rows.length > 0">
+    <div class="table-title">
+      <h2>Detalle del balance</h2>
+      <span>{{ rows.length }} cuenta(s)</span>
+    </div>
 
-    <tbody>
-      <tr *ngFor="let r of rows; trackBy: trackByCode">
-        <td>{{ r.account_code }}</td>
-        <td>{{ r.account_name }}</td>
-        <td>{{ r.account_type }}</td>
-        <td>{{ formatAmount(r.debit) }}</td>
-        <td>{{ formatAmount(r.credit) }}</td>
-        <td>{{ formatAmount(r.saldo) }}</td>
-      </tr>
-    </tbody>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Cuenta</th>
+            <th>Tipo</th>
+            <th class="text-right">Débito</th>
+            <th class="text-right">Crédito</th>
+            <th class="text-right">Saldo</th>
+          </tr>
+        </thead>
 
-    <tfoot>
-      <tr>
-        <td colspan="3"><strong>Totales</strong></td>
-        <td>{{ formatAmount(totalDebit) }}</td>
-        <td>{{ formatAmount(totalCredit) }}</td>
-        <td>{{ formatAmount(totalSaldo) }}</td>
-      </tr>
-    </tfoot>
-  </table>
+        <tbody>
+          <tr *ngFor="let r of rows; trackBy: trackByCode">
+            <td class="code-cell">{{ r.account_code }}</td>
+            <td>{{ r.account_name }}</td>
+            <td><span class="type-badge">{{ r.account_type }}</span></td>
+            <td class="text-right">{{ formatAmount(r.debit) }}</td>
+            <td class="text-right">{{ formatAmount(r.credit) }}</td>
+            <td class="text-right saldo-cell">{{ formatAmount(r.saldo) }}</td>
+          </tr>
+        </tbody>
 
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Totales</strong></td>
+            <td class="text-right">{{ formatAmount(totalDebit) }}</td>
+            <td class="text-right">{{ formatAmount(totalCredit) }}</td>
+            <td class="text-right">{{ formatAmount(totalSaldo) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
 </section>

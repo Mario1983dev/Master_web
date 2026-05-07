@@ -253,3 +253,29 @@
   .selector-row { grid-template-columns: 1fr; }
   .module-card { min-height: 165px; }
 }
+
+
+/* UX QA v0.9.18 */
+.build-version {
+  margin-bottom: 18px;
+}
+
+@media (max-width: 820px) {
+  .office-dashboard {
+    padding: 16px;
+  }
+
+  .hero-brand,
+  .company-selector-header,
+  .section-title-row {
+    flex-direction: column;
+  }
+
+  .selector-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modules-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,88 +1,104 @@
 <section class="ledger-page">
-  <div class="header">
-    <h1>Libro Mayor</h1>
-    <button type="button" (click)="goBack()">Volver</button>
-  </div>
-<div class="build-version">
-  
-</div>
-  <div class="filters">
-    <select
-      [(ngModel)]="selectedAccountId"
-      (ngModelChange)="onFiltersChanged()"
-      [disabled]="loadingAccounts"
-    >
-      <option [ngValue]="null">
-        {{ loadingAccounts ? 'Cargando cuentas...' : 'Seleccione cuenta' }}
-      </option>
+  <div class="page-header">
+    <div>
+      <div class="eyebrow">REPORTES · CONTABILIDAD</div>
+      <h1>Libro Mayor</h1>
+      <p>Consulta los movimientos y saldos de una cuenta contable.</p>
+    </div>
 
-      <option *ngFor="let acc of accounts" [ngValue]="acc.id">
-        {{ acc.code }} - {{ acc.name }}
-      </option>
-    </select>
-
-    <input
-      type="date"
-      [(ngModel)]="fromDate"
-      (ngModelChange)="onFiltersChanged()"
-    />
-
-    <input
-      type="date"
-      [(ngModel)]="toDate"
-      (ngModelChange)="onFiltersChanged()"
-    />
-
-    <button
-      type="button"
-      (click)="search()"
-      [disabled]="loading || loadingAccounts || !selectedAccountId"
-    >
-      {{ loading ? 'Buscando...' : 'Buscar' }}
-    </button>
-
-    <button
-      type="button"
-      (click)="openPdf()"
-      [disabled]="loading || loadingAccounts || !selectedAccountId"
-    >
-      Ver PDF
-    </button>
+    <button type="button" class="secondary-btn" (click)="goBack()">Volver</button>
   </div>
 
-  <p *ngIf="loadingAccounts">
-    Cargando cuentas...
-  </p>
+  <div class="build-version">ERP SOLUSOFT v0.9.18 · UX QA</div>
 
-  <p *ngIf="loading">
-    Cargando movimientos...
-  </p>
+  <section class="filters-card">
+    <div class="filters-grid">
+      <div class="field account-field">
+        <label>Cuenta contable</label>
+        <select
+          [(ngModel)]="selectedAccountId"
+          (ngModelChange)="onFiltersChanged()"
+          [disabled]="loadingAccounts"
+        >
+          <option [ngValue]="null">
+            {{ loadingAccounts ? 'Cargando cuentas...' : 'Seleccione cuenta' }}
+          </option>
 
-  <p *ngIf="searched && !loading && ledger.length === 0">
+          <option *ngFor="let acc of accounts" [ngValue]="acc.id">
+            {{ acc.code }} - {{ acc.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Desde</label>
+        <input type="date" [(ngModel)]="fromDate" (ngModelChange)="onFiltersChanged()" />
+      </div>
+
+      <div class="field">
+        <label>Hasta</label>
+        <input type="date" [(ngModel)]="toDate" (ngModelChange)="onFiltersChanged()" />
+      </div>
+
+      <div class="actions">
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="search()"
+          [disabled]="loading || loadingAccounts || !selectedAccountId"
+        >
+          {{ loading ? 'Buscando...' : 'Buscar' }}
+        </button>
+
+        <button
+          type="button"
+          class="pdf-btn"
+          (click)="openPdf()"
+          [disabled]="loading || loadingAccounts || !selectedAccountId"
+        >
+          Ver PDF
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <p *ngIf="loadingAccounts" class="state-box">Cargando cuentas...</p>
+  <p *ngIf="loading" class="state-box">Cargando movimientos...</p>
+
+  <p *ngIf="searched && !loading && ledger.length === 0" class="state-box">
     No hay movimientos para esta cuenta en el rango seleccionado.
   </p>
 
-  <table *ngIf="!loading && ledger.length > 0">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Cuenta</th>
-        <th>Glosa</th>
-        <th>Debe</th>
-        <th>Haber</th>
-        <th>Saldo</th>
-      </tr>
-    </thead>
+  <section class="table-card" *ngIf="!loading && ledger.length > 0">
+    <div class="table-title">
+      <h2>Movimientos de la cuenta</h2>
+      <span>{{ ledger.length }} movimiento(s)</span>
+    </div>
 
-    <tbody>
-      <tr *ngFor="let row of ledger">
-        <td>{{ row.entry_date | date:'dd-MM-yyyy':'UTC' }}</td>
-        <td>{{ row.account_code }} - {{ row.account_name }}</td>
-        <td>{{ row.line_description || row.entry_description }}</td>
-        <td>{{ row.debit | number:'1.0-0' }}</td>
-        <td>{{ row.credit | number:'1.0-0' }}</td>
-        <td>{{ row.saldo | number:'1.0-0' }}</td>
-      </tr>
-    </tbody>
-  </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cuenta</th>
+            <th>Glosa</th>
+            <th class="text-right">Debe</th>
+            <th class="text-right">Haber</th>
+            <th class="text-right">Saldo</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of ledger">
+            <td>{{ row.entry_date | date:'dd-MM-yyyy':'UTC' }}</td>
+            <td><strong>{{ row.account_code }}</strong> - {{ row.account_name }}</td>
+            <td>{{ row.line_description || row.entry_description }}</td>
+            <td class="text-right">{{ row.debit | number:'1.0-0' }}</td>
+            <td class="text-right">{{ row.credit | number:'1.0-0' }}</td>
+            <td class="text-right saldo-cell">{{ row.saldo | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </section>

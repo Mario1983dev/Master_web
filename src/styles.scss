@@ -1,1 +1,94 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales ERP SOLUSOFT */
+:root {
+  --erp-bg: #f4f7fb;
+  --erp-card: #ffffff;
+  --erp-text: #0f172a;
+  --erp-muted: #64748b;
+  --erp-border: #e2e8f0;
+  --erp-primary: #0d47a1;
+  --erp-primary-2: #1d4ed8;
+  --erp-danger: #b91c1c;
+  --erp-success: #166534;
+  --erp-radius: 16px;
+  --erp-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  min-height: 100%;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--erp-bg);
+  color: var(--erp-text);
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 42px;
+}
+
+button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.12);
+}
+
+.erp-build-version,
+.build-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+.erp-state,
+.loading-state,
+.empty-state {
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  border-radius: 14px;
+  color: var(--erp-muted);
+}
+
+.table-responsive,
+.table-wrapper,
+.lines-table-wrapper,
+.entries-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .page,
+  .office-dashboard,
+  .journal-report-page,
+  .journal-entry-page,
+  .trial-balance,
+  .ledger-page {
+    padding: 14px !important;
+  }
+
+  table {
+    font-size: 13px;
+  }
+}
