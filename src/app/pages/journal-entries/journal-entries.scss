@@ -386,4 +386,84 @@ button:disabled {
     padding: 18px;
     border-radius: 18px;
   }
+  /* BOTÓN DUPLICAR */
+
+.repeat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.repeat-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 18px rgba(13, 71, 161, 0.18);
+}
+
+.repeat-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(13, 71, 161, 0.24);
+}
+
+.repeat-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.repeat-help {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* CAJA PROYECTADA */
+
+.projected-amount {
+  margin-top: 10px;
+  margin-bottom: 18px;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #0d47a1;
+  line-height: 1.1;
+}
+
+.projected-help {
+  margin-top: 14px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* MEJORA VISUAL TABLA */
+
+.lines-header p {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.lines-table tbody tr:hover {
+  background: #f8fbff;
+}
+
+/* RESPONSIVE EXTRA */
+
+@media (max-width: 768px) {
+
+  .repeat-btn {
+    width: 100%;
+  }
+
+  .projected-amount {
+    font-size: 1.6rem;
+  }
+
+}
 }

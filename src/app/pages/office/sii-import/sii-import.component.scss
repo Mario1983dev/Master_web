@@ -1,0 +1,160 @@
+.sii-import {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: #666;
+  }
+}
+
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.form-group {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+}
+
+.input {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 12px;
+  border: 1px solid #cfd6dd;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.file-box {
+  display: block;
+  border: 2px dashed #c9c9c9;
+  border-radius: 14px;
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 16px;
+  background: #fafafa;
+
+  input {
+    display: none;
+  }
+
+  span {
+    font-weight: 600;
+  }
+}
+
+.file-info {
+  margin-bottom: 16px;
+  color: #444;
+  font-size: 14px;
+
+  p {
+    margin: 4px 0;
+  }
+}
+.action-row {
+  margin-top: 18px;
+}
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-weight: 600;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primary {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.secondary {
+  background: #eaeef2;
+  color: #222;
+}
+
+.alert {
+  margin-top: 16px;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.success {
+  background: #e7f7ec;
+  color: #176b2c;
+}
+
+.error {
+  background: #fdeaea;
+  color: #9b1c1c;
+}
+
+.preview-card {
+  overflow: hidden;
+}
+
+.preview-header {
+  margin-bottom: 12px;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.preview-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 9px 10px;
+    font-size: 13px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  th {
+    background: #f3f5f7;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) {
+    background: #fafafa;
+  }
+}

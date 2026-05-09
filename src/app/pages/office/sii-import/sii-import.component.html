@@ -1,0 +1,140 @@
+<section class="sii-import">
+  <div class="header">
+    <div>
+      <h1>Importador SII</h1>
+
+      <p>
+        Sube archivos CSV de compras o ventas del SII para validarlos antes de importarlos al ERP.
+      </p>
+    </div>
+
+    <button type="button" class="btn secondary" (click)="goBack()">
+      Volver
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>Archivo CSV</h2>
+
+    <div class="form-group">
+      <label for="bookType">Tipo de libro</label>
+
+      <select id="bookType" [(ngModel)]="bookType" class="input">
+        <option value="">Seleccionar tipo</option>
+        <option value="COMPRAS">Libro de Compras</option>
+        <option value="VENTAS">Libro de Ventas</option>
+      </select>
+    </div>
+
+    <label class="file-box">
+      <input
+        type="file"
+        accept=".csv,text/csv"
+        (change)="onFileSelected($event)"
+      />
+
+      <span *ngIf="!selectedFile">Seleccionar archivo CSV</span>
+      <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+    </label>
+
+    <div *ngIf="selectedFile" class="file-info">
+      <p>
+        <strong>Archivo:</strong>
+        {{ selectedFile.name }}
+      </p>
+
+      <p *ngIf="bookType">
+        <strong>Tipo:</strong>
+        {{ bookType }}
+      </p>
+    </div>
+
+    <div class="action-row">
+      <button
+        type="button"
+        class="btn primary"
+        (click)="uploadFile()"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Validando archivo...' : 'Validar archivo' }}
+      </button>
+    </div>
+
+    <div *ngIf="message" class="alert success">
+      {{ message }}
+    </div>
+
+    <div *ngIf="error" class="alert error">
+      {{ error }}
+    </div>
+  </div>
+
+  <div *ngIf="previewRows && previewRows.length" class="card preview-card">
+    <div class="preview-header">
+      <div>
+        <h2>Vista previa del archivo</h2>
+
+        <p>
+          Registros encontrados:
+          <strong>{{ totalRows }}</strong>
+        </p>
+
+        <p *ngIf="uploadedFile">
+          Archivo procesado:
+          <strong>{{ uploadedFile }}</strong>
+        </p>
+
+        <p *ngIf="libroCvId">
+          Libro importado:
+          <strong>#{{ libroCvId }}</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="alert success">
+      Archivo validado correctamente.
+      Revisa la información antes de importarla al ERP.
+    </div>
+
+    <div class="table-container">
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th *ngFor="let col of objectKeys(previewRows[0] || {})">
+              {{ col }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of previewRows; trackBy: trackByIndex">
+            <td *ngFor="let col of objectKeys(previewRows[0] || {})">
+              {{ row[col] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="action-row import-row">
+      <button
+        type="button"
+        class="btn primary"
+        (click)="importToERP()"
+        [disabled]="loading || importing || !!libroCvId"
+      >
+        {{ importing ? 'Importando...' : 'Importar al ERP' }}
+      </button>
+
+      <button
+        *ngIf="libroCvId"
+        type="button"
+        class="btn primary"
+        (click)="generateEntries()"
+        [disabled]="generatingEntries"
+      >
+        {{ generatingEntries ? 'Generando asientos...' : 'Generar asientos' }}
+      </button>
+    </div>
+  </div>
+</section>

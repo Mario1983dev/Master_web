@@ -131,6 +131,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/configuration/configuration').then(m => m.Configuration),
   },
+  
+  {
+     path: 'office/sii-import',
+     canActivate: [authGuard, companySelectedGuard],
+     loadComponent: () =>
+     import('./pages/office/sii-import/sii-import.component')
+      .then(m => m.SiiImportComponent),
+  },
 
   /* ======================================================
      FALLBACK
