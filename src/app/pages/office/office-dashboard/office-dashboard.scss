@@ -1,4 +1,7 @@
-:host { display: block; }
+
+:host {
+  display: block;
+}
 
 .office-dashboard {
   min-height: 100vh;
@@ -43,7 +46,10 @@
   text-transform: uppercase;
 }
 
-.eyebrow { opacity: 0.9; margin-bottom: 8px; }
+.eyebrow {
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
 
 .hero-card h1 {
   margin: 0 0 8px;
@@ -51,10 +57,25 @@
   line-height: 1.05;
 }
 
-.hero-card p { margin: 0; color: rgba(255,255,255,0.9); }
+.hero-card p {
+  margin: 0;
+  color: rgba(255,255,255,0.9);
+}
+
+.build-version {
+  margin-bottom: 18px;
+}
+
+.dashboard-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+  
+}
 
 .company-selector-card,
-.modules-section {
+.modules-section,
+.workflow-guide {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 22px;
@@ -72,16 +93,20 @@
   margin-bottom: 18px;
 }
 
-.section-kicker { color: #0d47a1; }
+.section-kicker {
+  color: #0d47a1;
+}
 
 .company-selector-card h2,
-.modules-section h2 {
-  margin: 5px 0 6px;
+.modules-section h2,
+.workflow-header h2 {
+  margin: 5px 0 10px;
   font-size: 24px;
 }
 
 .company-selector-card p,
-.modules-section p {
+.modules-section p,
+.workflow-header p {
   margin: 0;
   color: #64748b;
   line-height: 1.5;
@@ -139,11 +164,24 @@
   color: #0f172a;
 }
 
-.secondary-btn:hover { background: #eef2f7; }
+.secondary-btn:hover {
+  background: #eef2f7;
+}
 
-.helper { margin-top: 12px; color: #475569; font-size: 14px; }
-.helper.success { color: #166534; }
-.helper.error { color: #b91c1c; font-weight: 700; }
+.helper {
+  margin-top: 12px;
+  color: #475569;
+  font-size: 14px;
+}
+
+.helper.success {
+  color: #166534;
+}
+
+.helper.error {
+  color: #b91c1c;
+  font-weight: 700;
+}
 
 .active-company {
   margin-top: 14px;
@@ -158,7 +196,27 @@
   color: #1e3a8a;
 }
 
-.active-company span { color: #64748b; }
+.active-company span {
+  color: #64748b;
+}
+
+.workflow-list {
+  margin-top: 1.5rem;
+  padding-left: 1.4rem;
+}
+
+.workflow-list li {
+  margin-bottom: 1rem;
+  color: #334155;
+  line-height: 1.6;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.workflow-list strong {
+  color: #0f172a;
+  margin-right: 0.4rem;
+}
 
 .modules-grid {
   display: grid;
@@ -187,28 +245,8 @@
   box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
 }
 
-.module-card:focus-visible {
-  outline: 4px solid rgba(13, 71, 161, 0.18);
-  outline-offset: 2px;
-}
-
 .module-card.disabled {
   opacity: 0.72;
-}
-
-.module-card.disabled::after {
-  content: 'Selecciona empresa primero';
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 14px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  background: #fffbeb;
-  color: #92400e;
-  font-size: 12px;
-  font-weight: 800;
-  text-align: center;
 }
 
 .module-card.featured {
@@ -216,7 +254,9 @@
   background: linear-gradient(180deg, #ffffff 0%, #eff6ff 100%);
 }
 
-.module-card.admin-card { background: #f8fafc; }
+.module-card.admin-card {
+  background: #f8fafc;
+}
 
 .module-icon {
   display: inline-grid;
@@ -229,7 +269,11 @@
   font-size: 22px;
 }
 
-.module-tag { display: block; color: #0d47a1; margin-bottom: 7px; }
+.module-tag {
+  display: block;
+  color: #0d47a1;
+  margin-bottom: 7px;
+}
 
 .module-card h3 {
   margin: 0 0 8px;
@@ -243,27 +287,17 @@
   line-height: 1.5;
 }
 
-@media (max-width: 720px) {
-  .office-dashboard { padding: 16px; }
-  .hero-brand { align-items: flex-start; }
-  .brand-logo { width: 58px; height: 58px; border-radius: 16px; }
-  .company-selector-header,
-  .section-title-row { flex-direction: column; }
-  .status-pill { white-space: normal; }
-  .selector-row { grid-template-columns: 1fr; }
-  .module-card { min-height: 165px; }
-}
-
-
-/* UX QA v0.9.18 */
-.build-version {
-  margin-bottom: 18px;
-}
-
 @media (max-width: 820px) {
-  .office-dashboard {
-    padding: 16px;
-  }
+.office-dashboard {
+  min-height: 100vh;
+  padding: 28px;
+  max-width: 100%;
+  overflow-x: hidden;
+  background:
+    radial-gradient(900px 420px at 10% 0%, rgba(13, 71, 161, 0.12), transparent 55%),
+    linear-gradient(180deg, #f6f8fc 0%, #edf2f7 100%);
+  color: #0f172a;
+}
 
   .hero-brand,
   .company-selector-header,
@@ -278,61 +312,9 @@
   .modules-grid {
     grid-template-columns: 1fr;
   }
-}
-.workflow-guide {
-  margin-bottom: 2rem;
-  padding: 2rem;
-  background: #ffffff;
-  border-radius: 24px;
-  border: 1px solid #dbe4f0;
+
+  .dashboard-actions {
+    justify-content: stretch;
+  }
 }
 
-.workflow-header h2 {
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.workflow-header p {
-  color: #4b5563;
-  margin-bottom: 2rem;
-}
-
-.workflow-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-.workflow-step {
-  background: #f8fafc;
-  border: 1px solid #dbe4f0;
-  border-radius: 18px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.workflow-step strong {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #2563eb;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-}
-
-.workflow-step span {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #111827;
-}
-
-.workflow-step small {
-  color: #4b5563;
-  line-height: 1.4;
-  font-size: 0.9rem;
-}

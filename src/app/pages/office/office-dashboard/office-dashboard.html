@@ -1,29 +1,59 @@
+
 <section class="office-dashboard">
   <header class="hero-card">
     <div class="hero-brand">
-      <img class="brand-logo" src="assets/logo-solusoft.jpg" alt="SoluSoft Logo">
+
+      <img
+        class="brand-logo"
+        src="assets/logo-solusoft.jpg"
+        alt="SoluSoft Logo"
+      >
 
       <div>
-        <div class="eyebrow">OFFICE ERP · SOLUSOFT</div>
-        <h1>Panel de Oficina</h1>
+        <div class="eyebrow">
+          OFFICE ERP · SOLUSOFT
+        </div>
+
+        <h1>
+          Dashboard contable
+        </h1>
 
         <p>
           Selecciona una empresa y sigue los pasos para trabajar la contabilidad.
         </p>
       </div>
+
     </div>
+    
+  <div class="dashboard-actions">
+    <button
+      type="button"
+      class="secondary-btn"
+      (click)="goTo('/login')"
+    >
+      Salir
+    </button>
+  </div>
   </header>
 
-  <div class="build-version">
-    ERP SOLUSOFT v0.9.18 · UX QA
-  </div>
+  
 
-  <section class="company-selector-card" aria-label="Empresa activa">
+
+  <section
+    class="company-selector-card"
+    aria-label="Empresa activa"
+  >
+
     <div class="company-selector-header">
-      <div>
-        <span class="section-kicker">Paso 1</span>
 
-        <h2>Empresa activa</h2>
+      <div>
+        <span class="section-kicker">
+          Paso 1
+        </span>
+
+        <h2>
+          Empresa activa
+        </h2>
 
         <p>
           Todos los módulos contables trabajan con la empresa seleccionada.
@@ -37,15 +67,18 @@
       >
         {{ selectedCompany ? 'Empresa seleccionada' : 'Falta seleccionar empresa' }}
       </div>
+
     </div>
 
     <div class="selector-row">
+
       <select
         [(ngModel)]="selectedCompanyId"
         (change)="onCompanyChange()"
         [disabled]="loadingCompanies || companies.length === 0"
         aria-label="Seleccionar empresa activa"
       >
+
         <option [ngValue]="null">
           {{ loadingCompanies ? 'Cargando empresas...' : 'Selecciona una empresa' }}
         </option>
@@ -56,6 +89,7 @@
         >
           {{ company.label }}
         </option>
+
       </select>
 
       <button
@@ -66,9 +100,13 @@
       >
         Cambiar empresa
       </button>
+
     </div>
 
-    <div class="helper" *ngIf="loadingCompanies">
+    <div
+      class="helper"
+      *ngIf="loadingCompanies"
+    >
       Cargando empresas...
     </div>
 
@@ -86,96 +124,102 @@
       No hay empresas disponibles.
     </div>
 
-    <div class="helper error" *ngIf="errorMsg">
+    <div
+      class="helper error"
+      *ngIf="errorMsg"
+    >
       {{ errorMsg }}
     </div>
 
-    <div class="active-company" *ngIf="selectedCompany">
-      <span>Trabajando con</span>
+    <div
+      class="active-company"
+      *ngIf="selectedCompany"
+    >
+      <span>
+        Trabajando con
+      </span>
 
-      <strong>{{ selectedCompany.label }}</strong>
+      <strong>
+        {{ selectedCompany.label }}
+      </strong>
     </div>
+
   </section>
 
   <section
     class="workflow-guide"
     *ngIf="selectedCompany"
   >
-    <div class="workflow-header">
-      <span class="section-kicker">Guía rápida</span>
 
-      <h2>¿Qué debo hacer?</h2>
+    <div class="workflow-header">
+
+      <span class="section-kicker">
+        Guía rápida
+      </span>
+
+      <h2>
+        ¿Qué debo hacer?
+      </h2>
 
       <p>
         Sigue estos pasos en orden para trabajar la contabilidad de la empresa.
       </p>
+
     </div>
 
-    <div class="workflow-steps">
-      <div class="workflow-step">
-        <strong>1</strong>
+    <ul class="workflow-list">
 
-        <span>Revisar configuración</span>
+      <li>
+        <strong>1.</strong>
+        Revisar configuración contable
+      </li>
 
-        <small>
-          Configura compras, ventas, IVA y cuentas por pagar.
-        </small>
-      </div>
+      <li>
+        <strong>2.</strong>
+        Importar libro CSV del SII
+      </li>
 
-      <div class="workflow-step">
-        <strong>2</strong>
+      <li>
+        <strong>3.</strong>
+        Generar asientos contables
+      </li>
 
-        <span>Importar archivo SII</span>
+      <li>
+        <strong>4.</strong>
+        Revisar Libro Diario
+      </li>
 
-        <small>
-          Sube el libro de compras o ventas en formato CSV.
-        </small>
-      </div>
+      <li>
+        <strong>5.</strong>
+        Revisar Balance y saldos
+      </li>
 
-      <div class="workflow-step">
-        <strong>3</strong>
+    </ul>
 
-        <span>Generar asientos</span>
-
-        <small>
-          El sistema crea automáticamente los asientos contables.
-        </small>
-      </div>
-
-      <div class="workflow-step">
-        <strong>4</strong>
-
-        <span>Revisar Libro Diario</span>
-
-        <small>
-          Verifica que los movimientos estén correctos.
-        </small>
-      </div>
-
-      <div class="workflow-step">
-        <strong>5</strong>
-
-        <span>Revisar Balance</span>
-
-        <small>
-          Confirma saldos y resultados contables.
-        </small>
-      </div>
-    </div>
   </section>
 
-  <section class="modules-section" aria-label="Módulos del ERP">
-    <div class="section-title-row">
-      <div>
-        <span class="section-kicker">Paso 2</span>
+  <section
+    class="modules-section"
+    aria-label="Módulos del ERP"
+  >
 
-        <h2>Módulos disponibles</h2>
+    <div class="section-title-row">
+
+      <div>
+        <span class="section-kicker">
+          Paso 2
+        </span>
+
+        <h2>
+          Módulos disponibles
+        </h2>
 
         <p>
           El flujo recomendado es:
           Configuración → SII → Asientos → Libros → Balance.
         </p>
       </div>
+
     </div>
 
     <div class="modules-grid">
@@ -187,13 +231,17 @@
         (click)="goTo('/office/configuration', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">⚙️</span>
+        <span class="module-icon">
+          ⚙️
+        </span>
 
         <span class="module-tag">
           Administración
         </span>
 
-        <h3>Configuración</h3>
+        <h3>
+          Configuración
+        </h3>
 
         <p>
           Define compras, ventas, IVA y cuentas automáticas.
@@ -206,13 +254,17 @@
         (click)="goTo('/office/accounts', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">📘</span>
+        <span class="module-icon">
+          📘
+        </span>
 
         <span class="module-tag">
           Base contable
         </span>
 
-        <h3>Plan de cuentas</h3>
+        <h3>
+          Plan de cuentas
+        </h3>
 
         <p>
           Consulta y administra las cuentas contables de la empresa.
@@ -225,13 +277,17 @@
         (click)="goTo('/office/journal-entries', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">✍️</span>
+        <span class="module-icon">
+          ✍️
+        </span>
 
         <span class="module-tag">
           Operación diaria
         </span>
 
-        <h3>Asientos</h3>
+        <h3>
+          Asientos
+        </h3>
 
         <p>
           Registra movimientos contables con débito y crédito.
@@ -244,54 +300,20 @@
         (click)="goTo('/office/sii-import', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">📥</span>
+        <span class="module-icon">
+          📥
+        </span>
 
         <span class="module-tag">
           SII · Automático
         </span>
 
-        <h3>Importador SII</h3>
+        <h3>
+          Importador SII
+        </h3>
 
         <p>
           Importa libros CSV y genera asientos automáticamente.
-        </p>
-      </button>
-
-      <button
-        *ngIf="isOfficeAdmin"
-        class="module-card admin-card"
-        type="button"
-        (click)="goTo('/office/office-users')"
-      >
-        <span class="module-icon">👥</span>
-
-        <span class="module-tag">
-          Administración
-        </span>
-
-        <h3>Usuarios</h3>
-
-        <p>
-          Gestiona los usuarios con acceso a la oficina.
-        </p>
-      </button>
-
-      <button
-        *ngIf="isOfficeAdmin"
-        class="module-card admin-card"
-        type="button"
-        (click)="goTo('/office/companies')"
-      >
-        <span class="module-icon">🏢</span>
-
-        <span class="module-tag">
-          Administración
-        </span>
-
-        <h3>Empresas</h3>
-
-        <p>
-          Crea y administra empresas de la oficina.
         </p>
       </button>
 
@@ -301,13 +323,17 @@
         (click)="goTo('/office/journal-report', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">📄</span>
+        <span class="module-icon">
+          📄
+        </span>
 
         <span class="module-tag">
           Reportes
         </span>
 
-        <h3>Libro Diario</h3>
+        <h3>
+          Libro Diario
+        </h3>
 
         <p>
           Revisa los asientos en orden cronológico.
@@ -320,13 +346,17 @@
         (click)="goTo('/office/ledger-report', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">📚</span>
+        <span class="module-icon">
+          📚
+        </span>
 
         <span class="module-tag">
           Reportes
         </span>
 
-        <h3>Libro Mayor</h3>
+        <h3>
+          Libro Mayor
+        </h3>
 
         <p>
           Consulta movimientos agrupados por cuenta.
@@ -339,13 +369,17 @@
         (click)="goTo('/office/trial-balance', true)"
         [class.disabled]="!selectedCompany"
       >
-        <span class="module-icon">📊</span>
+        <span class="module-icon">
+          📊
+        </span>
 
         <span class="module-tag">
           Reportes
         </span>
 
-        <h3>Balance</h3>
+        <h3>
+          Balance
+        </h3>
 
         <p>
           Visualiza saldos y resultados contables de la empresa.
@@ -353,5 +387,7 @@
       </button>
 
     </div>
+
   </section>
 </section>
+
