@@ -1,6 +1,7 @@
-
 <section class="office-dashboard">
+
   <header class="hero-card">
+
     <div class="hero-brand">
 
       <img
@@ -10,6 +11,7 @@
       >
 
       <div>
+
         <div class="eyebrow">
           OFFICE ERP · SOLUSOFT
         </div>
@@ -21,23 +23,24 @@
         <p>
           Selecciona una empresa y sigue los pasos para trabajar la contabilidad.
         </p>
+
       </div>
 
     </div>
-    
-  <div class="dashboard-actions">
-    <button
-      type="button"
-      class="secondary-btn"
-      (click)="goTo('/login')"
-    >
-      Salir
-    </button>
-  </div>
+
+    <div class="dashboard-actions">
+
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="goTo('/login')"
+      >
+        Salir
+      </button>
+
+    </div>
+
   </header>
-
-  
-
 
   <section
     class="company-selector-card"
@@ -47,6 +50,7 @@
     <div class="company-selector-header">
 
       <div>
+
         <span class="section-kicker">
           Paso 1
         </span>
@@ -58,6 +62,7 @@
         <p>
           Todos los módulos contables trabajan con la empresa seleccionada.
         </p>
+
       </div>
 
       <div
@@ -74,7 +79,7 @@
 
       <select
         [(ngModel)]="selectedCompanyId"
-        (change)="onCompanyChange()"
+        (ngModelChange)="onCompanyChange()"
         [disabled]="loadingCompanies || companies.length === 0"
         aria-label="Seleccionar empresa activa"
       >
@@ -135,6 +140,7 @@
       class="active-company"
       *ngIf="selectedCompany"
     >
+
       <span>
         Trabajando con
       </span>
@@ -142,6 +148,7 @@
       <strong>
         {{ selectedCompany.label }}
       </strong>
+
     </div>
 
   </section>
@@ -206,6 +213,7 @@
     <div class="section-title-row">
 
       <div>
+
         <span class="section-kicker">
           Paso 2
         </span>
@@ -218,6 +226,7 @@
           El flujo recomendado es:
           Configuración → SII → Asientos → Libros → Balance.
         </p>
+
       </div>
 
     </div>
@@ -231,6 +240,7 @@
         (click)="goTo('/office/configuration', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           ⚙️
         </span>
@@ -246,6 +256,7 @@
         <p>
           Define compras, ventas, IVA y cuentas automáticas.
         </p>
+
       </button>
 
       <button
@@ -254,6 +265,7 @@
         (click)="goTo('/office/accounts', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           📘
         </span>
@@ -269,6 +281,7 @@
         <p>
           Consulta y administra las cuentas contables de la empresa.
         </p>
+
       </button>
 
       <button
@@ -277,6 +290,7 @@
         (click)="goTo('/office/journal-entries', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           ✍️
         </span>
@@ -292,6 +306,7 @@
         <p>
           Registra movimientos contables con débito y crédito.
         </p>
+
       </button>
 
       <button
@@ -300,6 +315,7 @@
         (click)="goTo('/office/sii-import', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           📥
         </span>
@@ -315,6 +331,7 @@
         <p>
           Importa libros CSV y genera asientos automáticamente.
         </p>
+
       </button>
 
       <button
@@ -323,6 +340,7 @@
         (click)="goTo('/office/journal-report', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           📄
         </span>
@@ -338,6 +356,7 @@
         <p>
           Revisa los asientos en orden cronológico.
         </p>
+
       </button>
 
       <button
@@ -346,6 +365,7 @@
         (click)="goTo('/office/ledger-report', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           📚
         </span>
@@ -361,6 +381,7 @@
         <p>
           Consulta movimientos agrupados por cuenta.
         </p>
+
       </button>
 
       <button
@@ -369,6 +390,7 @@
         (click)="goTo('/office/trial-balance', true)"
         [class.disabled]="!selectedCompany"
       >
+
         <span class="module-icon">
           📊
         </span>
@@ -384,10 +406,11 @@
         <p>
           Visualiza saldos y resultados contables de la empresa.
         </p>
+
       </button>
 
     </div>
 
   </section>
-</section>
 
+</section>
