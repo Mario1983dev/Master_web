@@ -15,27 +15,29 @@
 
       <div class="form-grid">
         <div class="form-group">
-          <label>Nombre</label>
+          <label>Nombre <span class="required">*</span></label>
           <input
             type="text"
             name="name"
             [(ngModel)]="form.name"
             placeholder="Ej: Mario Pérez"
           />
+          <small class="field-error" *ngIf="formErrors['name']">{{ formErrors['name'] }}</small>
         </div>
 
         <div class="form-group">
-          <label>Correo</label>
+          <label>Correo <span class="required">*</span></label>
           <input
             type="email"
             name="email"
             [(ngModel)]="form.email"
             placeholder="Ej: mario@empresa.cl"
           />
+          <small class="field-error" *ngIf="formErrors['email']">{{ formErrors['email'] }}</small>
         </div>
 
         <div class="form-group" *ngIf="!editingUserId">
-          <label>Contraseña</label>
+          <label>Contraseña <span class="required">*</span></label>
           <input
             type="password"
             name="password"
@@ -43,20 +45,26 @@
             placeholder="Ingrese contraseña (mínimo 6 caracteres)"
           />
           <small>Debe tener al menos 6 caracteres</small>
+          <small class="field-error" *ngIf="formErrors['password']">{{ formErrors['password'] }}</small>
         </div>
 
         <div class="form-group">
-          <label>Rol</label>
+          <label>Rol <span class="required">*</span></label>
           <select name="role" [(ngModel)]="form.role">
             <option value="user">Usuario</option>
-            <option value="sdmin">Administrador</option>
+            <option value="admin">Administrador</option>
           </select>
+          <small class="field-error" *ngIf="formErrors['role']">{{ formErrors['role'] }}</small>
         </div>
       </div>
 
+      <div *ngIf="formMessage" class="form-message" [class.success]="formMessage.includes('correctamente')">
+        {{ formMessage }}
+      </div>
+
       <div class="actions">
-        <button type="button" class="btn btn-primary" (click)="save()">
-          {{ editingUserId ? 'Actualizar usuario' : 'Crear usuario' }}
+        <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Guardando...' : (editingUserId ? 'Actualizar usuario' : 'Crear usuario') }}
         </button>
 
         <button type="button" class="btn btn-secondary" (click)="cancelEdit()">

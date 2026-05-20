@@ -3,6 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OfficesService } from '../../../services/offices.service';
+import {
+  ValidationErrors,
+  formatRut,
+  isValidRut,
+  isValidEmail,
+  normalizeEmail,
+  normalizePhone,
+  normalizeText
+} from '../../../shared/utils/erp-validators';
 
 @Component({
   selector: 'app-offices-new',
@@ -13,6 +22,7 @@ import { OfficesService } from '../../../services/offices.service';
 })
 export class OfficesNew implements OnInit {
   loading = false;
+  formErrors: ValidationErrors = {};
   errorMsg = '';
   isEdit = false;
   officeId = 0;
@@ -25,6 +35,7 @@ export class OfficesNew implements OnInit {
     phone: '',
     status: 1,
 
+    admin_username: '',
     admin_name: '',
     admin_email: '',
     admin_password: ''
@@ -57,7 +68,7 @@ export class OfficesNew implements OnInit {
         const office = resp?.data || resp;
 
         this.zone.run(() => {
-          this.form.rut = String(office?.rut ?? '');
+          this.form.rut = formatRut(office?.rut ?? '');
           this.form.name = String(office?.name ?? '');
           this.form.legal_name = String(office?.legal_name ?? '');
           this.form.email = String(office?.email ?? '');
@@ -79,17 +90,24 @@ export class OfficesNew implements OnInit {
   }
 
   save(): void {
-    this.loading = true;
     this.errorMsg = '';
+    const payload = this.buildPayload();
+
+    if (!this.validateOfficeForm(payload)) {
+      this.errorMsg = 'Revise los campos marcados antes de guardar.';
+      return;
+    }
+
+    this.loading = true;
 
     if (this.isEdit) {
       const officePayload = {
-        rut: this.form.rut,
-        name: this.form.name,
-        legal_name: this.form.legal_name,
-        email: this.form.email,
-        phone: this.form.phone,
-        status: this.form.status
+        rut: payload.rut,
+        name: payload.name,
+        legal_name: payload.legal_name,
+        email: payload.email,
+        phone: payload.phone,
+        status: payload.status
       };
 
       this.officesSrv.update(this.officeId, officePayload).subscribe({
@@ -108,31 +126,7 @@ export class OfficesNew implements OnInit {
       return;
     }
 
-    if (!this.form.admin_name?.trim()) {
-      alert('El nombre del administrador es obligatorio');
-      this.loading = false;
-      return;
-    }
-
-    if (!this.form.admin_email?.trim()) {
-      alert('El correo del administrador es obligatorio');
-      this.loading = false;
-      return;
-    }
-
-    if (!this.form.admin_password?.trim()) {
-      alert('La contraseña del administrador es obligatoria');
-      this.loading = false;
-      return;
-    }
-
-    if (this.form.admin_password.trim().length < 6) {
-      alert('La contraseña debe tener al menos 6 caracteres');
-      this.loading = false;
-      return;
-    }
-
-    this.officesSrv.create(this.form).subscribe({
+    this.officesSrv.create(payload).subscribe({
       next: () => {
         this.loading = false;
         alert('Oficina y administrador creados correctamente');
@@ -145,6 +139,54 @@ export class OfficesNew implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private buildPayload(): any {
+    return {
+      ...this.form,
+      rut: formatRut(this.form.rut),
+      name: normalizeText(this.form.name),
+      legal_name: normalizeText(this.form.legal_name),
+      email: normalizeEmail(this.form.email),
+      phone: normalizePhone(this.form.phone),
+      status: Number(this.form.status),
+      admin_username: normalizeText(this.form.admin_username),
+      admin_name: normalizeText(this.form.admin_name),
+      admin_email: normalizeEmail(this.form.admin_email),
+      admin_password: String(this.form.admin_password ?? '').trim()
+    };
+  }
+
+  private validateOfficeForm(payload: any): boolean {
+    const errors: ValidationErrors = {};
+
+    if (!payload.rut) errors['rut'] = 'El RUT de la oficina es obligatorio.';
+    else if (!isValidRut(payload.rut)) errors['rut'] = 'El RUT no es válido. Revise el dígito verificador.';
+
+    if (!payload.name) errors['name'] = 'El nombre de la oficina es obligatorio.';
+    if (!payload.legal_name) errors['legal_name'] = 'La razón social es obligatoria.';
+    if (payload.email && !isValidEmail(payload.email)) errors['email'] = 'Ingrese un correo válido.';
+
+    if (!this.isEdit) {
+      if (!payload.admin_username) errors['admin_username'] = 'El usuario administrador es obligatorio.';
+      if (!payload.admin_name) errors['admin_name'] = 'El nombre del administrador es obligatorio.';
+      if (!payload.admin_email) errors['admin_email'] = 'El correo del administrador es obligatorio.';
+      else if (!isValidEmail(payload.admin_email)) errors['admin_email'] = 'Ingrese un correo válido.';
+
+      if (!payload.admin_password) errors['admin_password'] = 'La contraseña es obligatoria.';
+      else if (payload.admin_password.length < 6) errors['admin_password'] = 'La contraseña debe tener al menos 6 caracteres.';
+    }
+
+    this.formErrors = errors;
+    return Object.keys(errors).length === 0;
+  }
+
+  onRutBlur(): void {
+    this.form.rut = formatRut(this.form.rut);
+  }
+
+  onPhoneInput(): void {
+    this.form.phone = normalizePhone(this.form.phone);
   }
 
   cancel(): void {

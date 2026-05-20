@@ -20,33 +20,38 @@
         <!-- ❌ ELIMINADO OFFICE ID -->
 
         <div class="field">
-          <label>RUT</label>
-          <input type="text" [(ngModel)]="form.rut" name="rut">
+          <label>RUT <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.rut" name="rut" placeholder="12.345.678-9" (blur)="onRutBlur()">
+          <small class="field-error" *ngIf="formErrors['rut']">{{ formErrors['rut'] }}</small>
         </div>
 
         <div class="field">
-          <label>Nombre</label>
-          <input type="text" [(ngModel)]="form.name" name="name">
+          <label>Nombre <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.name" name="name" placeholder="Nombre de fantasía">
+          <small class="field-error" *ngIf="formErrors['name']">{{ formErrors['name'] }}</small>
         </div>
 
         <div class="field">
-          <label>Razón social</label>
-          <input type="text" [(ngModel)]="form.legal_name" name="legal_name">
+          <label>Razón social <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.legal_name" name="legal_name" placeholder="Razón social completa">
+          <small class="field-error" *ngIf="formErrors['legal_name']">{{ formErrors['legal_name'] }}</small>
         </div>
 
         <div class="field">
-          <label>Giro</label>
-          <input type="text" [(ngModel)]="form.business_type" name="business_type">
+          <label>Giro <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.business_type" name="business_type" placeholder="Ej: Servicios contables">
+          <small class="field-error" *ngIf="formErrors['business_type']">{{ formErrors['business_type'] }}</small>
         </div>
 
         <div class="field">
           <label>Email</label>
-          <input type="email" [(ngModel)]="form.email" name="email">
+          <input type="email" [(ngModel)]="form.email" name="email" placeholder="contacto@empresa.cl">
+          <small class="field-error" *ngIf="formErrors['email']">{{ formErrors['email'] }}</small>
         </div>
 
         <div class="field">
           <label>Teléfono</label>
-          <input type="text" [(ngModel)]="form.phone" name="phone">
+          <input type="text" [(ngModel)]="form.phone" name="phone" inputmode="tel" placeholder="+56 9 1234 5678" (input)="onPhoneInput()">
         </div>
 
         <div class="field">
@@ -78,8 +83,9 @@
         </div>
 
         <div class="field">
-          <label>Año contable</label>
-          <input type="number" [(ngModel)]="form.year_num" name="year_num">
+          <label>Año contable <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="form.year_num" name="year_num" inputmode="numeric" maxlength="4" (input)="onYearInput()">
+          <small class="field-error" *ngIf="formErrors['year_num']">{{ formErrors['year_num'] }}</small>
         </div>
 
         <div class="field field-full">
@@ -87,9 +93,13 @@
           <textarea [(ngModel)]="form.notes" name="notes" rows="3"></textarea>
         </div>
 
+        <div *ngIf="formMessage" class="form-message" [class.success]="formMessage.includes('correctamente')">
+          {{ formMessage }}
+        </div>
+
         <div class="actions">
-          <button class="btn btn-primary" (click)="saveCompany()">
-            {{ editingCompanyId ? 'Actualizar' : 'Guardar' }}
+          <button class="btn btn-primary" (click)="saveCompany()" [disabled]="saving">
+            {{ saving ? 'Guardando...' : (editingCompanyId ? 'Actualizar' : 'Guardar') }}
           </button>
 
           <button class="btn btn-secondary" (click)="resetForm()">

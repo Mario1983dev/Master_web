@@ -264,3 +264,28 @@ tbody tr:hover {
     align-items: flex-start;
   }
 }
+.required {
+  color: #b91c1c;
+}
+
+.field-error {
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.form-message {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  font-weight: 700;
+}
+
+.form-message.success {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}

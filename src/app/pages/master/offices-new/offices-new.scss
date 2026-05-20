@@ -147,3 +147,12 @@
     flex-direction: column;
   }
 }
+.required {
+  color: #b91c1c;
+}
+
+.field-error {
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 700;
+}

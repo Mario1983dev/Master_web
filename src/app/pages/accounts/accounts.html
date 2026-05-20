@@ -15,17 +15,19 @@
 
     <div class="form-grid">
       <div class="form-group">
-        <label>Código propuesto</label>
-        <input [(ngModel)]="form.code" name="code" placeholder="Código propuesto" />
+        <label>Código propuesto <span class="required">*</span></label>
+        <input [(ngModel)]="form.code" name="code" placeholder="Código propuesto" inputmode="numeric" (input)="onCodeInput()" />
+        <small class="field-error" *ngIf="formErrors['code']">{{ formErrors['code'] }}</small>
       </div>
 
       <div class="form-group">
-        <label>Nombre</label>
+        <label>Nombre <span class="required">*</span></label>
         <input [(ngModel)]="form.name" name="name" placeholder="Ej: Caja" />
+        <small class="field-error" *ngIf="formErrors['name']">{{ formErrors['name'] }}</small>
       </div>
 
       <div class="form-group">
-        <label>Tipo</label>
+        <label>Tipo <span class="required">*</span></label>
         <select
           [(ngModel)]="form.account_type"
           name="account_type"
@@ -64,8 +66,9 @@
       </div>
 
       <div class="form-group">
-        <label>Orden</label>
-        <input type="number" [(ngModel)]="form.sort_order" name="sort_order" />
+        <label>Orden <span class="required">*</span></label>
+        <input type="text" [(ngModel)]="form.sort_order" name="sort_order" inputmode="numeric" (input)="onSortOrderInput()" />
+        <small class="field-error" *ngIf="formErrors['sort_order']">{{ formErrors['sort_order'] }}</small>
       </div>
 
       <div class="form-group">

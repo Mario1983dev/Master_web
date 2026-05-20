@@ -18,28 +18,32 @@
 
         <div class="grid">
           <div class="field">
-            <label>RUT</label>
-            <input type="text" name="rut" [(ngModel)]="form.rut" placeholder="76123456-7" required />
+            <label>RUT <span class="required">*</span></label>
+            <input type="text" name="rut" [(ngModel)]="form.rut" placeholder="76.123.456-7" (blur)="onRutBlur()" required />
+            <small class="field-error" *ngIf="formErrors['rut']">{{ formErrors['rut'] }}</small>
           </div>
 
           <div class="field">
-            <label>Nombre</label>
+            <label>Nombre <span class="required">*</span></label>
             <input type="text" name="name" [(ngModel)]="form.name" placeholder="Oficina Santiago" required />
+            <small class="field-error" *ngIf="formErrors['name']">{{ formErrors['name'] }}</small>
           </div>
 
           <div class="field">
-            <label>Razón social</label>
+            <label>Razón social <span class="required">*</span></label>
             <input type="text" name="legal_name" [(ngModel)]="form.legal_name" placeholder="SoluSoft SPA" />
+            <small class="field-error" *ngIf="formErrors['legal_name']">{{ formErrors['legal_name'] }}</small>
           </div>
 
           <div class="field">
             <label>Email oficina</label>
             <input type="email" name="email" [(ngModel)]="form.email" placeholder="contacto@empresa.cl" />
+            <small class="field-error" *ngIf="formErrors['email']">{{ formErrors['email'] }}</small>
           </div>
 
           <div class="field">
             <label>Teléfono</label>
-            <input type="text" name="phone" [(ngModel)]="form.phone" placeholder="+56 9 1111 2222" />
+            <input type="text" name="phone" [(ngModel)]="form.phone" inputmode="tel" placeholder="+56 9 1111 2222" (input)="onPhoneInput()" />
           </div>
 
           <div class="field">
@@ -53,7 +57,7 @@
 
         <div class="grid" *ngIf="!isEdit">
           <div class="field">
-            <label>Usuario administrador</label>
+            <label>Usuario administrador <span class="required">*</span></label>
             <input
               type="text"
               name="admin_username"
@@ -61,10 +65,11 @@
               placeholder="Ej: admin"
               required
             />
+            <small class="field-error" *ngIf="formErrors['admin_username']">{{ formErrors['admin_username'] }}</small>
           </div>
 
           <div class="field">
-            <label>Nombre administrador</label>
+            <label>Nombre administrador <span class="required">*</span></label>
             <input
               type="text"
               name="admin_name"
@@ -72,10 +77,11 @@
               placeholder="Ej: Administrador Oficina"
               required
             />
+            <small class="field-error" *ngIf="formErrors['admin_name']">{{ formErrors['admin_name'] }}</small>
           </div>
 
           <div class="field">
-            <label>Correo administrador</label>
+            <label>Correo administrador <span class="required">*</span></label>
             <input
               type="email"
               name="admin_email"
@@ -83,10 +89,11 @@
               placeholder="admin@empresa.cl"
               required
             />
+            <small class="field-error" *ngIf="formErrors['admin_email']">{{ formErrors['admin_email'] }}</small>
           </div>
 
           <div class="field">
-            <label>Contraseña administrador</label>
+            <label>Contraseña administrador <span class="required">*</span></label>
             <input
               type="password"
               name="admin_password"
@@ -94,6 +101,7 @@
               placeholder="Mínimo 6 caracteres"
               required
             />
+            <small class="field-error" *ngIf="formErrors['admin_password']">{{ formErrors['admin_password'] }}</small>
           </div>
         </div>
 
@@ -106,7 +114,7 @@
             Cancelar
           </button>
 
-          <button type="submit" class="btn-primary" [disabled]="loading || f.invalid">
+          <button type="submit" class="btn-primary" [disabled]="loading">
             {{
               loading
                 ? (isEdit ? 'Actualizando...' : 'Guardando...')

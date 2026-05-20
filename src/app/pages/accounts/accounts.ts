@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthMaster } from '../../services/auth-master';
 import { AccountsService, Account } from '../../services/accounts.service';
+import { ValidationErrors, normalizeText, onlyDigits } from '../../shared/utils/erp-validators';
 
 @Component({
   selector: 'app-accounts',
@@ -18,6 +19,7 @@ export class Accounts implements OnInit {
   loading = false;
   saving = false;
   error = '';
+  formErrors: ValidationErrors = {};
   success = '';
   companyName = '';
 
@@ -199,13 +201,22 @@ export class Accounts implements OnInit {
       this.generarCodigoPropuesto();
     }
 
+    if (!this.validateAccountForm()) {
+      this.error = 'Revise los campos marcados antes de guardar.';
+      return;
+    }
+
     this.saving = true;
     this.error = '';
     this.success = '';
 
     const payload = {
       company_id: Number(company.id),
-      ...this.form
+      ...this.form,
+      code: onlyDigits(this.form.code),
+      name: normalizeText(this.form.name),
+      sort_order: Number(this.form.sort_order) || 1,
+      level_num: Number(this.form.level_num) || 1
     };
 
     this.accountsService.createAccount(payload).subscribe({
@@ -236,5 +247,41 @@ export class Accounts implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private validateAccountForm(): boolean {
+    const errors: ValidationErrors = {};
+    const code = onlyDigits(this.form.code);
+    const name = normalizeText(this.form.name);
+
+    if (!code) errors['code'] = 'El código de cuenta es obligatorio.';
+    else if (code.length < 4) errors['code'] = 'El código debe tener al menos 4 dígitos.';
+
+    if (!name) errors['name'] = 'El nombre de la cuenta es obligatorio.';
+
+    const validTypes = ['ACTIVO', 'PASIVO', 'PATRIMONIO', 'INGRESO', 'GASTO'];
+    if (!validTypes.includes(this.form.account_type)) {
+      errors['account_type'] = 'Seleccione un tipo válido.';
+    }
+
+    const sameCode = this.accounts.find(account => String(account.code) === code);
+    if (sameCode) errors['code'] = 'Ya existe una cuenta con este código.';
+
+    const sortOrder = Number(this.form.sort_order);
+    if (!Number.isInteger(sortOrder) || sortOrder < 1) {
+      errors['sort_order'] = 'El orden debe ser un número mayor a cero.';
+    }
+
+    this.formErrors = errors;
+    return Object.keys(errors).length === 0;
+  }
+
+  onCodeInput(): void {
+    this.form.code = onlyDigits(this.form.code);
+  }
+
+  onSortOrderInput(): void {
+    const digits = onlyDigits(this.form.sort_order);
+    this.form.sort_order = digits ? Number(digits) : 1;
   }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OfficeUsersService, OfficeUser } from '../../services/office-users.service';
+import { ValidationErrors, isValidEmail, normalizeEmail, normalizeText } from '../../shared/utils/erp-validators';
 
 @Component({
   selector: 'app-office-users',
@@ -15,6 +16,9 @@ export class OfficeUsers implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   users: OfficeUser[] = [];
+  formErrors: ValidationErrors = {};
+  formMessage = '';
+  saving = false;
   officeId: number | null = null;
   editingUserId: number | null = null;
 
@@ -80,42 +84,39 @@ export class OfficeUsers implements OnInit {
   }
 
   save(): void {
+    this.formMessage = '';
+
     if (!this.officeId) {
-      alert('No hay oficina válida para guardar usuario');
+      this.formMessage = 'No hay oficina válida para guardar usuario.';
       return;
     }
 
-    if (!this.form.name.trim() || !this.form.email.trim()) {
-      alert('Nombre y correo son obligatorios');
+    if (!this.validateUserForm()) {
+      this.formMessage = 'Revise los campos marcados antes de guardar.';
       return;
     }
 
-    if (!this.editingUserId && !this.form.password.trim()) {
-      alert('La contraseña es obligatoria');
-      return;
-    }
-
-    if (!this.editingUserId && this.form.password.trim().length < 6) {
-      alert('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
+    this.saving = true;
 
     if (this.editingUserId !== null) {
       const payload = {
-        name: this.form.name.trim(),
-        email: this.form.email.trim().toLowerCase(),
+        name: normalizeText(this.form.name),
+        email: normalizeEmail(this.form.email),
         role: this.form.role,
         status: 1
       };
 
       this.officeUsersService.update(this.editingUserId, payload).subscribe({
         next: () => {
-          this.cancelEdit();
+          this.saving = false;
+          this.formMessage = 'Usuario actualizado correctamente.';
+          this.cancelEdit(false);
           this.loadUsers();
         },
         error: (err) => {
+          this.saving = false;
           console.error('ERROR UPDATE USER:', err);
-          alert(err?.error?.message || 'Error al actualizar usuario');
+          this.formMessage = err?.error?.message || 'No se pudo actualizar el usuario.';
         }
       });
 
@@ -124,8 +125,8 @@ export class OfficeUsers implements OnInit {
 
     const payload = {
       office_id: this.officeId,
-      name: this.form.name.trim(),
-      email: this.form.email.trim().toLowerCase(),
+      name: normalizeText(this.form.name),
+      email: normalizeEmail(this.form.email),
       password: this.form.password.trim(),
       role: this.form.role,
       status: 1
@@ -133,14 +134,45 @@ export class OfficeUsers implements OnInit {
 
     this.officeUsersService.create(payload).subscribe({
       next: () => {
-        this.cancelEdit();
+        this.saving = false;
+        this.formMessage = 'Usuario creado correctamente.';
+        this.cancelEdit(false);
         this.loadUsers();
       },
       error: (err) => {
+        this.saving = false;
         console.error('ERROR CREATE USER:', err);
-        alert(err?.error?.message || 'Error al crear usuario');
+        this.formMessage = err?.error?.message || 'No se pudo crear el usuario.';
       }
     });
+  }
+
+  private validateUserForm(): boolean {
+    const errors: ValidationErrors = {};
+    const name = normalizeText(this.form.name);
+    const email = normalizeEmail(this.form.email);
+
+    if (!name) errors['name'] = 'El nombre es obligatorio.';
+    if (!email) errors['email'] = 'El correo es obligatorio.';
+    else if (!isValidEmail(email)) errors['email'] = 'Ingrese un correo válido.';
+
+    if (!this.editingUserId) {
+      if (!this.form.password.trim()) errors['password'] = 'La contraseña es obligatoria.';
+      else if (this.form.password.trim().length < 6) errors['password'] = 'La contraseña debe tener al menos 6 caracteres.';
+    }
+
+    if (this.form.role !== 'admin' && this.form.role !== 'user') {
+      errors['role'] = 'Seleccione un rol válido.';
+    }
+
+    const sameEmail = this.users.find(user =>
+      normalizeEmail(user.email) === email && user.id !== this.editingUserId
+    );
+
+    if (sameEmail) errors['email'] = 'Ya existe un usuario con este correo.';
+
+    this.formErrors = errors;
+    return Object.keys(errors).length === 0;
   }
 
   edit(user: OfficeUser): void {
@@ -153,8 +185,10 @@ export class OfficeUsers implements OnInit {
     };
   }
 
-  cancelEdit(): void {
+  cancelEdit(clearMessage = true): void {
     this.editingUserId = null;
+    this.formErrors = {};
+    if (clearMessage) this.formMessage = '';
     this.form = {
       name: '',
       email: '',
@@ -164,6 +198,9 @@ export class OfficeUsers implements OnInit {
   }
 
   toggleStatus(user: OfficeUser): void {
+    const action = user.status === 1 ? 'desactivar' : 'activar';
+    if (!confirm(`¿Deseas ${action} al usuario ${user.name}?`)) return;
+
     const newStatus = user.status === 1 ? 0 : 1;
 
     this.officeUsersService.changeStatus(user.id, newStatus).subscribe({

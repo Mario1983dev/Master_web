@@ -3,6 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CompaniesService } from '../../services/companies.service';
 import { AuthMaster } from '../../services/auth-master';
+import {
+  ValidationErrors,
+  formatRut,
+  isValidRut,
+  isValidEmail,
+  normalizeEmail,
+  normalizePhone,
+  normalizeText,
+  onlyDigits
+} from '../../shared/utils/erp-validators';
 
 export interface Company {
   id?: number;
@@ -38,6 +48,9 @@ export class CompaniesComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
   companies: Company[] = [];
+  formErrors: ValidationErrors = {};
+  formMessage = '';
+  saving = false;
   editingCompanyId: number | null = null;
   currentOfficeId: number | null = null;
 
@@ -89,58 +102,114 @@ export class CompaniesComponent implements OnInit {
   }
 
   saveCompany(): void {
+    this.formMessage = '';
+
     if (!this.currentOfficeId) {
-      alert('No se pudo identificar la oficina activa');
+      this.formMessage = 'No se pudo identificar la oficina activa.';
       return;
     }
 
-    const payload: Company = {
-      office_id: this.currentOfficeId,
-      rut: this.form.rut?.trim() || '',
-      name: this.form.name?.trim() || '',
-      legal_name: this.form.legal_name?.trim() || '',
-      business_type: this.form.business_type?.trim() || '',
-      email: this.form.email?.trim() || '',
-      phone: this.form.phone?.trim() || '',
-      address: this.form.address?.trim() || '',
-      commune: this.form.commune?.trim() || '',
-      city: this.form.city?.trim() || '',
-      region_name: this.form.region_name?.trim() || '',
-      status: this.form.status || 'active',
-      notes: this.form.notes?.trim() || '',
-      year_num: this.form.year_num || new Date().getFullYear()
-    };
+    const payload: Company = this.buildPayload();
 
-    if (!payload.rut || !payload.name) {
-      alert('RUT y Nombre son obligatorios');
+    if (!this.validateCompany(payload)) {
+      this.formMessage = 'Revise los campos marcados antes de guardar.';
       return;
     }
+
+    this.saving = true;
 
     if (this.editingCompanyId) {
       this.companiesService.updateCompany(this.editingCompanyId, payload).subscribe({
         next: () => {
-          alert('Empresa actualizada correctamente');
+          this.saving = false;
+          this.formMessage = 'Empresa actualizada correctamente.';
           this.resetForm();
           this.loadCompanies();
         },
         error: (err) => {
+          this.saving = false;
           console.error('ERROR UPDATE COMPANY:', err);
-          alert(err?.error?.message || 'Error al actualizar empresa');
+          this.formMessage = err?.error?.message || 'No se pudo actualizar la empresa.';
         }
       });
     } else {
       this.companiesService.createCompany(payload).subscribe({
         next: () => {
-          alert('Empresa creada correctamente');
+          this.saving = false;
+          this.formMessage = 'Empresa creada correctamente.';
           this.resetForm();
           this.loadCompanies();
         },
         error: (err) => {
+          this.saving = false;
           console.error('ERROR CREATE COMPANY:', err);
-          alert(err?.error?.message || 'Error al crear empresa');
+          this.formMessage = err?.error?.message || 'No se pudo crear la empresa.';
         }
       });
     }
+  }
+
+  private buildPayload(): Company {
+    return {
+      office_id: this.currentOfficeId ?? undefined,
+      rut: formatRut(this.form.rut),
+      name: normalizeText(this.form.name),
+      legal_name: normalizeText(this.form.legal_name),
+      business_type: normalizeText(this.form.business_type),
+      email: normalizeEmail(this.form.email),
+      phone: normalizePhone(this.form.phone),
+      address: normalizeText(this.form.address),
+      commune: normalizeText(this.form.commune),
+      city: normalizeText(this.form.city),
+      region_name: normalizeText(this.form.region_name),
+      status: this.form.status || 'active',
+      notes: normalizeText(this.form.notes),
+      year_num: Number(this.form.year_num) || new Date().getFullYear()
+    };
+  }
+
+  private validateCompany(payload: Company): boolean {
+    const errors: ValidationErrors = {};
+
+    if (!payload.rut) errors['rut'] = 'El RUT es obligatorio.';
+    else if (!isValidRut(payload.rut)) errors['rut'] = 'El RUT no es válido. Revise el dígito verificador.';
+
+    if (!payload.name) errors['name'] = 'El nombre de fantasía es obligatorio.';
+    if (!payload.legal_name) errors['legal_name'] = 'La razón social es obligatoria.';
+    if (!payload.business_type) errors['business_type'] = 'El giro es obligatorio.';
+
+    if (payload.email && !isValidEmail(payload.email)) {
+      errors['email'] = 'Ingrese un correo válido.';
+    }
+
+    const year = Number(payload.year_num);
+    if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+      errors['year_num'] = 'Ingrese un año contable válido.';
+    }
+
+    const sameRut = this.companies.find(company =>
+      formatRut(company.rut) === payload.rut && company.id !== this.editingCompanyId
+    );
+
+    if (sameRut) {
+      errors['rut'] = 'Ya existe una empresa con este RUT en la oficina.';
+    }
+
+    this.formErrors = errors;
+    return Object.keys(errors).length === 0;
+  }
+
+  onRutBlur(): void {
+    this.form.rut = formatRut(this.form.rut);
+  }
+
+  onPhoneInput(): void {
+    this.form.phone = normalizePhone(this.form.phone);
+  }
+
+  onYearInput(): void {
+    const digits = onlyDigits(this.form.year_num);
+    this.form.year_num = digits ? Number(digits.slice(0, 4)) : undefined;
   }
 
   editCompany(company: Company): void {
@@ -148,7 +217,7 @@ export class CompaniesComponent implements OnInit {
 
     this.form = {
       office_id: company.office_id ?? this.currentOfficeId ?? undefined,
-      rut: company.rut ?? '',
+      rut: formatRut(company.rut) ?? '',
       name: company.name ?? '',
       legal_name: company.legal_name ?? '',
       business_type: company.business_type ?? '',
@@ -179,7 +248,7 @@ export class CompaniesComponent implements OnInit {
 
     const payload: Company = {
       office_id: company.office_id ?? this.currentOfficeId,
-      rut: company.rut ?? '',
+      rut: formatRut(company.rut) ?? '',
       name: company.name ?? '',
       legal_name: company.legal_name ?? '',
       business_type: company.business_type ?? '',
@@ -209,6 +278,7 @@ export class CompaniesComponent implements OnInit {
 
   resetForm(): void {
     this.editingCompanyId = null;
+    this.formErrors = {};
 
     this.form = {
       office_id: this.currentOfficeId ?? undefined,
