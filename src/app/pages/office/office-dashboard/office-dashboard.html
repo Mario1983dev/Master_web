@@ -136,6 +136,26 @@
       {{ errorMsg }}
     </div>
 
+    <!-- BLOQUE CORREGIDO -->
+
+    <div class="empty-company-actions">
+
+      <p *ngIf="companies.length === 0">
+        Para comenzar debes crear la primera empresa de esta oficina.
+      </p>
+
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="goTo('/office/companies')"
+      >
+        + Nueva empresa
+      </button>
+
+    </div>
+
+    <!-- FIN BLOQUE CORREGIDO -->
+
     <div
       class="active-company"
       *ngIf="selectedCompany"
@@ -233,12 +253,13 @@
 
     <div class="modules-grid">
 
+      <!-- CONFIGURACIÓN -->
+
       <button
         *ngIf="isOfficeAdmin"
         class="module-card admin-card"
         type="button"
-        (click)="goTo('/office/configuration', true)"
-        [class.disabled]="!selectedCompany"
+        (click)="goTo('/office/configuration')"
       >
 
         <span class="module-icon">
@@ -258,6 +279,35 @@
         </p>
 
       </button>
+
+      <!-- EMPRESAS -->
+
+      <button
+        *ngIf="isOfficeAdmin"
+        class="module-card admin-card"
+        type="button"
+        (click)="goTo('/office/companies')"
+      >
+
+        <span class="module-icon">
+          🏢
+        </span>
+
+        <span class="module-tag">
+          Administración
+        </span>
+
+        <h3>
+          Empresas
+        </h3>
+
+        <p>
+          Crea y administra las empresas de la oficina.
+        </p>
+
+      </button>
+
+      <!-- PLAN DE CUENTAS -->
 
       <button
         class="module-card"
@@ -284,6 +334,8 @@
 
       </button>
 
+      <!-- ASIENTOS -->
+
       <button
         class="module-card featured"
         type="button"
@@ -308,6 +360,8 @@
         </p>
 
       </button>
+
+      <!-- IMPORTADOR -->
 
       <button
         class="module-card featured"
@@ -334,6 +388,8 @@
 
       </button>
 
+      <!-- LIBRO DIARIO -->
+
       <button
         class="module-card"
         type="button"
@@ -359,6 +415,8 @@
 
       </button>
 
+      <!-- LIBRO MAYOR -->
+
       <button
         class="module-card"
         type="button"
@@ -383,6 +441,8 @@
         </p>
 
       </button>
+
+      <!-- BALANCE -->
 
       <button
         class="module-card"

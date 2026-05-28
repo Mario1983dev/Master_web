@@ -84,6 +84,13 @@
                   (click)="toggleOfficeStatus(office)">
                   {{ +office.status === 1 ? 'Desactivar' : 'Activar' }}
                 </button>
+
+                <button
+                  type="button"
+                  [disabled]="exportingOfficeId === office.id"
+                  (click)="exportOffice(office)">
+                  {{ exportingOfficeId === office.id ? 'Exportando...' : 'Exportar info' }}
+                </button>
               </td>
 
             </tr>

@@ -15,6 +15,7 @@ export class Offices implements OnInit {
   loading = false;
   errorMsg = '';
   offices: any[] = [];
+  exportingOfficeId: number | null = null;
 
   constructor(
     private officesSrv: OfficesService,
@@ -89,6 +90,51 @@ export class Offices implements OnInit {
         alert('No se pudo cambiar el estado');
       }
     });
+  }
+
+
+  /* =========================================
+     EXPORTAR INFORMACIÓN DE OFICINA
+  ========================================= */
+  exportOffice(office: any): void {
+    if (!office?.id) return;
+
+    const ok = confirm(`¿Descargar la información de la oficina "${office.name}"?`);
+    if (!ok) return;
+
+    this.exportingOfficeId = office.id;
+
+    this.officesSrv.exportOffice(office.id).subscribe({
+      next: (blob: Blob) => {
+        this.exportingOfficeId = null;
+        this.downloadBlob(blob, `oficina_${office.id}_${this.safeFileName(office.name || 'oficina')}.json`);
+      },
+      error: (err: any) => {
+        this.exportingOfficeId = null;
+        console.error('EXPORT OFFICE ERROR:', err);
+        alert('No se pudo exportar la información de la oficina. Revise permisos o API.');
+      }
+    });
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  private safeFileName(value: string): string {
+    return String(value || 'archivo')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 80) || 'archivo';
   }
 
   /* =========================================

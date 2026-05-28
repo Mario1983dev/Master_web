@@ -36,8 +36,18 @@
           {{ successMsg }}
         </div>
 
+        <div *ngIf="warningMsg" class="warning-box">
+          {{ warningMsg }}
+        </div>
+
         <div *ngIf="errorMsg" class="error-box">
           {{ errorMsg }}
+
+          <ul *ngIf="validationMessages.length" class="validation-list">
+            <li *ngFor="let message of validationMessages">
+              {{ message }}
+            </li>
+          </ul>
         </div>
 
         <div *ngIf="editingEntryId" class="info-box">
@@ -55,6 +65,7 @@
             <input
               type="date"
               [(ngModel)]="entryDate"
+              (ngModelChange)="updatePeriodWarning()"
             />
 
           </div>
@@ -88,7 +99,7 @@
           <div class="field field-full">
 
             <label>
-              Glosa
+              Glosa <span class="required">*</span>
             </label>
 
             <input
@@ -209,11 +220,12 @@
                   <td>
 
                     <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      [(ngModel)]="line.debit"
-                      (ngModelChange)="onDebitChange(i)"
+                      type="text"
+                      inputmode="numeric"
+                      [ngModel]="formatAmountInput(line.debit)"
+                      (ngModelChange)="onDebitAmountInput(i, $event)"
+                      placeholder="$ 0"
+                      class="money-input"
                     />
 
                   </td>
@@ -221,11 +233,12 @@
                   <td>
 
                     <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      [(ngModel)]="line.credit"
-                      (ngModelChange)="onCreditChange(i)"
+                      type="text"
+                      inputmode="numeric"
+                      [ngModel]="formatAmountInput(line.credit)"
+                      (ngModelChange)="onCreditAmountInput(i, $event)"
+                      placeholder="$ 0"
+                      class="money-input"
                     />
 
                   </td>
@@ -272,11 +285,11 @@
 
                 <tr>
 
-                  <td colspan="5">
+                  <td colspan="5" [ngClass]="{ 'difference-ok': difference === 0, 'difference-error': difference !== 0 }">
 
                     <strong>
                       Diferencia:
-                      $ {{ formatMoney(difference) }}
+                      $ {{ formatMoney(difference < 0 ? -difference : difference) }}
                     </strong>
 
                   </td>
@@ -297,11 +310,12 @@
             type="button"
             class="primary-btn"
             (click)="saveEntry()"
+            [disabled]="loading"
           >
             {{
               editingEntryId
-                ? 'Actualizar asiento'
-                : 'Guardar asiento'
+                ? (loading ? 'Actualizando...' : 'Actualizar asiento')
+                : (loading ? 'Guardando...' : 'Guardar asiento')
             }}
           </button>
 

@@ -51,6 +51,7 @@ export class CompaniesComponent implements OnInit {
   formErrors: ValidationErrors = {};
   formMessage = '';
   saving = false;
+  exportingCompanyId: number | null = null;
   editingCompanyId: number | null = null;
   currentOfficeId: number | null = null;
 
@@ -274,6 +275,48 @@ export class CompaniesComponent implements OnInit {
         alert(err?.error?.message || `Error al ${actionText} empresa`);
       }
     });
+  }
+
+
+  exportCompany(company: Company): void {
+    if (!company.id) return;
+
+    const ok = confirm(`¿Descargar la información de la empresa "${company.name}"?`);
+    if (!ok) return;
+
+    this.exportingCompanyId = company.id;
+
+    this.companiesService.exportCompany(company.id).subscribe({
+      next: (blob) => {
+        this.exportingCompanyId = null;
+        this.downloadBlob(blob, `empresa_${company.id}_${this.safeFileName(company.name || 'empresa')}.json`);
+      },
+      error: (err) => {
+        this.exportingCompanyId = null;
+        console.error('ERROR EXPORT COMPANY:', err);
+        alert('No se pudo exportar la información de la empresa. Revise la API o permisos.');
+      }
+    });
+  }
+
+  private downloadBlob(blob: Blob, filename: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
+  private safeFileName(value: string): string {
+    return String(value || 'archivo')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 80) || 'archivo';
   }
 
   resetForm(): void {

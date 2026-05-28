@@ -467,3 +467,59 @@ button:disabled {
 
 }
 }
+/* QA VISUAL / VALIDACIONES */
+.warning-box,
+.info-box {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.warning-box {
+  background: #fff8e1;
+  color: #8a5a00;
+  border: 1px solid #ffe0a3;
+}
+
+.info-box {
+  background: #eef4ff;
+  color: #0d47a1;
+  border: 1px solid #c8d9ff;
+}
+
+.validation-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-weight: 500;
+}
+
+.validation-list li {
+  margin: 4px 0;
+}
+
+.required {
+  color: #b71c1c;
+}
+
+.money-input {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lines-table td:nth-child(3),
+.lines-table td:nth-child(4),
+.entries-table td:nth-child(5),
+.entries-table td:nth-child(6) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.difference-ok {
+  color: #1b5e20;
+}
+
+.difference-error {
+  color: #b71c1c;
+  background: #fdeeee !important;
+}

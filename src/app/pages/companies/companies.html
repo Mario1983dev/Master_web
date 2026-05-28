@@ -162,6 +162,14 @@
                       : 'Activar' }}
                   </button>
 
+                  <button
+                    class="btn btn-small btn-secondary"
+                    type="button"
+                    [disabled]="exportingCompanyId === company.id"
+                    (click)="exportCompany(company)">
+                    {{ exportingCompanyId === company.id ? 'Exportando...' : 'Exportar info' }}
+                  </button>
+
                 </td>
               </tr>
 

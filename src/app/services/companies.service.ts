@@ -49,6 +49,12 @@ export class CompaniesService {
     );
   }
 
+  exportCompany(id: number): Observable<Blob> {
+    return this.http.get(`${environment.apiUrl}/export/company/${id}`, {
+      responseType: 'blob'
+    });
+  }
+
   clearCompaniesCache(): void {
     this.companiesCache = null;
   }

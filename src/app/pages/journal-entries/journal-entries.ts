@@ -9,6 +9,8 @@ import {
   JournalEntryPayload
 } from '../../services/journal-entries.service';
 import { AccountsService, Account } from '../../services/accounts.service';
+import { ConfigurationService, AccountingPeriod } from '../../services/configuration.service';
+import { formatInteger, parseFormattedInteger } from '../../shared/utils/erp-validators';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -49,6 +51,7 @@ export class JournalEntries implements OnInit {
   private router = inject(Router);
   private service = inject(JournalEntriesService);
   private accountsService = inject(AccountsService);
+  private configurationService = inject(ConfigurationService);
   private cdr = inject(ChangeDetectorRef);
 
   companyId = 0;
@@ -76,6 +79,12 @@ export class JournalEntries implements OnInit {
 
   successMsg = '';
   errorMsg = '';
+  warningMsg = '';
+  validationMessages: string[] = [];
+
+  accountingPeriod: AccountingPeriod | null = null;
+  accountingPeriodYear: number | null = null;
+  accountingPeriodStatus = '';
 
   cashAccountCode = '1010101';
   currentCashBalance = 0;
@@ -94,6 +103,7 @@ export class JournalEntries implements OnInit {
       this.loadEntries();
       this.loadAccounts();
       this.loadCashBalance();
+      this.loadAccountingPeriod();
     } else {
       this.errorMsg = 'No hay empresa seleccionada.';
     }
@@ -116,8 +126,53 @@ export class JournalEntries implements OnInit {
     return now.toISOString().substring(0, 10);
   }
 
-   toNumber(value: any): number {
+  toNumber(value: any): number {
     return Number(value ?? 0) || 0;
+  }
+
+  private roundAmount(value: number): number {
+    return Math.round((Number(value) || 0) * 100) / 100;
+  }
+
+  formatAmountInput(value: number | null): string {
+    const amount = this.toNumber(value);
+    return amount > 0 ? '$ ' + formatInteger(amount) : '';
+  }
+
+  onDebitAmountInput(index: number, value: string): void {
+    const amount = parseFormattedInteger(value);
+    this.lines[index].debit = amount > 0 ? amount : null;
+    if (amount > 0) {
+      this.lines[index].credit = null;
+    }
+    this.clearValidationState();
+  }
+
+  onCreditAmountInput(index: number, value: string): void {
+    const amount = parseFormattedInteger(value);
+    this.lines[index].credit = amount > 0 ? amount : null;
+    if (amount > 0) {
+      this.lines[index].debit = null;
+    }
+    this.clearValidationState();
+  }
+
+  private clearValidationState(): void {
+    this.errorMsg = '';
+    this.successMsg = '';
+    this.validationMessages = [];
+  }
+
+  private logTechnicalError(context: string, error: any, extra: Record<string, unknown> = {}): void {
+    console.error('[ERP][Asientos]', {
+      context,
+      companyId: this.companyId,
+      editingEntryId: this.editingEntryId,
+      entryDate: this.entryDate,
+      entryType: this.entryType,
+      extra,
+      error
+    });
   }
 
   private formatAccountOption(account: CompanyAccountOption): string {
@@ -147,13 +202,56 @@ export class JournalEntries implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        console.error('Error cargando cuentas:', error);
+        this.logTechnicalError('Error cargando cuentas', error);
         this.availableAccounts = [];
         this.loadingAccounts = false;
         this.errorMsg = 'No se pudieron cargar las cuentas.';
         this.cdr.detectChanges();
       }
     });
+  }
+
+  loadAccountingPeriod(): void {
+    if (!this.companyId) return;
+
+    this.configurationService.getAccountingPeriod(this.companyId).subscribe({
+      next: (period) => {
+        this.accountingPeriod = period;
+        this.accountingPeriodYear = period ? Number(period.year_num) : null;
+        this.accountingPeriodStatus = period?.status || '';
+        this.updatePeriodWarning();
+        this.cdr.detectChanges();
+      },
+      error: (error: any) => {
+        this.logTechnicalError('Error cargando período contable', error);
+        this.accountingPeriod = null;
+        this.accountingPeriodYear = null;
+        this.accountingPeriodStatus = '';
+        this.warningMsg = 'No se pudo verificar el período contable activo.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  updatePeriodWarning(): void {
+    const entryYear = this.entryDate ? Number(this.entryDate.substring(0, 4)) : null;
+
+    if (!this.entryDate || !this.accountingPeriodYear) {
+      this.warningMsg = '';
+      return;
+    }
+
+    if (this.accountingPeriodStatus === 'CLOSED') {
+      this.warningMsg = `El período contable ${this.accountingPeriodYear} está cerrado. No deberías ingresar asientos sin reabrirlo.`;
+      return;
+    }
+
+    if (entryYear && entryYear !== this.accountingPeriodYear) {
+      this.warningMsg = `La fecha del asiento pertenece al año ${entryYear}, pero el período activo es ${this.accountingPeriodYear}.`;
+      return;
+    }
+
+    this.warningMsg = '';
   }
 
   loadCashBalance(): void {
@@ -165,7 +263,7 @@ export class JournalEntries implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        console.error('Error cargando saldo de caja:', error);
+        this.logTechnicalError('Error cargando saldo de caja', error);
         this.currentCashBalance = 0;
         this.cdr.detectChanges();
       }
@@ -236,7 +334,7 @@ export class JournalEntries implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        console.error('Error cargando tipos de asiento:', error);
+        this.logTechnicalError('Error cargando tipos de asiento', error);
         this.entryTypes = [];
         this.entryType = '';
         this.errorMsg = 'No se pudieron cargar los tipos de asiento.';
@@ -256,7 +354,7 @@ export class JournalEntries implements OnInit {
         this.loadingEntries = false;
       },
       error: (error: any) => {
-        console.error('Error cargando asientos:', error);
+        this.logTechnicalError('Error cargando asientos', error);
         this.loadingEntries = false;
       }
     });
@@ -275,12 +373,14 @@ export class JournalEntries implements OnInit {
     if (this.lines[i].debit) {
       this.lines[i].credit = null;
     }
+    this.clearValidationState();
   }
 
   onCreditChange(i: number): void {
     if (this.lines[i].credit) {
       this.lines[i].debit = null;
     }
+    this.clearValidationState();
   }
 
   get totalDebit(): number {
@@ -292,7 +392,7 @@ export class JournalEntries implements OnInit {
   }
 
   get difference(): number {
-    return this.totalDebit - this.totalCredit;
+    return this.roundAmount(this.totalDebit - this.totalCredit);
   }
 
   get cashDraftImpact(): number {
@@ -338,6 +438,8 @@ export class JournalEntries implements OnInit {
     this.copyUntilDecember = false;
     this.successMsg = '';
     this.errorMsg = '';
+    this.warningMsg = '';
+    this.validationMessages = [];
     this.entryType = this.entryTypes.length > 0 ? this.entryTypes[0].code : '';
     this.lines = [
       this.createEmptyLine(),
@@ -348,6 +450,7 @@ export class JournalEntries implements OnInit {
   editEntry(entry: JournalEntryItem): void {
     this.errorMsg = '';
     this.successMsg = '';
+    this.validationMessages = [];
 
     this.service.getEntryById(entry.id).subscribe({
       next: (res: any) => {
@@ -376,60 +479,106 @@ export class JournalEntries implements OnInit {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: (error: any) => {
-        console.error('Error cargando asiento para editar:', error);
+        this.logTechnicalError('Error cargando asiento para editar', error, { entryId: entry.id });
         this.errorMsg = error?.error?.message || 'No se pudo cargar el asiento.';
       }
     });
   }
 
-  saveEntry(): void {
-    this.errorMsg = '';
-    this.successMsg = '';
+  private validateEntryBeforeSave(): JournalEntryLineForm[] | null {
+    this.validationMessages = [];
+    this.updatePeriodWarning();
 
     if (!this.companyId) {
-      this.errorMsg = 'No hay empresa seleccionada.';
-      return;
+      this.validationMessages.push('No hay empresa seleccionada.');
     }
 
     if (!this.entryDate) {
-      this.errorMsg = 'La fecha es obligatoria.';
-      return;
+      this.validationMessages.push('La fecha es obligatoria.');
+    }
+
+    if (this.accountingPeriodYear && this.entryDate) {
+      const entryYear = Number(this.entryDate.substring(0, 4));
+
+      if (this.accountingPeriodStatus === 'CLOSED') {
+        this.validationMessages.push(`El período contable ${this.accountingPeriodYear} está cerrado.`);
+      }
+
+      if (entryYear !== this.accountingPeriodYear) {
+        this.validationMessages.push(`La fecha del asiento no corresponde al período activo ${this.accountingPeriodYear}.`);
+      }
     }
 
     if (!this.entryType) {
-      this.errorMsg = 'El tipo de asiento es obligatorio.';
-      return;
+      this.validationMessages.push('El tipo de asiento es obligatorio.');
     }
 
-    const invalidLine = this.lines.find((l) => {
-      const debit = this.toNumber(l.debit);
-      const credit = this.toNumber(l.credit);
-      return (debit > 0 || credit > 0) && !l.account_id;
+    if (!String(this.description || '').trim()) {
+      this.validationMessages.push('La glosa del asiento es obligatoria.');
+    }
+
+    this.lines.forEach((line, index) => {
+      const debit = this.toNumber(line.debit);
+      const credit = this.toNumber(line.credit);
+      const hasAccountText = !!String(line.account_search || '').trim();
+      const hasDescription = !!String(line.description || '').trim();
+      const hasAnyData = !!line.account_id || hasAccountText || hasDescription || debit > 0 || credit > 0;
+
+      if (!hasAnyData) {
+        return;
+      }
+
+      if (!line.account_id) {
+        this.validationMessages.push(`Línea ${index + 1}: selecciona una cuenta válida.`);
+      }
+
+      if (debit <= 0 && credit <= 0) {
+        this.validationMessages.push(`Línea ${index + 1}: ingresa monto en Debe o Haber.`);
+      }
+
+      if (debit > 0 && credit > 0) {
+        this.validationMessages.push(`Línea ${index + 1}: no puede tener Debe y Haber al mismo tiempo.`);
+      }
+
+      if (debit < 0 || credit < 0) {
+        this.validationMessages.push(`Línea ${index + 1}: los montos no pueden ser negativos.`);
+      }
     });
-
-    if (invalidLine) {
-      this.errorMsg = 'Todas las líneas con monto deben tener una cuenta válida.';
-      return;
-    }
 
     const validLines = this.lines.filter((l) => {
       const debit = this.toNumber(l.debit);
       const credit = this.toNumber(l.credit);
-      return l.account_id && (debit > 0 || credit > 0);
+      return l.account_id && (debit > 0 || credit > 0) && !(debit > 0 && credit > 0);
     });
 
     if (validLines.length < 2) {
-      this.errorMsg = 'Debes ingresar al menos 2 líneas válidas.';
-      return;
+      this.validationMessages.push('Debes ingresar al menos 2 líneas completas.');
     }
 
     if (this.totalDebit <= 0 || this.totalCredit <= 0) {
-      this.errorMsg = 'El asiento debe tener débito y crédito.';
-      return;
+      this.validationMessages.push('El asiento debe tener total en Debe y total en Haber.');
     }
 
-    if (this.totalDebit !== this.totalCredit) {
-      this.errorMsg = 'El asiento no está cuadrado.';
+    if (this.roundAmount(this.totalDebit) !== this.roundAmount(this.totalCredit)) {
+      this.validationMessages.push(`El asiento no está cuadrado. Diferencia: $ ${this.formatMoney(Math.abs(this.difference))}.`);
+    }
+
+    if (this.validationMessages.length) {
+      this.errorMsg = 'No se pudo guardar el asiento. Revisa las validaciones.';
+      return null;
+    }
+
+    return validLines;
+  }
+
+  saveEntry(): void {
+    this.errorMsg = '';
+    this.successMsg = '';
+    this.validationMessages = [];
+
+    const validLines = this.validateEntryBeforeSave();
+
+    if (!validLines) {
       return;
     }
 
@@ -437,11 +586,11 @@ export class JournalEntries implements OnInit {
       company_id: this.companyId,
       entry_date: this.entryDate,
       entry_type: this.entryType,
-      description: this.description,
+      description: String(this.description || '').trim(),
       copy_until_december: this.editingEntryId ? false : this.copyUntilDecember,
       lines: validLines.map((l) => ({
         account_id: l.account_id,
-        description: l.description,
+        description: String(l.description || '').trim(),
         debit: this.toNumber(l.debit),
         credit: this.toNumber(l.credit)
       }))
@@ -468,9 +617,10 @@ export class JournalEntries implements OnInit {
 
         this.loadEntries();
         this.loadCashBalance();
+        this.loadAccountingPeriod();
       },
       error: (error: any) => {
-        console.error('Error guardando/actualizando asiento:', error);
+        this.logTechnicalError('Error guardando/actualizando asiento', error, { payload });
         this.loading = false;
         this.errorMsg = error?.error?.message || 'No se pudo guardar el asiento.';
       }
@@ -483,6 +633,7 @@ export class JournalEntries implements OnInit {
     this.deletingId = id;
     this.errorMsg = '';
     this.successMsg = '';
+    this.validationMessages = [];
 
     this.service.voidEntry(id).subscribe({
       next: () => {
@@ -490,13 +641,14 @@ export class JournalEntries implements OnInit {
         this.successMsg = 'Asiento anulado correctamente.';
         this.loadEntries();
         this.loadCashBalance();
+        this.loadAccountingPeriod();
 
         if (this.editingEntryId === id) {
           this.resetForm();
         }
       },
       error: (error: any) => {
-        console.error('Error anulando asiento:', error);
+        this.logTechnicalError('Error anulando asiento', error, { entryId: id });
         this.deletingId = null;
         this.errorMsg = error?.error?.message || 'No se pudo anular el asiento.';
       }
@@ -507,6 +659,7 @@ export class JournalEntries implements OnInit {
     this.loadingPdf = true;
     this.errorMsg = '';
     this.successMsg = '';
+    this.validationMessages = [];
 
     this.service.getEntryById(entry.id).subscribe({
       next: (res: any) => {
@@ -565,7 +718,7 @@ export class JournalEntries implements OnInit {
         this.loadingPdf = false;
       },
       error: (error: any) => {
-        console.error('Error generando PDF:', error);
+        this.logTechnicalError('Error generando PDF', error, { entryId: entry.id });
         this.loadingPdf = false;
         this.errorMsg = 'No se pudo generar el PDF del asiento.';
       }

@@ -60,12 +60,22 @@
       </button>
     </div>
 
+    <div *ngIf="warning" class="alert warning">
+      {{ warning }}
+    </div>
+
     <div *ngIf="message" class="alert success">
       {{ message }}
     </div>
 
     <div *ngIf="error" class="alert error">
       {{ error }}
+
+      <ul *ngIf="validationMessages.length" class="validation-list">
+        <li *ngFor="let validation of validationMessages">
+          {{ validation }}
+        </li>
+      </ul>
     </div>
   </div>
 
@@ -94,6 +104,10 @@
     <div class="alert success">
       Archivo validado correctamente.
       Revisa la información antes de importarla al ERP.
+    </div>
+
+    <div class="alert warning">
+      Antes de importar, confirma que este período/libro no haya sido cargado antes para evitar duplicados.
     </div>
 
     <div class="table-container">

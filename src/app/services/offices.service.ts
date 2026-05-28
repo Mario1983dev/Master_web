@@ -49,4 +49,11 @@ export class OfficesService {
     );
   }
 
+  exportOffice(id: number) {
+    return this.http.get(`${environment.apiUrl}/export/office/${id}`, {
+      ...this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
+
 }
