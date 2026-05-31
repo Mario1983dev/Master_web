@@ -14,9 +14,7 @@ export const routes: Routes = [
       import('./pages/login/login').then(m => m.Login),
   },
 
-  /* ======================================================
-     MASTER
-  ====================================================== */
+  /* MASTER */
   {
     path: 'master',
     canActivate: [authGuard],
@@ -54,9 +52,7 @@ export const routes: Routes = [
       import('./pages/companies/companies').then(m => m.CompaniesComponent),
   },
 
-  /* ======================================================
-     OFFICE
-  ====================================================== */
+  /* OFFICE */
   {
     path: 'office',
     redirectTo: 'office/dashboard',
@@ -90,7 +86,7 @@ export const routes: Routes = [
   },
   {
     path: 'office/journal-entries',
-    canActivate: [authGuard],
+    canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
       import('./pages/journal-entries/journal-entries').then(
         m => m.JournalEntries
@@ -104,8 +100,6 @@ export const routes: Routes = [
         m => m.JournalReport
       ),
   },
-
-  // 🔥 LIBRO MAYOR
   {
     path: 'office/ledger-report',
     canActivate: [authGuard, companySelectedGuard],
@@ -114,8 +108,6 @@ export const routes: Routes = [
         m => m.LedgerReportComponent
       ),
   },
-
-  // 🔥 BALANCE (NUEVO)
   {
     path: 'office/trial-balance',
     canActivate: [authGuard, companySelectedGuard],
@@ -124,25 +116,29 @@ export const routes: Routes = [
         m => m.TrialBalanceComponent
       ),
   },
-
   {
     path: 'office/configuration',
-    canActivate: [authGuard],
+    canActivate: [authGuard, companySelectedGuard],
     loadComponent: () =>
       import('./pages/configuration/configuration').then(m => m.Configuration),
   },
-  
   {
-     path: 'office/sii-import',
-     canActivate: [authGuard, companySelectedGuard],
-     loadComponent: () =>
-     import('./pages/office/sii-import/sii-import.component')
-      .then(m => m.SiiImportComponent),
+    path: 'office/accounting-periods',
+    canActivate: [authGuard, companySelectedGuard],
+    loadComponent: () =>
+      import('./pages/accounting-periods/accounting-periods').then(
+        m => m.AccountingPeriods
+      ),
+  },
+  {
+    path: 'office/sii-import',
+    canActivate: [authGuard, companySelectedGuard],
+    loadComponent: () =>
+      import('./pages/office/sii-import/sii-import.component').then(
+        m => m.SiiImportComponent
+      ),
   },
 
-  /* ======================================================
-     FALLBACK
-  ====================================================== */
   {
     path: '**',
     redirectTo: 'login',

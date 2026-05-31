@@ -1,0 +1,98 @@
+<section class="page">
+  <div class="hero-card">
+
+    <div class="hero-top">
+      <button type="button" class="back-btn" (click)="goBack()">
+        ← Volver
+      </button>
+    </div>
+
+    <p class="eyebrow">MASTER ERP · SOLUSOFT</p>
+
+    <h1>Períodos Contables</h1>
+
+    <p class="subtitle">
+      Administra los años contables disponibles de la empresa.
+    </p>
+
+    <p class="company" *ngIf="companyName">
+      Empresa activa:
+      <strong>{{ companyName }}</strong>
+    </p>
+
+  </div>
+
+  <div class="card">
+
+    <div class="create-box">
+
+      <div class="field">
+        <label>Año</label>
+        <input type="number" [(ngModel)]="newYear" />
+      </div>
+
+      <button type="button" class="primary-btn" (click)="createPeriod()">
+        Crear período
+      </button>
+
+    </div>
+
+    <div *ngIf="loading === true" class="info-box">
+      Cargando períodos...
+    </div>
+
+    <div *ngIf="!loading && errorMessage" class="error-box">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && successMessage" class="success-box">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="!loading && periods.length === 0 && !errorMessage" class="info-box">
+      No hay períodos contables registrados para esta empresa.
+    </div>
+
+    <table *ngIf="!loading && periods.length > 0" class="table">
+      <thead>
+        <tr>
+          <th>Año</th>
+          <th>Estado</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let period of periods">
+          <td>{{ period.year_num }}</td>
+
+          <td>
+            <span class="badge">
+              {{ period.status }}
+            </span>
+          </td>
+
+          <td>{{ period.start_date | date:'yyyy-MM-dd' }}</td>
+          <td>{{ period.end_date | date:'yyyy-MM-dd' }}</td>
+
+          <td class="actions">
+            <button type="button" class="open-btn" (click)="changeStatus(period.id, 'OPEN')">
+              Abrir
+            </button>
+
+            <button type="button" class="current-btn" (click)="changeStatus(period.id, 'CURRENT')">
+              Actual
+            </button>
+
+            <button type="button" class="close-btn" (click)="changeStatus(period.id, 'CLOSED')">
+              Cerrar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</section>

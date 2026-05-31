@@ -360,6 +360,32 @@
         </p>
 
       </button>
+      <!-- PERÍODOS CONTABLES -->
+
+<button
+  class="module-card"
+  type="button"
+  (click)="goTo('/office/accounting-periods', true)"
+  [class.disabled]="!selectedCompany"
+>
+
+  <span class="module-icon">
+    📅
+  </span>
+
+  <span class="module-tag">
+    Administración
+  </span>
+
+  <h3>
+    Períodos Contables
+  </h3>
+
+  <p>
+    Administra los años contables y períodos activos de la empresa.
+  </p>
+
+</button>
 
       <!-- IMPORTADOR -->
 
