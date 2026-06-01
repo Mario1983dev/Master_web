@@ -78,13 +78,17 @@ export class OfficeDashboard implements OnInit {
     this.companiesService.getCompanies().subscribe({
       next: (data: Company[]) => {
         const filteredCompanies = (data || [])
-          .filter(company => Number(company.office_id) === Number(officeId))
-          .map(company => ({
-            ...company,
-            label: this.buildCompanyLabel(company)
-          }));
+          .filter(company => Number(company.office_id) === Number(officeId));
 
-        this.companies = filteredCompanies;
+        const uniqueCompanies = filteredCompanies.filter(
+          (company, index, self) =>
+            index === self.findIndex(c => Number(c.id) === Number(company.id))
+        );
+
+        this.companies = uniqueCompanies.map(company => ({
+          ...company,
+          label: this.buildCompanyLabel(company)
+        }));
 
         if (this.companies.length === 0) {
           this.selectedCompanyId = null;
@@ -110,6 +114,11 @@ export class OfficeDashboard implements OnInit {
           if (found) {
             this.auth.setSelectedCompany(found);
             localStorage.setItem('company_id', String(found.id));
+          } else {
+            this.selectedCompanyId = null;
+            this.selectedCompany = null;
+            this.auth.clearSelectedCompany();
+            localStorage.removeItem('company_id');
           }
         }
 
