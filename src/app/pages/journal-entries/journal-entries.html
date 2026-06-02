@@ -224,6 +224,7 @@
                       inputmode="numeric"
                       [ngModel]="formatAmountInput(line.debit)"
                       (ngModelChange)="onDebitAmountInput(i, $event)"
+                      (focus)="autoCompleteDebit(i)"
                       placeholder="$ 0"
                       class="money-input"
                     />
@@ -237,6 +238,7 @@
                       inputmode="numeric"
                       [ngModel]="formatAmountInput(line.credit)"
                       (ngModelChange)="onCreditAmountInput(i, $event)"
+                      (focus)="autoCompleteCredit(i)"
                       placeholder="$ 0"
                       class="money-input"
                     />
@@ -290,6 +292,11 @@
                     <strong>
                       Diferencia:
                       $ {{ formatMoney(difference < 0 ? -difference : difference) }}
+
+                      <small *ngIf="difference !== 0">
+                        · Sugerido para cuadrar:
+                        $ {{ formatMoney(suggestedDifferenceAmount) }}
+                      </small>
                     </strong>
 
                   </td>
@@ -387,7 +394,7 @@
               </td>
 
               <td>
-                {{ entry.entry_type }}
+                {{ formatEntryTypeLabel(entry.entry_type) }}
               </td>
 
               <td>

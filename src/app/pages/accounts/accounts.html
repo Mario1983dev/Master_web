@@ -38,12 +38,15 @@
           <option value="PATRIMONIO">PATRIMONIO</option>
           <option value="INGRESO">INGRESO</option>
           <option value="GASTO">GASTO</option>
+          <option value="RESULTADO">RESULTADO</option>
         </select>
+        <small class="field-error" *ngIf="formErrors['account_type']">{{ formErrors['account_type'] }}</small>
       </div>
 
       <div class="form-group">
         <label>Naturaleza</label>
         <input [value]="form.balance_nature" readonly />
+        <small class="field-error" *ngIf="formErrors['balance_nature']">{{ formErrors['balance_nature'] }}</small>
       </div>
 
       <div class="form-group">
@@ -100,7 +103,6 @@
       </div>
     </div>
 
-    <!-- 🔍 BUSCADOR -->
     <div class="accounts-toolbar">
       <input
         type="text"
@@ -137,6 +139,7 @@
             <th>Orden</th>
           </tr>
         </thead>
+
         <tbody>
           <tr *ngFor="let acc of filteredAccounts">
             <td class="code-cell">{{ acc.code }}</td>
@@ -177,13 +180,11 @@
             <td>{{ acc.sort_order }}</td>
           </tr>
 
-          <!-- vacío -->
           <tr *ngIf="!loading && filteredAccounts.length === 0">
             <td colspan="8" class="empty-state">
               No se encontraron resultados.
             </td>
           </tr>
-
         </tbody>
       </table>
     </div>

@@ -24,7 +24,6 @@ export class Accounts implements OnInit {
   companyName = '';
 
   searchTerm = '';
-
   puedeAdministrarCuentas = false;
 
   form = {
@@ -56,7 +55,6 @@ export class Accounts implements OnInit {
     this.companyName = company.name || '';
 
     const user = this.auth.getUser();
-    console.log('👤 USER ACCOUNTS =>', user);
 
     this.definirPermisos(user);
     this.onAccountTypeChange();
@@ -101,7 +99,8 @@ export class Accounts implements OnInit {
       GASTO: 'DEBITO',
       PASIVO: 'CREDITO',
       PATRIMONIO: 'CREDITO',
-      INGRESO: 'CREDITO'
+      INGRESO: 'CREDITO',
+      RESULTADO: 'CREDITO'
     };
 
     this.form.balance_nature = map[this.form.account_type] || 'DEBITO';
@@ -141,7 +140,8 @@ export class Accounts implements OnInit {
           PASIVO: '2010101',
           PATRIMONIO: '3010101',
           INGRESO: '4010101',
-          GASTO: '5010101'
+          GASTO: '5010101',
+          RESULTADO: '3020101'
         };
 
         this.form.code = baseMap[this.form.account_type] || '1010101';
@@ -201,6 +201,8 @@ export class Accounts implements OnInit {
       this.generarCodigoPropuesto();
     }
 
+    this.onAccountTypeChange();
+
     if (!this.validateAccountForm()) {
       this.error = 'Revise los campos marcados antes de guardar.';
       return;
@@ -259,9 +261,16 @@ export class Accounts implements OnInit {
 
     if (!name) errors['name'] = 'El nombre de la cuenta es obligatorio.';
 
-    const validTypes = ['ACTIVO', 'PASIVO', 'PATRIMONIO', 'INGRESO', 'GASTO'];
+    const validTypes = ['ACTIVO', 'PASIVO', 'PATRIMONIO', 'INGRESO', 'GASTO', 'RESULTADO'];
+
     if (!validTypes.includes(this.form.account_type)) {
       errors['account_type'] = 'Seleccione un tipo válido.';
+    }
+
+    const validNatures = ['DEBITO', 'CREDITO'];
+
+    if (!validNatures.includes(this.form.balance_nature)) {
+      errors['balance_nature'] = 'Seleccione una naturaleza válida.';
     }
 
     const sameCode = this.accounts.find(account => String(account.code) === code);

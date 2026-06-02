@@ -123,7 +123,10 @@ export class JournalEntries implements OnInit {
 
   private getTodayLocalDate(): string {
     const now = new Date();
-    return now.toISOString().substring(0, 10);
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   toNumber(value: any): number {
@@ -141,20 +144,90 @@ export class JournalEntries implements OnInit {
 
   onDebitAmountInput(index: number, value: string): void {
     const amount = parseFormattedInteger(value);
+
     this.lines[index].debit = amount > 0 ? amount : null;
+
     if (amount > 0) {
       this.lines[index].credit = null;
     }
+
+    this.ensureNextEmptyLine(index);
     this.clearValidationState();
   }
 
   onCreditAmountInput(index: number, value: string): void {
     const amount = parseFormattedInteger(value);
+
     this.lines[index].credit = amount > 0 ? amount : null;
+
     if (amount > 0) {
       this.lines[index].debit = null;
     }
+
+    this.ensureNextEmptyLine(index);
     this.clearValidationState();
+  }
+
+  private ensureNextEmptyLine(index: number): void {
+    const line = this.lines[index];
+    const isLastLine = index === this.lines.length - 1;
+    const hasAccount = !!line.account_id;
+    const hasAmount = this.toNumber(line.debit) > 0 || this.toNumber(line.credit) > 0;
+
+    if (isLastLine && hasAccount && hasAmount) {
+      this.addLine();
+    }
+  }
+
+  private getTotalsExcludingLine(index: number): { debit: number; credit: number } {
+    return this.lines.reduce(
+      (totals, line, currentIndex) => {
+        if (currentIndex === index) {
+          return totals;
+        }
+
+        totals.debit += this.toNumber(line.debit);
+        totals.credit += this.toNumber(line.credit);
+        return totals;
+      },
+      { debit: 0, credit: 0 }
+    );
+  }
+
+  autoCompleteDebit(index: number): void {
+    const line = this.lines[index];
+
+    if (!line || !line.account_id || this.toNumber(line.debit) > 0 || this.toNumber(line.credit) > 0) {
+      return;
+    }
+
+    const totals = this.getTotalsExcludingLine(index);
+    const missingDebit = this.roundAmount(totals.credit - totals.debit);
+
+    if (missingDebit > 0) {
+      line.debit = missingDebit;
+      line.credit = null;
+      this.ensureNextEmptyLine(index);
+      this.clearValidationState();
+    }
+  }
+
+  autoCompleteCredit(index: number): void {
+    const line = this.lines[index];
+
+    if (!line || !line.account_id || this.toNumber(line.debit) > 0 || this.toNumber(line.credit) > 0) {
+      return;
+    }
+
+    const totals = this.getTotalsExcludingLine(index);
+    const missingCredit = this.roundAmount(totals.debit - totals.credit);
+
+    if (missingCredit > 0) {
+      line.credit = missingCredit;
+      line.debit = null;
+      this.ensureNextEmptyLine(index);
+      this.clearValidationState();
+    }
   }
 
   private clearValidationState(): void {
@@ -395,6 +468,10 @@ export class JournalEntries implements OnInit {
     return this.roundAmount(this.totalDebit - this.totalCredit);
   }
 
+  get suggestedDifferenceAmount(): number {
+    return Math.abs(this.difference);
+  }
+
   get cashDraftImpact(): number {
     return this.lines.reduce((sum, l) => {
       if (l.account_code !== this.cashAccountCode) return sum;
@@ -431,9 +508,16 @@ export class JournalEntries implements OnInit {
     return new Intl.NumberFormat('es-CL').format(value);
   }
 
-  resetForm(): void {
+  formatEntryTypeLabel(value: string): string {
+    if (value === 'MANUAL') return 'Asiento Contable';
+    return value || '';
+  }
+
+  resetForm(keepDate = false): void {
+    const currentDate = this.entryDate;
+
     this.editingEntryId = null;
-    this.entryDate = this.getTodayLocalDate();
+    this.entryDate = keepDate ? currentDate : this.getTodayLocalDate();
     this.description = '';
     this.copyUntilDecember = false;
     this.successMsg = '';
@@ -445,6 +529,8 @@ export class JournalEntries implements OnInit {
       this.createEmptyLine(),
       this.createEmptyLine()
     ];
+
+    this.updatePeriodWarning();
   }
 
   editEntry(entry: JournalEntryItem): void {
@@ -609,7 +695,7 @@ export class JournalEntries implements OnInit {
         this.loading = false;
         this.errorMsg = '';
 
-        this.resetForm();
+        this.resetForm(true);
 
         this.successMsg = wasEditing
           ? 'Asiento actualizado correctamente.'
@@ -673,7 +759,7 @@ export class JournalEntries implements OnInit {
         doc.setFontSize(10);
         doc.text(`ID: ${entry.id}`, 14, 25);
         doc.text(`Fecha: ${entry.entry_date}`, 14, 31);
-        doc.text(`Tipo: ${entry.entry_type}`, 14, 37);
+        doc.text(`Tipo: ${this.formatEntryTypeLabel(entry.entry_type)}`, 14, 37);
         doc.text(`Glosa: ${entry.description || ''}`, 14, 43);
 
         const generalDescription = entry.description || '';
