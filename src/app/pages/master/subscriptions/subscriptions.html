@@ -1,0 +1,77 @@
+<div class="subscriptions-page">
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">Administración SaaS</span>
+      <h1>Planes y Suscripciones</h1>
+      <p>Administra planes, vencimientos y estado de las oficinas.</p>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-card">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!errorMessage" class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Oficina</th>
+          <th>Plan</th>
+          <th>Valor</th>
+          <th>Estado</th>
+          <th>Vence</th>
+          <th>Suspendida</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of subscriptions">
+          <td>
+            <strong>{{ item.name }}</strong>
+            <br />
+            <small>{{ item.email || 'Sin email' }}</small>
+          </td>
+
+          <td>{{ item.plan_name || 'Sin plan' }}</td>
+
+          <td>${{ formatMoney(item.monthly_price) }}</td>
+
+          <td>
+            <span class="badge">
+              {{ item.subscription_status || 'SIN ESTADO' }}
+            </span>
+          </td>
+
+          <td>{{ formatDate(item.subscription_end) }}</td>
+
+          <td>
+            <span class="badge" [class.bad]="item.is_suspended == 1">
+              {{ item.is_suspended == 1 ? 'Sí' : 'No' }}
+            </span>
+          </td>
+
+          <td class="actions-cell">
+            <button type="button" (click)="editSubscription(item)">
+              Editar
+            </button>
+
+            <button type="button" (click)="toggleSuspension(item)">
+              {{ item.is_suspended == 1 ? 'Activar' : 'Suspender' }}
+            </button>
+
+            <button type="button" (click)="viewHistory(item)">
+              Historial
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="subscriptions.length === 0">
+          <td colspan="7" class="empty">
+            No hay suscripciones registradas.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

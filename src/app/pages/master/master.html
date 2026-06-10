@@ -1,33 +1,93 @@
 <div class="master-page">
   <header class="topbar">
     <div class="brand">
-      <img class="brand-logo" src="assets/logo-solusoft.jpg" alt="SoluSoft" />
+      <img
+        class="brand-logo"
+        src="assets/logo-solusoft.jpg"
+        alt="SoluSoft"
+      />
+
       <div class="brand-text">
         <div class="app-name">MASTER ERP · SOLUSOFT</div>
-        <div class="app-sub">Panel de administración general</div>
+        <div class="app-sub">
+          Panel de administración general
+        </div>
       </div>
     </div>
 
     <div class="actions">
-      <button class="logout-btn" type="button" (click)="logout()">Salir</button>
+      <button
+        class="logout-btn"
+        type="button"
+        (click)="logout()"
+      >
+        Salir
+      </button>
     </div>
   </header>
 
   <main class="content">
+
     <section class="hero">
-      <span class="eyebrow">Administración SaaS</span>
+      <span class="eyebrow">
+        Administración SaaS
+      </span>
+
       <h1>Panel Master</h1>
-      <p>Desde aquí se crean y mantienen las oficinas que usarán el ERP contable.</p>
+
+      <p>
+        Desde aquí se crean y mantienen las oficinas que
+        usarán el ERP contable.
+      </p>
     </section>
 
-    <section class="grid" aria-label="Módulos master">
-      <a class="card" [routerLink]="['/master/offices']">
+    <section
+      class="grid"
+      aria-label="Módulos master"
+    >
+
+      <a
+        class="card"
+        [routerLink]="['/master/offices']"
+      >
         <div class="card-icon">🏢</div>
-        <div class="card-title">Oficinas</div>
-        <div class="card-desc">Crear, editar y administrar oficinas/clientes.</div>
-        <div class="card-cta">Ir a Oficinas →</div>
+
+        <div class="card-title">
+          Oficinas
+        </div>
+
+        <div class="card-desc">
+          Crear, editar y administrar
+          oficinas/clientes.
+        </div>
+
+        <div class="card-cta">
+          Ir a Oficinas →
+        </div>
       </a>
+
+      <a
+        class="card"
+        [routerLink]="['/master/subscriptions']"
+      >
+        <div class="card-icon">💳</div>
+
+        <div class="card-title">
+          Suscripciones
+        </div>
+
+        <div class="card-desc">
+          Administrar planes, vencimientos
+          y estado de las oficinas.
+        </div>
+
+        <div class="card-cta">
+          Ir a Suscripciones →
+        </div>
+      </a>
+
     </section>
+
   </main>
 
   <footer class="footer">

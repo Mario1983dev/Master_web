@@ -40,6 +40,14 @@ export const routes: Routes = [
       import('./pages/master/offices-new/offices-new').then(m => m.OfficesNew),
   },
   {
+  path: 'master/subscriptions',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./pages/master/subscriptions/subscriptions').then(
+      m => m.Subscriptions
+    ),
+},
+  {
     path: 'master/office-users',
     canActivate: [authGuard],
     loadComponent: () =>
