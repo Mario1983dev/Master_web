@@ -136,8 +136,6 @@
       {{ errorMsg }}
     </div>
 
-    <!-- BLOQUE CORREGIDO -->
-
     <div class="empty-company-actions">
 
       <p *ngIf="companies.length === 0">
@@ -153,8 +151,6 @@
       </button>
 
     </div>
-
-    <!-- FIN BLOQUE CORREGIDO -->
 
     <div
       class="active-company"
@@ -280,6 +276,33 @@
 
       </button>
 
+      <!-- USUARIOS -->
+
+      <button
+        *ngIf="isOfficeAdmin"
+        class="module-card admin-card"
+        type="button"
+        (click)="goTo('/office/office-users')"
+      >
+
+        <span class="module-icon">
+          👥
+        </span>
+
+        <span class="module-tag">
+          Administración
+        </span>
+
+        <h3>
+          Usuarios
+        </h3>
+
+        <p>
+          Crea y administra los usuarios asociados a esta oficina.
+        </p>
+
+      </button>
+
       <!-- EMPRESAS -->
 
       <button
@@ -360,32 +383,33 @@
         </p>
 
       </button>
+
       <!-- PERÍODOS CONTABLES -->
 
-<button
-  class="module-card"
-  type="button"
-  (click)="goTo('/office/accounting-periods', true)"
-  [class.disabled]="!selectedCompany"
->
+      <button
+        class="module-card"
+        type="button"
+        (click)="goTo('/office/accounting-periods', true)"
+        [class.disabled]="!selectedCompany"
+      >
 
-  <span class="module-icon">
-    📅
-  </span>
+        <span class="module-icon">
+          📅
+        </span>
 
-  <span class="module-tag">
-    Administración
-  </span>
+        <span class="module-tag">
+          Administración
+        </span>
 
-  <h3>
-    Períodos Contables
-  </h3>
+        <h3>
+          Períodos Contables
+        </h3>
 
-  <p>
-    Administra los años contables y períodos activos de la empresa.
-  </p>
+        <p>
+          Administra los años contables y períodos activos de la empresa.
+        </p>
 
-</button>
+      </button>
 
       <!-- IMPORTADOR -->
 

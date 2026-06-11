@@ -52,16 +52,8 @@
           </td>
 
           <td class="actions-cell">
-            <button type="button" (click)="editSubscription(item)">
-              Editar
-            </button>
-
             <button type="button" (click)="toggleSuspension(item)">
               {{ item.is_suspended == 1 ? 'Activar' : 'Suspender' }}
-            </button>
-
-            <button type="button" (click)="viewHistory(item)">
-              Historial
             </button>
           </td>
         </tr>
