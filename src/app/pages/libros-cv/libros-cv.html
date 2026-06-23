@@ -1,0 +1,134 @@
+<section class="libros-page">
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">Módulo tributario</span>
+      <h1>Libro Compras y Ventas</h1>
+      <p>Visualiza documentos de compra y venta para control de IVA y generación contable.</p>
+    </div>
+
+<button class="back-btn" type="button" (click)="goBack()">
+  Volver
+</button>
+  </div>
+  <div class="success-msg" *ngIf="successMsg">
+  {{ successMsg }}
+</div>
+
+<div class="error-msg" *ngIf="errorMsg">
+  {{ errorMsg }}
+</div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <span>Compras</span>
+      <strong>{{ comprasCount }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Ventas</span>
+      <strong>{{ ventasCount }}</strong>
+    </div>
+
+    <div class="summary-card">
+      <span>Total libros</span>
+      <strong>{{ records.length }}</strong>
+    </div>
+  </div>
+
+  <div class="table-card">
+    
+    <div class="table-header">
+      <h2>Documentos registrados</h2>
+      <span>{{ records.length }} registros</span>
+    </div>
+
+    <div class="empty-state" *ngIf="records.length === 0">
+      Aún no hay documentos registrados para mostrar.
+    </div>
+
+    <table *ngIf="records.length > 0">
+      <thead>
+        <tr>
+          <th>Período</th>
+          <th>Tipo</th>
+          <th>Archivo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of records">
+          <td>{{ item.periodo }}</td>
+
+          <td>
+            <span class="badge" [class.sale]="item.tipo_libro === 'VENTA'">
+              {{ item.tipo_libro }}
+            </span>
+          </td>
+
+          <td>{{ item.archivo_nombre }}</td>
+
+          <td class="actions-cell">
+            <button
+              type="button"
+              class="detail-btn"
+              (click)="verDetalle(item)"
+            >
+              Ver detalle
+            </button>
+
+            <button
+              type="button"
+              class="entry-btn"
+              (click)="generarAsientos(item)"
+            >
+              Generar asientos
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-card detail-card" *ngIf="showDetail">
+
+  <div class="table-header">
+    <h2>Detalle {{ selectedBook?.tipo_libro }}</h2>
+    <span>{{ details.length }} registro(s)</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Documento</th>
+        <th>Cantidad</th>
+        <th>Neto</th>
+        <th>IVA</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of details">
+
+        <td>{{ item.tipo_documento }}</td>
+
+        <td>{{ item.total_documentos }}</td>
+
+        <td class="num">
+          {{ item.monto_neto | number }}
+        </td>
+
+        <td class="num">
+          {{ item.iva_recuperable | number }}
+        </td>
+
+        <td class="num">
+          {{ item.monto_total | number }}
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+  </div>
+</section>

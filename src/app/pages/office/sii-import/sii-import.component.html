@@ -140,15 +140,7 @@
         {{ importing ? 'Importando...' : 'Importar al ERP' }}
       </button>
 
-      <button
-        *ngIf="libroCvId"
-        type="button"
-        class="btn primary"
-        (click)="generateEntries()"
-        [disabled]="generatingEntries"
-      >
-        {{ generatingEntries ? 'Generando asientos...' : 'Generar asientos' }}
-      </button>
+      
     </div>
   </div>
 </section>

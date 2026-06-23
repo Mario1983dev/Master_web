@@ -166,7 +166,14 @@
       </strong>
 
     </div>
-
+<div
+  class="helper"
+  *ngIf="selectedCompany && configurationMsg"
+  [class.success]="isConfigured"
+  [class.error]="!isConfigured"
+>
+  {{ configurationMsg }}
+</div>
   </section>
 
   <section
@@ -202,10 +209,10 @@
         Importar libro CSV del SII
       </li>
 
-      <li>
-        <strong>3.</strong>
-        Generar asientos contables
-      </li>
+  <li>
+  <strong>3.</strong>
+  Registrar o revisar asientos
+</li>
 
       <li>
         <strong>4.</strong>
@@ -362,8 +369,8 @@
       <button
         class="module-card featured"
         type="button"
-        (click)="goTo('/office/journal-entries', true)"
-        [class.disabled]="!selectedCompany"
+        (click)="goTo('/office/journal-entries', true, true)"
+[class.disabled]="!selectedCompany || !isConfigured"
       >
 
         <span class="module-icon">
@@ -416,8 +423,8 @@
       <button
         class="module-card featured"
         type="button"
-        (click)="goTo('/office/sii-import', true)"
-        [class.disabled]="!selectedCompany"
+(click)="goTo('/office/sii-import', true, true)"
+[class.disabled]="!selectedCompany || !isConfigured"
       >
 
         <span class="module-icon">
@@ -432,19 +439,46 @@
           Importador SII
         </h3>
 
-        <p>
-          Importa libros CSV y genera asientos automáticamente.
-        </p>
+       <p>
+  Importa libros CSV del SII para registrarlos en el ERP.
+</p>
 
       </button>
+
+      <!-- LIBRO COMPRAS Y VENTAS -->
+
+<button
+  class="module-card"
+  type="button"
+(click)="goTo('/office/libros-cv', true, true)"
+[class.disabled]="!selectedCompany || !isConfigured"
+>
+
+  <span class="module-icon">
+    📒
+  </span>
+
+  <span class="module-tag">
+    SII · Libros
+  </span>
+
+  <h3>
+    Libro Compras y Ventas
+  </h3>
+
+  <p>
+    Consulta compras y ventas importadas desde el SII.
+  </p>
+
+</button>
 
       <!-- LIBRO DIARIO -->
 
       <button
         class="module-card"
         type="button"
-        (click)="goTo('/office/journal-report', true)"
-        [class.disabled]="!selectedCompany"
+(click)="goTo('/office/journal-report', true, true)"
+[class.disabled]="!selectedCompany || !isConfigured"
       >
 
         <span class="module-icon">
@@ -470,8 +504,8 @@
       <button
         class="module-card"
         type="button"
-        (click)="goTo('/office/ledger-report', true)"
-        [class.disabled]="!selectedCompany"
+(click)="goTo('/office/ledger-report', true, true)"
+[class.disabled]="!selectedCompany || !isConfigured"
       >
 
         <span class="module-icon">
@@ -497,8 +531,8 @@
       <button
         class="module-card"
         type="button"
-        (click)="goTo('/office/trial-balance', true)"
-        [class.disabled]="!selectedCompany"
+       (click)="goTo('/office/trial-balance', true, true)"
+[class.disabled]="!selectedCompany || !isConfigured"
       >
 
         <span class="module-icon">

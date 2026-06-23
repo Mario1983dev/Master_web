@@ -1,0 +1,208 @@
+.libros-page {
+  min-height: 100vh;
+  padding: 24px 32px;
+  background: #f3f6fb;
+  color: #061733;
+}
+
+.page-header {
+  background: linear-gradient(135deg, #061733, #124ca5);
+  color: white;
+  border-radius: 22px;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  box-shadow: 0 14px 32px rgba(6, 23, 51, 0.14);
+
+  h1 {
+    margin: 6px 0;
+    font-size: 30px;
+    line-height: 1.15;
+  }
+
+  p {
+    margin: 0;
+    color: #d8e6ff;
+    font-size: 15px;
+  }
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 800;
+  font-size: 11px;
+  color: #9ee7d8;
+}
+
+.back-btn {
+  border: none;
+  border-radius: 16px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  color: #061733;
+  background: white;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 18px;
+  padding: 18px 22px;
+  box-shadow: 0 10px 24px rgba(6, 23, 51, 0.07);
+
+  span {
+    color: #65748b;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 28px;
+    color: #0b3f91;
+  }
+}
+
+.table-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 24px rgba(6, 23, 51, 0.07);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+
+  h2 {
+    margin: 0;
+    font-size: 24px;
+  }
+
+  span {
+    color: #65748b;
+    font-weight: 700;
+    font-size: 14px;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  text-align: left;
+  padding: 12px 14px;
+  color: #0b3f91;
+  border-bottom: 2px solid #e3eaf5;
+  font-size: 14px;
+}
+
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #edf1f7;
+  font-size: 14px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #eafaf5;
+  color: #087a4a;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.badge.sale {
+  background: #eaf1ff;
+  color: #0b3f91;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 10px;
+}
+
+.detail-btn,
+.entry-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.detail-btn {
+  background: #dbeafe;
+  color: #0b3f91;
+}
+
+.entry-btn {
+  background: #e8f5ee;
+  color: #087a4a;
+}
+
+.empty-state {
+  padding: 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #65748b;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .libros-page {
+    padding: 18px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    h1 {
+      font-size: 26px;
+    }
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-card {
+    overflow-x: auto;
+  }
+  .success-msg {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.error-msg {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+}

@@ -22,7 +22,6 @@ export class SiiImportComponent {
   selectedFile: File | null = null;
   loading = false;
   importing = false;
-  generatingEntries = false;
 
   message = '';
   error = '';
@@ -166,7 +165,7 @@ export class SiiImportComponent {
           this.previewRows = Array.isArray(res?.preview) ? res.preview : [];
           this.totalRows = Number(res?.totalRows ?? this.previewRows.length);
           this.uploadedFile = res?.file || this.selectedFile?.name || '';
-          this.warning = 'Revisa la vista previa antes de importar. Si ya importaste este libro antes, evita duplicarlo.';
+          this.warning = 'Revisa la vista previa antes de importar. El sistema omitirá documentos duplicados.';
 
           this.loading = false;
           this.cdr.detectChanges();
@@ -193,7 +192,7 @@ export class SiiImportComponent {
       return;
     }
 
-    if (!confirm('¿Confirmas importar este libro al ERP? Revisa que no esté duplicado.')) {
+    if (!confirm('¿Confirmas importar este libro al ERP? Los documentos duplicados serán omitidos.')) {
       return;
     }
 
@@ -222,7 +221,8 @@ export class SiiImportComponent {
           this.message =
             res?.message ||
             'Libro importado correctamente al ERP.';
-          this.warning = 'Importación realizada. Genera asientos solo si corresponde y evita duplicar registros ingresados manualmente.';
+
+          this.warning = 'Importación finalizada. Revisa el resumen de importados, duplicados y errores.';
 
           this.importing = false;
           this.cdr.detectChanges();
@@ -240,49 +240,6 @@ export class SiiImportComponent {
       });
   }
 
-  generateEntries(): void {
-    this.error = '';
-    this.message = '';
-
-    if (!this.libroCvId) {
-      this.error = 'Primero debes importar el libro al ERP.';
-      this.cdr.detectChanges();
-      return;
-    }
-
-    this.generatingEntries = true;
-    this.cdr.detectChanges();
-
-    this.http
-      .post<any>(
-        `${environment.apiUrl}/sii/generate-entries/${this.libroCvId}`,
-        {}
-      )
-      .pipe(timeout(15000))
-      .subscribe({
-        next: (res) => {
-          console.log('[ERP][Importador SII] Asiento generado:', res);
-
-          this.message =
-            res?.message ||
-            'Asiento generado correctamente.';
-
-          this.generatingEntries = false;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          this.logTechnicalError('Error generando asiento automático', err);
-
-          this.error =
-            err?.error?.message ||
-            'No se pudo generar el asiento automático.';
-
-          this.generatingEntries = false;
-          this.cdr.detectChanges();
-        }
-      });
-  }
-
   resetResult(): void {
     this.message = '';
     this.error = '';
@@ -292,7 +249,6 @@ export class SiiImportComponent {
     this.totalRows = 0;
     this.uploadedFile = '';
     this.libroCvId = null;
-    this.generatingEntries = false;
   }
 
   goBack(): void {

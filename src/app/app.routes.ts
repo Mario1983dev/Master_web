@@ -146,6 +146,12 @@ export const routes: Routes = [
         m => m.SiiImportComponent
       ),
   },
+  {
+  path: 'office/libros-cv',
+  canActivate: [authGuard, companySelectedGuard],
+  loadComponent: () =>
+    import('./pages/libros-cv/libros-cv').then(m => m.LibrosCv),
+},
 
   {
     path: '**',
